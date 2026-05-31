@@ -53,12 +53,12 @@ If Klever is required at launch, add a from-scratch Klever signing path (extra b
 ## NEXT ACTION (cron: read this first)
 The tool has SEVERAL functions; each is its own red→green→review slice (pipeline Steps 5→6b repeat per slice).
 Steps 7-9 (review-work, package, live-test-everything) run ONCE all slices exist — do NOT jump to them early.
-Slice 1 (wallet) is DONE through green-review. NEXT = Slice 2 red tests.
+Slices 1-2 DONE through green-review. NEXT = Slice 3 (send) red tests.
 
 ## SLICES
 1. [x] wallet — create/own key, address, key-secrecy invariant. DONE (9 tests green, both reviews pass).
-2. [ ] get_balance — read a wallet's balance from the LIVE chain via Etherscan v2 (read-only, no funds). NEXT.
-3. [ ] send — build/sign/post a transfer (Polygon Amoy testnet).
+2. [x] get_balance — read balance from the LIVE chain via Etherscan v2 (read-only). DONE (4 tests green, red+green reviewed).
+3. [ ] send — build/sign/post a transfer (Polygon Amoy testnet). NEXT.
 4. [ ] call_contract — sign/post an app/contract interaction (testnet).
 5. [ ] swap + fee — DEX-aggregator swap with our 0.1% integrator fee (prove on mainnet fork).
 6. [ ] mcp_server — expose the contract so any AI can call it.
@@ -66,6 +66,8 @@ Slice 1 (wallet) is DONE through green-review. NEXT = Slice 2 red tests.
 ## Known limitations to harden later (not blocking this slice)
 - The private key sits in the instance __dict__, so vars()/pickle could expose it. No code path does this and no
   function logs it, but a later hardening slice should add a redaction test (vars()/pickle must not reveal the key).
+- get_balance does not check Etherscan's status field; an API error payload raises on int() instead of a clear
+  message. Add a red test + clear error in a hardening slice.
 
 ## DEFINITION OF DONE (Kelvin 2026-05-31) — the cron's "are you done yet?" bar
 The 15-min cron asks "are you done yet?" each cycle. The answer is YES only when ALL of these are true:
