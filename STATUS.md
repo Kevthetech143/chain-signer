@@ -50,6 +50,19 @@ Custody + fee model: NON-CUSTODIAL + tiny per-tx fee (he confirmed).
 KLEVER AT LAUNCH? Default = defer Klever to phase 2; launch on EVM + Solana + Bitcoin via the MoonPay standard.
 If Klever is required at launch, add a from-scratch Klever signing path (extra build). Override if needed; else review-plan proceeds on the default.
 
+## LIVE PROOF — REAL TRANSFER CONFIRMED (2026-05-31)
+We DO have gas: our funding EOA 0x01F5404f...46aD (key in builder vault) holds ~20.3 POL. (I'd been checking the
+wrong wallets 0x0a94/0x646.) Ran the tool LIVE on Polygon mainnet, fully autonomous (no human, no seed):
+- create_wallet (live), get_balance (live) — proven.
+- send (live): 0.05 POL from 0x01F5404f -> fresh tool wallet 0xFb4061a879aB88aAc512B468f34C4d6a086800Ec.
+  tx 0x42ecea8723fbb07d1a30fa8b7816ebd7585c5d4ae6ea6032efbbb07c231943d4 — MINED block 87729872, status 0x1 SUCCESS.
+  B received 0.05 POL; sender debited. THIS IS THE DONE-CRITERION real wallet-to-wallet transfer.
+- Wallet B key saved to vault: ~/agents/global/tools/web3/chain-signer-testwallet.md (chmod 600), funds stay ours.
+Remaining live proofs: call_contract (do a tiny WPOL deposit), swap (needs a free 0x API key — self-register).
+Lessons: 0x646 is a CONTRACT (reverted a plain send, tx ...300fb9 status 0x0) — use plain EOAs. get_gas_fees default
+priority (2 gwei) too low for Polygon — needs ~30+ gwei (overrode manually; fix as a hardening test). polygon-rpc.com
+now needs auth (401) — broadcast via Etherscan v2 proxy works.
+
 ## NEXT ACTION (cron: read this first)
 The tool has SEVERAL functions; each is its own red→green→review slice (pipeline Steps 5→6b repeat per slice).
 Steps 7-9 (review-work, package, live-test-everything) run ONCE all slices exist — do NOT jump to them early.
