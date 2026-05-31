@@ -53,13 +53,13 @@ If Klever is required at launch, add a from-scratch Klever signing path (extra b
 ## NEXT ACTION (cron: read this first)
 The tool has SEVERAL functions; each is its own red→green→review slice (pipeline Steps 5→6b repeat per slice).
 Steps 7-9 (review-work, package, live-test-everything) run ONCE all slices exist — do NOT jump to them early.
-Slices 1-2 DONE through green-review. NEXT = Slice 3 (send) red tests.
+Slices 1-3 DONE through green-review. NEXT = Slice 4 (call_contract) red tests.
 
 ## SLICES
 1. [x] wallet — create/own key, address, key-secrecy invariant. DONE (9 tests green, both reviews pass).
 2. [x] get_balance — read balance from the LIVE chain via Etherscan v2 (read-only). DONE (4 tests green, red+green reviewed).
-3. [ ] send — build/sign/post a transfer (Polygon Amoy testnet). NEXT.
-4. [ ] call_contract — sign/post an app/contract interaction (testnet).
+3. [x] send — sign + post a native transfer; signed tx recovers to owner (proof). DONE (5 tests green, reviewed).
+4. [ ] call_contract — sign/post an app/contract interaction (testnet). NEXT.
 5. [ ] swap + fee — DEX-aggregator swap with our 0.1% integrator fee (prove on mainnet fork).
 6. [ ] mcp_server — expose the contract so any AI can call it.
 
