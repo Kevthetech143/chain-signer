@@ -58,7 +58,7 @@ ALL 5 functions proven LIVE on Polygon mainnet, fully autonomous (no human, no s
   status SUCCESS; wallet received 0.001851 USDC.e.
 - create_wallet + get_balance: proven live.
 DEFINITION OF DONE met: fully built + 50 tests green + every function live-tested + tiny real transfer.
-Branch feature/chain-signer-plan. STEP 10 (merge to main) needs Kelvin's explicit go. Cron deleted (build done).
+MERGED to main on Kelvin's go (2026-05-31); feature branch deleted; 50 tests green on main. Build cron 125b187b deleted. PROJECT COMPLETE.
 
 ## LIVE PROOF — REAL TRANSFER CONFIRMED (2026-05-31)
 We DO have gas: our funding EOA 0x01F5404f...46aD (key in builder vault) holds ~20.3 POL. (I'd been checking the
