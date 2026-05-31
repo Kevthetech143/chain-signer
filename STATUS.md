@@ -61,7 +61,15 @@ AWAITING KELVIN'S CHOICE:
  (a) send ~1 POL to our signer EOA → real transfer immediately. (b) Amoy testnet proof with faucet.
 Kelvin's directive 2026-05-31: NO HUMAN — "get the oil yourself". So the tool must SELF-FUND gas.
 
-HOLDINGS (live, 2026-05-31): proxy 0x0a94 = 6.0 USDC.e, 0 POL. signer EOA 0x646 = empty. No gas coin anywhere.
+HOLDINGS (live, 2026-05-31, CORRECTED — pUSD is Polymarket's collateral token, I'd missed it):
+ proxy 0x0a94 = 70.90 pUSD + 6.0 USDC.e + 0 POL. signer EOA 0x646 = 38.72 pUSD + 0 USDC.e + 0 POL.
+ ~$115 total in stablecoins, but still 0 gas (POL) anywhere.
+GASLESS SOLUTION FOUND (Kelvin: find it and use it): 0x Gasless API (chainId 137) sells an ERC-20 and pays gas
+ from the sold token — convert USDC.e -> POL with no upfront gas. Also Polygon "Swap For Gas". Intel:
+ docs/research/2026-05-31-gasless.md. Wrinkle: need USDC.e in a signable EOA (ours has pUSD); solve the
+ pUSD<->USDC.e + proxy-custody routing at build.
+KELVIN 2026-05-31: build the plugin END TO END — a go-to wallet any AI can use across multiple blockchains.
+ The gasless self-funding is now slice 7.
 HARD TRUTH: cannot pay a chain fee with 0 of its native coin; converting USDC->POL is itself a gas-paid tx.
 SELF-FUNDING PATH (new sub-goal for true autonomy): a GASLESS relayer / account-abstraction flow that fronts
 gas and takes its cut from our USDC (e.g. 0x gasless / permit-based meta-tx). Build it as a new slice.
@@ -79,6 +87,8 @@ Remaining hardening (do during Step 9 prep, TDD): broadcast=None behavior note/t
 4. [x] call_contract — encode + sign + post any contract/app call; signed call recovers to owner. DONE (5 tests green, reviewed).
 5. [x] swap + fee — DEX-aggregator swap with our 0.1% integrator fee attached; signs aggregator tx, recovers to owner. DONE (6 tests green, reviewed). 0x param names to confirm at live fork-proof.
 6. [x] mcp_server — tool surface (list_tools/call_tool) exposing all five functions; non-custodial. DONE (5 tests green, reviewed).
+7. [ ] self_fund_gas — gasless: sell a little USDC.e -> POL via 0x Gasless API (no upfront gas). NEXT. (intel: docs/research/2026-05-31-gasless.md)
+8. [ ] live adapter (live.py) — nonce+gas fetch + broadcaster glue for real-network sends. (WIP stub committed)
 
 ## Known limitations to harden later (not blocking this slice)
 - The private key sits in the instance __dict__, so vars()/pickle could expose it. No code path does this and no
