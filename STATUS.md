@@ -14,7 +14,7 @@ private key (no Polymarket account, no browser). This generalizes that.
 - [x] Step 3 — Review-plan GATE — PROCEED. Decisions locked (fee 0.1%, new collector wallet, EVM-first, fork-proof). Kelvin delegated the calls 2026-05-31.
 - [ ] Step 4 — TDD pre-recon
 - [x] Step 5 — Red tests — 7 failing tests for wallet + key-secrecy invariant (pure unit). Committed.
-- [~] Step 5b — Red-test review (next cycle)
+- [x] Step 5b — Red-test review — ACCEPTED. 3 independent reviewers (behavioral, coverage, runtime) all PASS after one fix round.
 - [ ] Step 6 — Green code
 - [ ] Step 6b — Green review
 - [ ] Step 7 — Review-work audit
