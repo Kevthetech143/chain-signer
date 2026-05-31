@@ -1,0 +1,8 @@
+*.key
+_secrets.py
+.env
+*.pem
+keys/
+wallet.md
+__pycache__/
+*.pyc
