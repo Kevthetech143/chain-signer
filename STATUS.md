@@ -54,7 +54,9 @@ If Klever is required at launch, add a from-scratch Klever signing path (extra b
 The tool has SEVERAL functions; each is its own red→green→review slice (pipeline Steps 5→6b repeat per slice).
 Steps 7-9 (review-work, package, live-test-everything) run ONCE all slices exist — do NOT jump to them early.
 ALL 6 SLICES DONE. Step 7 review-work = COMMIT. Step 8 packaging: README + runnable CLI entrypoint DONE (37 tests; `python -m chain_signer` works).
-NEXT = Step 9 live test of every function on a real-chain copy + tiny real wallet-to-wallet transfer.
+Step 9 IN PROGRESS: LIVE read path PROVEN (real Polygon read via Etherscan v2, no funds). 
+AWAITING KELVIN'S GO for the tiny real wallet-to-wallet transfer (proves the live send path + is the bonus). 
+This is a binding stop gate (real funds) — cron HOLDS here until Kelvin says go. Plan: docs/reviews/2026-05-31-live-proof.md
 
 Remaining hardening (do during Step 9 prep, TDD): broadcast=None behavior note/test; get_balance/swap API-error response shapes (status!="1" / missing 'transaction'). Also: foundry/anvil install for the fork; confirm live 0x fee param names.
 
