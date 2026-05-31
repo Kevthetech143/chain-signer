@@ -101,6 +101,12 @@ LIVE RUN (Step 9) BLOCKED on a real-world funds bootstrap, NOT code:
 UNBLOCK OPTIONS (asked Kelvin): (a) seed ~1 POL (a few cents) to 0x646 -> full live test runs immediately +
 self-funding proven thereafter; (b) I keep researching a Polymarket pUSD-export / gasless-pUSD route (uncertain, may burn cycles).
 
+PREREQUISITE FOUND (2026-05-31): the 0x swap/gasless endpoints require a free 0x API key (keyless request rejected:
+{message,request_id}). We hold none. I can self-register one via the web (no human) when we proceed. NOTE: seeding
+a little POL alone unblocks the core live transfer (send_live with POL) WITHOUT needing 0x — the 0x key is only
+for the swap/self-fund live proof, which can follow. So gas-seed is the single gating decision.
+HOLDING for Kelvin's gas-seed choice; not re-asking each cycle to avoid spam.
+
 ## Known limitations to harden later (not blocking this slice)
 - The private key sits in the instance __dict__, so vars()/pickle could expose it. No code path does this and no
   function logs it, but a later hardening slice should add a redaction test (vars()/pickle must not reveal the key).
