@@ -72,10 +72,15 @@ Run /patterns-reuse + /audit-patterns when code begins.
 - Base may not deliver Python+MCP as summarized → spike verifies; fallback GOAT SDK. (MED, UNVERIFIED until spike)
 - Legal: non-custodial keeps us out of money-transmitter rule; this is research, not legal advice. (tracked)
 
-## Open questions — NEED KELVIN (plan gate: REVISE until answered)
-1. Fee size — how tiny, exactly? Needs a number (basis points or %). Cannot be guessed.
-2. Fee-collector wallet — a NEW dedicated address (recommended) or reuse an existing one?
-3. Klever at launch, or phase 2? (default: phase 2)
-4. Approve EVM-first v1 sequencing (multi-chain in phase 1.5)?
-5. Approve proving the fee-bearing swap on a mainnet FORK (no real money), with a real-mainnet test only on your go?
-6. Distribution at launch — Python library + MCP only (lower legal profile), or also a hosted API later?
+## Decisions LOCKED (senior call; Kelvin delegated "do what makes sense" 2026-05-31)
+1. Fee size: 0.1% (10 basis points) of swap notional — tiny, never blocks a trade. Lives in fee.py as a single
+   config constant so it changes in one line. No floor that could block tiny swaps.
+2. Fee-collector wallet: a NEW dedicated address generated as the first build action. Private key → vault
+   (~/agents/global/tools/), NEVER a brain file or the repo. Only the public address is committed.
+3. Klever: phase 2.
+4. EVM-first v1 (Polygon); Solana + Bitcoin in phase 1.5. Approved.
+5. Prove the fee-bearing swap on a local mainnet FORK (no real money). One tiny real-mainnet swap only on Kelvin's
+   explicit go. Approved.
+6. Distribution at launch: Python library + MCP server only (lower legal profile). Hosted API deferred.
+
+Gate verdict: PROCEED (decisions locked). Real-mainnet money still requires Kelvin's go (unchanged).
