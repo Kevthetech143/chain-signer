@@ -50,6 +50,16 @@ Custody + fee model: NON-CUSTODIAL + tiny per-tx fee (he confirmed).
 KLEVER AT LAUNCH? Default = defer Klever to phase 2; launch on EVM + Solana + Bitcoin via the MoonPay standard.
 If Klever is required at launch, add a from-scratch Klever signing path (extra build). Override if needed; else review-plan proceeds on the default.
 
+## ===== DONE — MERGE-READY (2026-05-31) =====
+ALL 5 functions proven LIVE on Polygon mainnet, fully autonomous (no human, no seed). Full suite 50 green.
+- send (real wallet-to-wallet, the DONE bonus): tx 0x42ecea87...231943d4 — block 87729872, status SUCCESS.
+- call_contract (WPOL deposit): tx 0x103ebfdc...27ea5f28 — block 87730560, status SUCCESS.
+- swap (native POL -> USDC.e via keyless Paraswap, our fee attached): tx 0x380d4b94...32f5536d — block 87731926,
+  status SUCCESS; wallet received 0.001851 USDC.e.
+- create_wallet + get_balance: proven live.
+DEFINITION OF DONE met: fully built + 50 tests green + every function live-tested + tiny real transfer.
+Branch feature/chain-signer-plan. STEP 10 (merge to main) needs Kelvin's explicit go. Cron deleted (build done).
+
 ## LIVE PROOF — REAL TRANSFER CONFIRMED (2026-05-31)
 We DO have gas: our funding EOA 0x01F5404f...46aD (key in builder vault) holds ~20.3 POL. (I'd been checking the
 wrong wallets 0x0a94/0x646.) Ran the tool LIVE on Polygon mainnet, fully autonomous (no human, no seed):
