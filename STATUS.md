@@ -11,7 +11,7 @@ private key (no Polymarket account, no browser). This generalizes that.
 - [x] Step 0 — Research & close knowledge gaps — DONE. Brief: docs/research/2026-05-31-landscape.md
 - [ ] Step 1 — Think-first (architecture)
 - [ ] Step 2 — Write plan → docs/plans/chain-signer.md
-- [ ] Step 3 — Review-plan GATE (Kelvin sign-off on custody + fee + legal)
+- [~] Step 3 — Review-plan GATE — verdict REVISE; plan revised (EVM-first). AWAITING KELVIN on 6 questions. Review: docs/reviews/2026-05-31-plan-review.md
 - [ ] Step 4 — TDD pre-recon
 - [ ] Step 5 — Red tests
 - [ ] Step 5b — Red-test review
