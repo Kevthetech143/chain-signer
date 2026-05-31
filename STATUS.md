@@ -58,9 +58,17 @@ Step 9 IN PROGRESS: LIVE read path PROVEN. Kelvin said GO for the real transfer 
 wallets (proxy 0x0a94..., signer EOA 0x646EA869...) hold 0 POL. Polygon needs native POL for gas; our funds
 are USDC-type collateral in the Polymarket proxy, not spendable as gas. Cannot broadcast a real tx without gas.
 AWAITING KELVIN'S CHOICE:
- (a) send ~1 POL (a few cents) to our signer EOA 0x646EA869DE7c9f0FD0B339cae747EF5a0Eb23F98 → I do the real transfer immediately, show tx hash.
- (b) I prove the identical live send path on Polygon Amoy testnet with free faucet POL (real tx hash, no real money) now, real one later.
-Cron HOLDS until Kelvin chooses. Live read already proves get_balance on the real chain.
+ (a) send ~1 POL to our signer EOA → real transfer immediately. (b) Amoy testnet proof with faucet.
+Kelvin's directive 2026-05-31: NO HUMAN — "get the oil yourself". So the tool must SELF-FUND gas.
+
+HOLDINGS (live, 2026-05-31): proxy 0x0a94 = 6.0 USDC.e, 0 POL. signer EOA 0x646 = empty. No gas coin anywhere.
+HARD TRUTH: cannot pay a chain fee with 0 of its native coin; converting USDC->POL is itself a gas-paid tx.
+SELF-FUNDING PATH (new sub-goal for true autonomy): a GASLESS relayer / account-abstraction flow that fronts
+gas and takes its cut from our USDC (e.g. 0x gasless / permit-based meta-tx). Build it as a new slice.
+WRINKLE: our 6 USDC.e is inside the Polymarket PROXY (sig_type=3), not a plain EOA — confirm the gasless route
+can reach proxy-held funds, else that $6 is effectively Polymarket-locked.
+WIP this cycle: chain_signer/live.py (nonce+gas fetch + broadcaster glue) — still needed for any live send.
+NEXT: research live gasless route for Polygon on our holdings, then TDD the self-funding slice.
 
 Remaining hardening (do during Step 9 prep, TDD): broadcast=None behavior note/test; get_balance/swap API-error response shapes (status!="1" / missing 'transaction'). Also: foundry/anvil install for the fork; confirm live 0x fee param names.
 
