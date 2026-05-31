@@ -65,8 +65,9 @@ LIVE-PROVEN: create_wallet, get_balance, send, call_contract (4/5). REMAINING: s
 SWAP PLAN (revised — no registration needed): Paraswap API is KEYLESS (confirmed live: quoted 0.01 WPOL->USDC.e
 via QuickSwap). So add a Paraswap-based swap path (keyless) with our partner fee (partnerAddress + partnerFeeBps),
 instead of the 0x key route. This avoids any account signup (clears the registration concern).
-NEXT: (1) add swap_paraswap (TDD, injected fetch) with our fee params; (2) live-execute a tiny WPOL->USDC.e swap
-(sign+broadcast machinery already proven live); (3) confirm mined -> 5/5 live -> merge-ready.
+(1) swap_paraswap DONE — keyless, our partner fee (partnerAddress+partnerFeeBps=10), signs to owner. 50 tests green.
+NEXT: (2) live-execute a tiny WPOL->USDC.e swap via Paraswap (real funds, tiny; sign+broadcast proven live);
+(3) confirm mined -> 5/5 functions live -> merge-ready.
 Note: 0x route stays in code (works with a key later); Paraswap is the keyless live-proof path.
 Lessons: 0x646 is a CONTRACT (reverted a plain send, tx ...300fb9 status 0x0) — use plain EOAs. get_gas_fees default
 priority (2 gwei) too low for Polygon — needs ~30+ gwei (overrode manually; fix as a hardening test). polygon-rpc.com
