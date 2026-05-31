@@ -89,7 +89,17 @@ Remaining hardening (do during Step 9 prep, TDD): broadcast=None behavior note/t
 6. [x] mcp_server — tool surface (list_tools/call_tool) exposing all five functions; non-custodial. DONE (5 tests green, reviewed).
 7. [x] self_fund_gas — gasless USDC.e -> POL via 0x Gasless API (no upfront gas); signs EIP-712 trade, recovers to owner. DONE (4 tests green, reviewed).
    LIVE wrinkle remaining: our standard USDC.e (6.0) sits in the PROXY, not a signable EOA; gasless needs a signable EOA holding USDC.e. Routing pUSD/USDC.e into the signer EOA is the real-world step to solve before the live self-fund runs.
-8. [ ] live adapter (live.py) — nonce+gas fetch + broadcaster glue for real-network sends. (WIP stub committed)
+8. [x] live adapter (live.py) — nonce+gas fetch + broadcaster; send_live recovers to owner. DONE (4 tests green).
+
+ALL CODE COMPLETE: 45 tests green. Every function built + the gasless self-funding + the live adapter.
+LIVE RUN (Step 9) BLOCKED on a real-world funds bootstrap, NOT code:
+- Our only signable EOA (0x646) holds 38.72 pUSD (Polymarket's token); proxy holds 70.90 pUSD + 6.0 USDC.e.
+- 0x gasless needs a standard token (USDC.e) in a signable EOA. pUSD has no gasless/DEX route we found; the
+  USDC.e is locked in the Polymarket proxy (executes via Polymarket's relayer, not arbitrary transfers).
+- A cold wallet holding only Polymarket-locked funds CANNOT mint its own first gas — needs a seed or a
+  Polymarket-export path. This is the honest limit of "no human from a cold start".
+UNBLOCK OPTIONS (asked Kelvin): (a) seed ~1 POL (a few cents) to 0x646 -> full live test runs immediately +
+self-funding proven thereafter; (b) I keep researching a Polymarket pUSD-export / gasless-pUSD route (uncertain, may burn cycles).
 
 ## Known limitations to harden later (not blocking this slice)
 - The private key sits in the instance __dict__, so vars()/pickle could expose it. No code path does this and no
