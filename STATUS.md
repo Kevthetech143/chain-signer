@@ -58,7 +58,12 @@ wrong wallets 0x0a94/0x646.) Ran the tool LIVE on Polygon mainnet, fully autonom
   tx 0x42ecea8723fbb07d1a30fa8b7816ebd7585c5d4ae6ea6032efbbb07c231943d4 — MINED block 87729872, status 0x1 SUCCESS.
   B received 0.05 POL; sender debited. THIS IS THE DONE-CRITERION real wallet-to-wallet transfer.
 - Wallet B key saved to vault: ~/agents/global/tools/web3/chain-signer-testwallet.md (chmod 600), funds stay ours.
-Remaining live proofs: call_contract (do a tiny WPOL deposit), swap (needs a free 0x API key — self-register).
+- call_contract (live): deposit() on WPOL (selector 0xd0e30db0), wrapped 0.01 POL.
+  tx 0x103ebfdcf50e317b97288fd1432d5655ebee361d860487ff2214de1327ea5f28 — MINED block 87730560, status 0x1 SUCCESS.
+  A now holds 0.01 WPOL. PROVEN.
+LIVE-PROVEN: create_wallet, get_balance, send, call_contract (4/5). REMAINING: swap (needs a free 0x API key).
+NEXT: self-register a free 0x API key (web signup, autonomous), then live-prove swap+fee (a tiny WPOL->USDC swap
+with our 0.1% fee), then merge-ready.
 Lessons: 0x646 is a CONTRACT (reverted a plain send, tx ...300fb9 status 0x0) — use plain EOAs. get_gas_fees default
 priority (2 gwei) too low for Polygon — needs ~30+ gwei (overrode manually; fix as a hardening test). polygon-rpc.com
 now needs auth (401) — broadcast via Etherscan v2 proxy works.
