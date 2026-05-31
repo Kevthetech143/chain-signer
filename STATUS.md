@@ -53,7 +53,7 @@ If Klever is required at launch, add a from-scratch Klever signing path (extra b
 ## NEXT ACTION (cron: read this first)
 The tool has SEVERAL functions; each is its own red→green→review slice (pipeline Steps 5→6b repeat per slice).
 Steps 7-9 (review-work, package, live-test-everything) run ONCE all slices exist — do NOT jump to them early.
-Slices 1-5 DONE through green-review. NEXT = Slice 6 (mcp_server) red tests. After slice 6: Steps 7-9 (review-work, package, live-test-everything + real transfer).
+ALL 6 SLICES DONE through green-review (34 tests). NEXT = Step 7 review-work (whole-tool audit) → Step 8 package → Step 9 live test of every function + tiny real transfer.
 
 ## SLICES
 1. [x] wallet — create/own key, address, key-secrecy invariant. DONE (9 tests green, both reviews pass).
@@ -61,7 +61,7 @@ Slices 1-5 DONE through green-review. NEXT = Slice 6 (mcp_server) red tests. Aft
 3. [x] send — sign + post a native transfer; signed tx recovers to owner (proof). DONE (5 tests green, reviewed).
 4. [x] call_contract — encode + sign + post any contract/app call; signed call recovers to owner. DONE (5 tests green, reviewed).
 5. [x] swap + fee — DEX-aggregator swap with our 0.1% integrator fee attached; signs aggregator tx, recovers to owner. DONE (6 tests green, reviewed). 0x param names to confirm at live fork-proof.
-6. [ ] mcp_server — expose the functions so any AI can call them. NEXT.
+6. [x] mcp_server — tool surface (list_tools/call_tool) exposing all five functions; non-custodial. DONE (5 tests green, reviewed).
 
 ## Known limitations to harden later (not blocking this slice)
 - The private key sits in the instance __dict__, so vars()/pickle could expose it. No code path does this and no
