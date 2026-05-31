@@ -60,3 +60,22 @@ def send(
         "value": int(value_wei),
         "raw": raw_hex,
     }
+
+
+def call_contract(
+    wallet,
+    contract,
+    function_signature,
+    args=(),
+    *,
+    value=0,
+    chain="evm",
+    nonce,
+    max_fee_per_gas,
+    max_priority_fee_per_gas,
+    gas=120000,
+    chain_id=137,
+    broadcast=None,
+):
+    """Sign + post a call to a contract function (the 'interact with any app' path)."""
+    raise NotImplementedError("green step")
