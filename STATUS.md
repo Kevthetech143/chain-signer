@@ -13,13 +13,13 @@ private key (no Polymarket account, no browser). This generalizes that.
 - [ ] Step 2 — Write plan → docs/plans/chain-signer.md
 - [x] Step 3 — Review-plan GATE — PROCEED. Decisions locked (fee 0.1%, new collector wallet, EVM-first, fork-proof). Kelvin delegated the calls 2026-05-31.
 - [ ] Step 4 — TDD pre-recon
-- [ ] Step 5 — Red tests
-- [ ] Step 5b — Red-test review
+- [x] Step 5 — Red tests — 7 failing tests for wallet + key-secrecy invariant (pure unit). Committed.
+- [~] Step 5b — Red-test review (next cycle)
 - [ ] Step 6 — Green code
 - [ ] Step 6b — Green review
 - [ ] Step 7 — Review-work audit
 - [ ] Step 8 — Package tool + local control API
-- [ ] Step 9 — Verify end-to-end on Polygon testnet (NO real money)
+- [ ] Step 9 — Live test EVERY function end-to-end + bonus real wallet-to-wallet transfer (see DEFINITION OF DONE)
 - [ ] Step 10 — Merge (Kelvin go-ahead)
 
 ## Hard rules
@@ -50,6 +50,18 @@ Custody + fee model: NON-CUSTODIAL + tiny per-tx fee (he confirmed).
 KLEVER AT LAUNCH? Default = defer Klever to phase 2; launch on EVM + Solana + Bitcoin via the MoonPay standard.
 If Klever is required at launch, add a from-scratch Klever signing path (extra build). Override if needed; else review-plan proceeds on the default.
 
+## DEFINITION OF DONE (Kelvin 2026-05-31) — the cron's "are you done yet?" bar
+The 15-min cron asks "are you done yet?" each cycle. The answer is YES only when ALL of these are true:
+1. Tool FULLY BUILT — every planned function implemented (create wallet, read state, send, call_contract/app, swap-with-fee).
+2. FULLY TESTED — full test suite green.
+3. LIVE TEST — a real run on a live network confirms EVERY function works (not just unit tests).
+4. BONUS PROOF — a real wallet-to-wallet crypto transfer executed with crypto we actually hold (TINY amount on Polygon).
+Until all four are true, the answer is "not yet" + the one thing blocking. Then report merge-ready and delete the cron.
+
+Note on #4: this is the ONE step that touches REAL funds. Kelvin pre-approved it (2026-05-31). Keep it tiny, use crypto
+we already hold on Polygon (deposit wallet 0x0a94...), and report the tx hash before+after. Everything else stays testnet.
+
 ## Heartbeat
-A 15-min cron drives the next pending step, runs tests, reports status, and self-ends when Step 9 passes.
+A 15-min cron (id 14a00c11) drives the next pending step, runs tests, reports status each cycle, and self-ends only
+when the DEFINITION OF DONE above is fully met.
 Spec: ~/agents/global/cron/polymarket/chain-signer-build.md
