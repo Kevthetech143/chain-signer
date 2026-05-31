@@ -53,12 +53,10 @@ If Klever is required at launch, add a from-scratch Klever signing path (extra b
 ## NEXT ACTION (cron: read this first)
 The tool has SEVERAL functions; each is its own red→green→review slice (pipeline Steps 5→6b repeat per slice).
 Steps 7-9 (review-work, package, live-test-everything) run ONCE all slices exist — do NOT jump to them early.
-ALL 6 SLICES DONE. Step 7 review-work = COMMIT (no security/correctness blockers; non-custodial invariant holds on every signing path).
-NEXT = Step 8 package (README + runnable MCP/CLI entrypoint) → Step 9 live test of every function + tiny real transfer.
+ALL 6 SLICES DONE. Step 7 review-work = COMMIT. Step 8 packaging: README + runnable CLI entrypoint DONE (37 tests; `python -m chain_signer` works).
+NEXT = Step 9 live test of every function on a real-chain copy + tiny real wallet-to-wallet transfer.
 
-Step 8/9 follow-ups from the audit:
-- Add README (drop-in usage) + a runnable entrypoint (MCP stdio server / CLI) wrapping mcp_server.call_tool.
-- Add robustness tests + handling: broadcast=None silent no-op; get_balance/swap API-error response shapes (status!="1" / missing 'transaction').
+Remaining hardening (do during Step 9 prep, TDD): broadcast=None behavior note/test; get_balance/swap API-error response shapes (status!="1" / missing 'transaction'). Also: foundry/anvil install for the fork; confirm live 0x fee param names.
 
 ## SLICES
 1. [x] wallet — create/own key, address, key-secrecy invariant. DONE (9 tests green, both reviews pass).
