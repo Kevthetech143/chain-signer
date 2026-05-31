@@ -54,9 +54,13 @@ If Klever is required at launch, add a from-scratch Klever signing path (extra b
 The tool has SEVERAL functions; each is its own red→green→review slice (pipeline Steps 5→6b repeat per slice).
 Steps 7-9 (review-work, package, live-test-everything) run ONCE all slices exist — do NOT jump to them early.
 ALL 6 SLICES DONE. Step 7 review-work = COMMIT. Step 8 packaging: README + runnable CLI entrypoint DONE (37 tests; `python -m chain_signer` works).
-Step 9 IN PROGRESS: LIVE read path PROVEN (real Polygon read via Etherscan v2, no funds). 
-AWAITING KELVIN'S GO for the tiny real wallet-to-wallet transfer (proves the live send path + is the bonus). 
-This is a binding stop gate (real funds) — cron HOLDS here until Kelvin says go. Plan: docs/reviews/2026-05-31-live-proof.md
+Step 9 IN PROGRESS: LIVE read path PROVEN. Kelvin said GO for the real transfer — but BLOCKED: both our
+wallets (proxy 0x0a94..., signer EOA 0x646EA869...) hold 0 POL. Polygon needs native POL for gas; our funds
+are USDC-type collateral in the Polymarket proxy, not spendable as gas. Cannot broadcast a real tx without gas.
+AWAITING KELVIN'S CHOICE:
+ (a) send ~1 POL (a few cents) to our signer EOA 0x646EA869DE7c9f0FD0B339cae747EF5a0Eb23F98 → I do the real transfer immediately, show tx hash.
+ (b) I prove the identical live send path on Polygon Amoy testnet with free faucet POL (real tx hash, no real money) now, real one later.
+Cron HOLDS until Kelvin chooses. Live read already proves get_balance on the real chain.
 
 Remaining hardening (do during Step 9 prep, TDD): broadcast=None behavior note/test; get_balance/swap API-error response shapes (status!="1" / missing 'transaction'). Also: foundry/anvil install for the fork; confirm live 0x fee param names.
 
