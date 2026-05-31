@@ -53,14 +53,14 @@ If Klever is required at launch, add a from-scratch Klever signing path (extra b
 ## NEXT ACTION (cron: read this first)
 The tool has SEVERAL functions; each is its own red→green→review slice (pipeline Steps 5→6b repeat per slice).
 Steps 7-9 (review-work, package, live-test-everything) run ONCE all slices exist — do NOT jump to them early.
-Slices 1-3 DONE through green-review. NEXT = Slice 4 (call_contract) red tests.
+Slices 1-4 DONE through green-review. NEXT = Slice 5 (swap + 0.1% fee) red tests.
 
 ## SLICES
 1. [x] wallet — create/own key, address, key-secrecy invariant. DONE (9 tests green, both reviews pass).
 2. [x] get_balance — read balance from the LIVE chain via Etherscan v2 (read-only). DONE (4 tests green, red+green reviewed).
 3. [x] send — sign + post a native transfer; signed tx recovers to owner (proof). DONE (5 tests green, reviewed).
-4. [ ] call_contract — sign/post an app/contract interaction (testnet). NEXT.
-5. [ ] swap + fee — DEX-aggregator swap with our 0.1% integrator fee (prove on mainnet fork).
+4. [x] call_contract — encode + sign + post any contract/app call; signed call recovers to owner. DONE (5 tests green, reviewed).
+5. [ ] swap + fee — DEX-aggregator swap with our 0.1% integrator fee (prove on mainnet fork). NEXT.
 6. [ ] mcp_server — expose the contract so any AI can call it.
 
 ## Known limitations to harden later (not blocking this slice)
@@ -68,6 +68,8 @@ Slices 1-3 DONE through green-review. NEXT = Slice 4 (call_contract) red tests.
   function logs it, but a later hardening slice should add a redaction test (vars()/pickle must not reveal the key).
 - get_balance does not check Etherscan's status field; an API error payload raises on int() instead of a clear
   message. Add a red test + clear error in a hardening slice.
+- _encode_call splits the signature by commas, so nested tuple/array arg types (e.g. f((uint256,uint256),bytes[]))
+  would parse wrong. Fine for flat types (transfer, approve, etc.). Harden later if we need complex ABI types.
 
 ## DEFINITION OF DONE (Kelvin 2026-05-31) — the cron's "are you done yet?" bar
 The 15-min cron asks "are you done yet?" each cycle. The answer is YES only when ALL of these are true:
