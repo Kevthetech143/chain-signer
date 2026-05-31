@@ -87,7 +87,8 @@ Remaining hardening (do during Step 9 prep, TDD): broadcast=None behavior note/t
 4. [x] call_contract — encode + sign + post any contract/app call; signed call recovers to owner. DONE (5 tests green, reviewed).
 5. [x] swap + fee — DEX-aggregator swap with our 0.1% integrator fee attached; signs aggregator tx, recovers to owner. DONE (6 tests green, reviewed). 0x param names to confirm at live fork-proof.
 6. [x] mcp_server — tool surface (list_tools/call_tool) exposing all five functions; non-custodial. DONE (5 tests green, reviewed).
-7. [ ] self_fund_gas — gasless: sell a little USDC.e -> POL via 0x Gasless API (no upfront gas). NEXT. (intel: docs/research/2026-05-31-gasless.md)
+7. [x] self_fund_gas — gasless USDC.e -> POL via 0x Gasless API (no upfront gas); signs EIP-712 trade, recovers to owner. DONE (4 tests green, reviewed).
+   LIVE wrinkle remaining: our standard USDC.e (6.0) sits in the PROXY, not a signable EOA; gasless needs a signable EOA holding USDC.e. Routing pUSD/USDC.e into the signer EOA is the real-world step to solve before the live self-fund runs.
 8. [ ] live adapter (live.py) — nonce+gas fetch + broadcaster glue for real-network sends. (WIP stub committed)
 
 ## Known limitations to harden later (not blocking this slice)
