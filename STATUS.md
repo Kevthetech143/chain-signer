@@ -15,8 +15,8 @@ private key (no Polymarket account, no browser). This generalizes that.
 - [ ] Step 4 — TDD pre-recon
 - [x] Step 5 — Red tests — 7 failing tests for wallet + key-secrecy invariant (pure unit). Committed.
 - [x] Step 5b — Red-test review — ACCEPTED. 3 independent reviewers (behavioral, coverage, runtime) all PASS after one fix round.
-- [ ] Step 6 — Green code
-- [ ] Step 6b — Green review
+- [x] Step 6 — Green code — non-custodial Wallet via eth_account; 9/9 tests pass. Committed.
+- [x] Step 6b — Green review — ACCEPTED. Both reviewers (implementation integrity + anti-pattern) PASS.
 - [ ] Step 7 — Review-work audit
 - [ ] Step 8 — Package tool + local control API
 - [ ] Step 9 — Live test EVERY function end-to-end + bonus real wallet-to-wallet transfer (see DEFINITION OF DONE)
@@ -49,6 +49,23 @@ private key (no Polymarket account, no browser). This generalizes that.
 Custody + fee model: NON-CUSTODIAL + tiny per-tx fee (he confirmed). 
 KLEVER AT LAUNCH? Default = defer Klever to phase 2; launch on EVM + Solana + Bitcoin via the MoonPay standard.
 If Klever is required at launch, add a from-scratch Klever signing path (extra build). Override if needed; else review-plan proceeds on the default.
+
+## NEXT ACTION (cron: read this first)
+The tool has SEVERAL functions; each is its own red→green→review slice (pipeline Steps 5→6b repeat per slice).
+Steps 7-9 (review-work, package, live-test-everything) run ONCE all slices exist — do NOT jump to them early.
+Slice 1 (wallet) is DONE through green-review. NEXT = Slice 2 red tests.
+
+## SLICES
+1. [x] wallet — create/own key, address, key-secrecy invariant. DONE (9 tests green, both reviews pass).
+2. [ ] get_balance — read a wallet's balance from the LIVE chain via Etherscan v2 (read-only, no funds). NEXT.
+3. [ ] send — build/sign/post a transfer (Polygon Amoy testnet).
+4. [ ] call_contract — sign/post an app/contract interaction (testnet).
+5. [ ] swap + fee — DEX-aggregator swap with our 0.1% integrator fee (prove on mainnet fork).
+6. [ ] mcp_server — expose the contract so any AI can call it.
+
+## Known limitations to harden later (not blocking this slice)
+- The private key sits in the instance __dict__, so vars()/pickle could expose it. No code path does this and no
+  function logs it, but a later hardening slice should add a redaction test (vars()/pickle must not reveal the key).
 
 ## DEFINITION OF DONE (Kelvin 2026-05-31) — the cron's "are you done yet?" bar
 The 15-min cron asks "are you done yet?" each cycle. The answer is YES only when ALL of these are true:
