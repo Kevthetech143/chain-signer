@@ -1,0 +1,9 @@
+[project]
+name = "chain-signer"
+version = "0.0.1"
+description = "Non-custodial, multi-chain transaction tool for AI agents. The agent holds its own key and signs + posts directly. No MetaMask, no GUI."
+requires-python = ">=3.10"
+dependencies = ["web3>=7", "eth-account"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

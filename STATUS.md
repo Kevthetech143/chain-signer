@@ -33,6 +33,11 @@ private key (no Polymarket account, no browser). This generalizes that.
 1. Production-ready tool (not a demo).
 2. Built-in fee: OTHER users pay a very small, tiny fee that does NOT stop them from using it.
 3. Acceptance: I must PROVE it works by using it myself (dogfood — I create a wallet with it and post a real transaction).
+4. UNIVERSAL APP INTERACTION (reaffirmed 2026-05-31): the tool must let an agent interact with ANY app on a supported
+   chain by signing whatever that app needs — exactly like we interact with Polymarket (an app on Polygon). So
+   call_contract / program-call is a first-class ability, not optional. EVM (Polygon/ETH) + Solana = full app+contract
+   interaction. Bitcoin caveat: Bitcoin is NOT an app platform like the others — it mostly moves coins with limited
+   scripting; real "apps" live on add-on layers. On Bitcoin we support transfers + its scripting, not full apps. Flagged to Kelvin.
 
 ## Research findings (brief: docs/research/2026-05-31-landscape.md)
 - Best reuse base: MoonPay Open Wallet Standard — non-custodial (agent holds key), open-source, Python, MCP/Claude-ready.
