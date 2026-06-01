@@ -57,9 +57,9 @@ Live-prove on FREE test networks (we hold no SOL/BTC): Solana devnet (airdrop fa
 Mainnet for these only on Kelvin's go + funds. Same discipline: red->review->green->review per slice, notify each cycle.
 
 Slices:
-- [~] 9. Solana adapter — create_wallet('solana') DONE (chain dispatch + SolanaWallet, ed25519 via solders; 7 tests,
-      key-secrecy held, EVM regression green; 57 total). NEXT in slice 9: get_balance (Solana RPC) + send (SOL transfer)
-      + devnet live proof (free airdrop). solders installed.
+- [~] 9. Solana adapter — wallet DONE; get_balance DONE (chain dispatch + Solana JSON-RPC getBalance; 60 tests green;
+      LIVE devnet read proven — fresh wallet 0 SOL via real RPC). NEXT: send (SOL transfer via solders, sign+broadcast)
+      + devnet live proof (requestAirdrop to fund, then real wallet-to-wallet send on devnet).
 - [ ] 10. Bitcoin adapter — create_wallet('bitcoin'), get_balance, send (UTXO transfer; NO contracts/swap — honest cap).
       Dep: a BTC lib (bit / bitcoinlib). Live-prove on testnet (faucet).
 - [ ] 11. Extend chain dispatch + mcp/CLI surface to route 'solana'/'bitcoin'; full suite stays green.

@@ -7,11 +7,12 @@ without a network call. The API key is read from the ETHERSCAN_API_KEY env var â
 import json
 import os
 from urllib.parse import urlencode
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
-SUPPORTED_CHAINS = ("evm",)
+SUPPORTED_CHAINS = ("evm", "solana")
 CHAIN_IDS = {"evm": 137}  # Polygon mainnet
 ETHERSCAN_V2_BASE = "https://api.etherscan.io/v2/api"
+SOLANA_RPC = "https://api.mainnet-beta.solana.com"
 
 
 def _default_fetch(url: str) -> dict:
@@ -19,20 +20,35 @@ def _default_fetch(url: str) -> dict:
         return json.load(resp)
 
 
+def _default_solana_rpc(method, params, url=SOLANA_RPC):
+    body = json.dumps({"jsonrpc": "2.0", "id": 1, "method": method, "params": params}).encode()
+    req = Request(url, data=body, headers={"Content-Type": "application/json"})
+    with urlopen(req, timeout=20) as resp:  # noqa: S310
+        return json.load(resp).get("result")
+
+
 def _resolve_address(target) -> str:
-    """Accept a Wallet (has .address) or a plain 0x-address string."""
+    """Accept a Wallet (has .address) or a plain address string."""
     return str(getattr(target, "address", target))
 
 
-def get_balance(target, token=None, *, chain="evm", decimals=18, fetch=None):
-    """Return the balance of `target` (a Wallet or 0x-address) in human units.
+def get_solana_balance(target, *, rpc=None):
+    """Return native SOL balance (read-only) via Solana JSON-RPC getBalance."""
+    res = (rpc or _default_solana_rpc)("getBalance", [_resolve_address(target)])
+    return res["value"] / 1e9
 
-    token=None reads the native coin (POL); a token contract address reads that ERC-20.
+
+def get_balance(target, token=None, *, chain="evm", decimals=18, fetch=None, rpc=None):
+    """Return the balance of `target` (a Wallet or address) in human units.
+
+    EVM: token=None reads native (POL); a token address reads that ERC-20. Solana: native SOL.
     """
     if chain not in SUPPORTED_CHAINS:
         raise ValueError(
             f"unsupported chain {chain!r}; supported: {', '.join(SUPPORTED_CHAINS)}"
         )
+    if chain == "solana":
+        return get_solana_balance(target, rpc=rpc)
     fetch = fetch or _default_fetch
     params = {
         "chainid": CHAIN_IDS[chain],
