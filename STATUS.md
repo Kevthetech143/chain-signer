@@ -64,7 +64,13 @@ Slices:
 - [ ] 11. Extend chain dispatch + mcp/CLI surface to route 'solana'/'bitcoin'; full suite stays green.
 NEXT = Slice 9 (Solana) recon + red tests. Build cron re-armed for this phase.
 BLOCKER (2026-05-31): Solana devnet RPC reachable, but pip install of solders/base58/pynacl keeps FAILING on
-network ("connectivity" errors mid-download); no ed25519 libs pre-installed. BLOCKED — ENVIRONMENT/NETWORK (2026-05-31): cannot download the Solana libs on this machine's connection.
+network ("connectivity" errors mid-download); no ed25519 libs pre-installed. UNBLOCKED (2026-06-01): the 25MB issue was the connection dropping LONG transfers, not size. Fix: download in
+512KB ranged chunks + stitch (sha256-verified), then pip install the local wheel. solders 0.27.1 INSTALLED +
+working (real Solana pubkey generated); base58 installed. Reusable helper saved: tools/fetch_wheel.py <pkg> <ver>
+— use it for the Bitcoin lib too. Note: solders alone can build+sign Solana transfers (no solana-py needed); RPC
+via plain JSON-RPC. RESUMING Solana build. Cron re-armed.
+--- prior blocker note (resolved) ---
+BLOCKED — ENVIRONMENT/NETWORK (2026-05-31): cannot download the Solana libs on this machine's connection.
 tiny pip packages install fine (base58 OK), but the 25MB solders wheel STALLS at ~2MB via both pip and curl
 (0 bytes/15s; repeated timeouts). Same will hit Bitcoin libs. This is a network limit, not the code.
 ESCALATED to Kelvin; PHASE-1.5 CRON c1f4cd89 DELETED to stop 15-min noise on an unfixable-by-me download.
