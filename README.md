@@ -24,6 +24,12 @@ send_ether(w, "0x...recipient", 0.001)  # auto nonce+gas, signed locally, broadc
 ```
 That's it — your agent just held a wallet and moved funds, no human in the loop.
 
+### Try it offline in 2 seconds (no key, no funds, no network)
+```
+pip install chain-signer
+python examples/quickstart.py   # makes a wallet, signs, proves it recovers + encrypts the key
+```
+
 ## What you get
 - `burner()` — a fresh wallet for a one-off task; discard it when done.
 - `restore(key)` — reload a wallet later from its exported private key (same key → same address).
