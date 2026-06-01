@@ -1,5 +1,7 @@
 # chain-signer
 
+<!-- mcp-name: io.github.Kevthetech143/chain-signer -->
+
 Give your AI agent its own non-custodial wallet in one line. Make a fresh (burner) wallet,
 check balance, send, and swap — your agent holds its own key and signs locally. No MetaMask,
 no browser, no account, no custody.
