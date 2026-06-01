@@ -6,3 +6,8 @@ keys/
 wallet.md
 __pycache__/
 *.pyc
+
+# build artifacts
+dist/
+build/
+*.egg-info/
