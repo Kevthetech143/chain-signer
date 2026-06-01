@@ -34,6 +34,21 @@ That's it — your agent just held a wallet and moved funds, no human in the loo
 The private key is generated/loaded locally, used only to sign, and never logged, returned, or
 stored by this library. You hold the key; we never touch your funds. That is the whole design.
 
+## Handling the key (read this)
+`w.private_key` is the keys to the wallet. Treat it like a password:
+- NEVER log it, print it in production, or write it into notes/memory/chat. Anyone who has it controls the funds.
+- For a burner holding a few dollars this is low-stakes by design — but the rule still holds.
+- To reuse a wallet later, store the key in a secret manager / env var, then `restore(key)`.
+
+## Signing idiom (note for web3.py users)
+The wallet does not expose `sign_transaction` / `sign_message` methods. Signing is done by the
+action helpers — e.g. `send_ether(w, to, amount)` signs and broadcasts for you. You pass the wallet
+to a function; the function signs with its key. (Message signing helper is on the roadmap.)
+
+## CLI on PATH
+`pip install` may warn that the `chain-signer` script dir isn't on your PATH. The library works
+regardless; to use the CLI directly, add that dir to PATH or run `python -m chain_signer ...`.
+
 ## Tool surface (for any AI / MCP / CLI)
 `chain_signer.mcp_server` exposes `list_tools()` and `call_tool(name, arguments)`. CLI:
 ```
