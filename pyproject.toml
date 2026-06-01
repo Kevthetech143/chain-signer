@@ -33,8 +33,8 @@ all = ["solders", "base58", "bit"]
 chain-signer = "chain_signer.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/chain-signer/chain-signer"
-Documentation = "https://github.com/chain-signer/chain-signer#readme"
+Homepage = "https://github.com/Kevthetech143/chain-signer"
+Documentation = "https://github.com/Kevthetech143/chain-signer#readme"
 
 [tool.hatch.build.targets.wheel]
 packages = ["chain_signer"]
