@@ -79,6 +79,11 @@ EVM/Polygon already proven with a real on-chain transfer (phase 1). Faucets retr
 Forbidden (browser/captcha gated). Public faucets refuse automated clients. 4th angle available but not auto-run:
 drive faucet.solana.com in our signed-in browser (/web) to clear the captcha — heavy for a marginal proof.
 Specific ask to Kelvin: merge now (sends proven-in-tests) OR I run the browser-faucet angle / you drop test funds.
+
+2026-06-01 10:15 — PHASE 1.5 build cron 41373fce DELETED. No autonomous code work remains (all slices built+tested,
+audited COMMIT, tools+patterns catalogued). Remaining items are Kelvin decisions only: (a) merge feature/solana-bitcoin
+to main, (b) whether to add cross-chain bridging next. Live testnet sends still faucet-blocked (devnet 429). Re-arm a
+cron only if we want continuous faucet retries.
 NEXT = Slice 9 (Solana) recon + red tests. Build cron re-armed for this phase.
 BLOCKER (2026-05-31): Solana devnet RPC reachable, but pip install of solders/base58/pynacl keeps FAILING on
 network ("connectivity" errors mid-download); no ed25519 libs pre-installed. UNBLOCKED (2026-06-01): the 25MB issue was the connection dropping LONG transfers, not size. Fix: download in
