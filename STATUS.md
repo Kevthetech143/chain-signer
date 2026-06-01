@@ -63,6 +63,14 @@ Slices:
       Dep: a BTC lib (bit / bitcoinlib). Live-prove on testnet (faucet).
 - [ ] 11. Extend chain dispatch + mcp/CLI surface to route 'solana'/'bitcoin'; full suite stays green.
 NEXT = Slice 9 (Solana) recon + red tests. Build cron re-armed for this phase.
+BLOCKER (2026-05-31): Solana devnet RPC reachable, but pip install of solders/base58/pynacl keeps FAILING on
+network ("connectivity" errors mid-download); no ed25519 libs pre-installed. BLOCKED — ENVIRONMENT/NETWORK (2026-05-31): cannot download the Solana libs on this machine's connection.
+tiny pip packages install fine (base58 OK), but the 25MB solders wheel STALLS at ~2MB via both pip and curl
+(0 bytes/15s; repeated timeouts). Same will hit Bitcoin libs. This is a network limit, not the code.
+ESCALATED to Kelvin; PHASE-1.5 CRON c1f4cd89 DELETED to stop 15-min noise on an unfixable-by-me download.
+Phase 1 (Polygon) is DONE + merged + 50 tests green — fully unaffected.
+TO RESUME phase 1.5, need ONE of: (a) better network on the machine for ~25MB downloads, (b) solders+solana+a BTC
+lib pre-installed by other means, OR (c) a pip mirror/proxy that holds. Then re-arm the cron and continue Solana->Bitcoin.
 
 ## ===== DONE — PHASE 1 MERGE-READY (2026-05-31) =====
 ALL 5 functions proven LIVE on Polygon mainnet, fully autonomous (no human, no seed). Full suite 50 green.
