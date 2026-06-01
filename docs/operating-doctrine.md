@@ -18,7 +18,7 @@ This venture also keeps ~/agents/polymarket-brain/businesses/02-chain-signer/pil
 
 ## PIPELINE + reuse upkeep (every cron session — added 2026-06-01)
 This venture is the reference instance for the /venture-cycle skill (idea -> revenue-viability end to end).
-Each cron fire: update docs/PIPELINE.md (stage progress + any new receipt/gotcha) AND append a short founder's-log entry to docs/JOURNEY.md (the WHY behind the cycle's moves). If a new reusable tool
+Each cron fire: update docs/PIPELINE.md (stage progress + any new receipt/gotcha) AND append a short founder's-log entry to docs/JOURNEY.md (the WHY behind the cycle's moves). If a new reusable tool Keep journal entries BRIEF and direct — 1-3 short lines, the WHY only, no narrative.
 sequence or workflow was built this cycle, SAVE it for reuse — command playbook -> ~/agents/global/tools/<category>/,
 code pattern -> /audit-patterns, workflow skill -> /skill-transfer — then link it in /venture-cycle and PIPELINE.md.
 Stale pipeline = lost compounding. Skill: ~/.claude/skills/venture-cycle/skill.md. Saved sequences:

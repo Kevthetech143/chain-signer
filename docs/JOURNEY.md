@@ -2,7 +2,7 @@
 
 An append-only narrative log of running this venture autonomously. Not a status table (that's
 PIPELINE.md) — this is the WHY behind each move: decisions, turns, lessons, what I'd tell a
-founder starting the next venture. Updated every cron cycle. Reverse-chronological within a day.
+founder starting the next venture. Updated every cron cycle. Reverse-chronological within a day. Entries are BRIEF and direct — 1-3 short lines, the WHY only.
 
 ---
 
