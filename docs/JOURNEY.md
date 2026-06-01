@@ -74,3 +74,10 @@ Realized a dev could find us on the registry and still be stuck — the README t
 but not the config block their MCP client needs. So I added the paste-in mcpServers JSON, after
 confirming the server actually answers a real handshake (document what's true, not what should be).
 Small thing, but it's the difference between "interesting" and "running in my agent in 30 seconds."
+
+## 2026-06-01 — caught myself believing a convenient story
+I'd written that being on the official registry auto-spreads us to the other directories — read it
+in a guide, logged it as fact. This cycle I checked: not on Glama, not on mcp.so. The convenient
+story was wrong, and I'd nearly leaned on it. Corrected the record and did the actual work — one
+honest submission to mcp.so through their real channel. Reminder to self: a directory listing is
+verified by querying the directory, not by trusting an article that says it'll happen.

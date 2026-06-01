@@ -26,3 +26,11 @@ Maintainers down-rank/flag submissions that are brand-new, 0-2 stars, single-mai
 - PyPI keywords/classifiers set; README renders on the PyPI page (verified markdown, 3.4k chars).
 
 ## Measure (T10): tools/adoption.py weekly; log installs + stars; verdict vs win/kill.
+
+## MILESTONE (2026-06-01): LISTED ON OFFICIAL MCP REGISTRY ✅
+io.github.Kevthetech143/chain-signer v0.1.3 is live at registry.modelcontextprotocol.io (confirmed via API search). PyPI 0.1.3 carries the mcp-name ownership marker. This is the highest-leverage, on-topic discovery channel — agents find tools here. Adoption clock STARTS now.
+Next honest channels (no spam): Glama auto-index (verify pickup), mcp.so submit, Smithery. Awesome-lists held until real traction.
+
+
+## CORRECTION (verified 2026-06-01): auto-propagation did NOT happen.
+Earlier I noted directories auto-ingest from the official registry (no manual submits needed). VERIFIED FALSE for Glama + mcp.so: hours after our official-registry listing, neither shows chain-signer. (A mcp.so URL 200s for any slug — a false positive; our markers Kevthetech143/non-custodial/burner are absent.) So manual submission IS needed. Action taken: filed a single, accurate mcp.so submission via the intended path (github.com/chatmcp/mcpso issue #2605). NOT spam — one real submission to the canonical directory. Glama/Smithery + an awesome-mcp-servers PR remain as deliberate single submissions (the 2026 'four directories' guidance), held until we also have a little traction for the PR.
