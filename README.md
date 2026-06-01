@@ -85,3 +85,18 @@ pip install chain-signer
 chain-signer-mcp          # speaks MCP over stdio (JSON-RPC 2.0)
 ```
 Exposes 6 tools: create_wallet, get_balance (balance), send, call_contract, swap, bridge.
+
+Wire it into any MCP client (Claude Desktop, Cursor, etc.) by adding it to the client's
+`mcpServers` config:
+```json
+{
+  "mcpServers": {
+    "chain-signer": {
+      "command": "chain-signer-mcp",
+      "env": { "ETHERSCAN_API_KEY": "your-key-for-live-balance-and-broadcast" }
+    }
+  }
+}
+```
+That's all — the agent can now make a wallet, read balances, send, and swap as native tools.
+(`ETHERSCAN_API_KEY` is optional; needed only for live balance reads and broadcasting.)
