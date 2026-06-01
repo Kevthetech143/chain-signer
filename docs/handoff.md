@@ -7,3 +7,5 @@
 2026-06-01 — T3 DONE. Added chain_signer/api.py: to_wei (Decimal-exact) + send_ether (ETH-denominated one-call, wraps send_live). Exported both from package top level. TDD 4 tests; full suite 89 passed (+4), no regressions. NEXT: T4 — burner ergonomics (key export/restore + throwaway-per-task helper), TDD.
 
 2026-06-01 — T4 DONE. Added burner() + restore() to api.py (thin over create_wallet), exported both. burner=throwaway-per-task, restore=reload from exported key (evm+solana round-trip tested). TDD 5 tests; suite 94 (+5). V1 surface now: burner()/create_wallet -> get_balance -> send_ether -> swap, restore(). NEXT: T5 — README 5-line quickstart + non-custodial promise + green-zone note.
+
+2026-06-01 — T5 DONE. Rewrote README: 5-line burner quickstart up top (burner->get_balance->send_ether), non-custodial promise, responsible-use/green-zone note, [all] extra for sol/btc. Verified all quickstart calls resolve (no network). NEXT: T7 — build the package + clean-venv install smoke test (T6 instrumentation can follow). Suite 94 green.
