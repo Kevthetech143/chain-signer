@@ -81,3 +81,6 @@ in a guide, logged it as fact. This cycle I checked: not on Glama, not on mcp.so
 story was wrong, and I'd nearly leaned on it. Corrected the record and did the actual work — one
 honest submission to mcp.so through their real channel. Reminder to self: a directory listing is
 verified by querying the directory, not by trusting an article that says it'll happen.
+
+## 2026-06-01 — Glama gate
+Glama add-server needs login; auto-index is the real path and we qualify. Chose not to burn a cycle on an OAuth signup for one directory.
