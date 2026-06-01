@@ -67,9 +67,12 @@ Slices:
 - [x] 11. Tool surface (call_tool) now routes ALL chains — create_wallet/get_balance/send for evm/solana/bitcoin
       (rpc/testnet/broadcast threaded). 80 tests green. PHASE 1.5 CODE COMPLETE.
 
-REMAINING for phase-1.5 merge: live testnet SEND proofs only (read paths already live-proven both chains; sends
-unit-proven — Solana verified, Bitcoin real bit signing). Solana devnet faucet = HTTP 429 (retry). Bitcoin testnet
-faucet = needs a web/API faucet (try). Then /review-work + merge to main on Kelvin's go.
+PHASE 1.5 STATUS: code complete (80 tests), review-work AUDIT = COMMIT (non-custodial on all 3 chains, no secrets).
+MERGE-READY on branch feature/solana-bitcoin. Merge to main awaits Kelvin's explicit go.
+Live testnet SEND proofs (Solana devnet + Bitcoin testnet) remain BLOCKED on free faucets that won't serve an
+automated client (Solana devnet airdrop returns null/429; Bitcoin testnet faucets need captcha). NOT code issues:
+read paths live-proven both chains; Solana send cryptographically verified; Bitcoin send is real bit signing.
+EVM/Polygon already proven with a real on-chain transfer (phase 1). Faucets retried opportunistically.
 NEXT = Slice 9 (Solana) recon + red tests. Build cron re-armed for this phase.
 BLOCKER (2026-05-31): Solana devnet RPC reachable, but pip install of solders/base58/pynacl keeps FAILING on
 network ("connectivity" errors mid-download); no ed25519 libs pre-installed. UNBLOCKED (2026-06-01): the 25MB issue was the connection dropping LONG transfers, not size. Fix: download in
