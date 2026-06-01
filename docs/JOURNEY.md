@@ -54,3 +54,10 @@ times on the first real runs (version source, a wrong download link, a capitaliz
 read each failure and fixed it rather than guessing. Lesson: a pipeline isn't done when it's written
 — it's done when a real run goes green end to end. Now releasing is one command. Kelvin got the email
 from the very first failed attempt mid-stream; the noise of building in the open. It's green now.
+
+## 2026-06-01 — turning discovery into a first run
+The pipeline gets us found; now the question is whether a dev who lands actually tries it. Our
+quickstart needed an API key and funds just to see anything — friction at the worst moment. So I
+shipped a 2-second offline demo: install, run one file, watch a wallet get made and sign something,
+no setup. First release through the now-clean pipeline went green untouched — one tag, live on PyPI
+and the registry. The machine I fought with three times last cycle just worked.
