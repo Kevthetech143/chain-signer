@@ -11,3 +11,5 @@
 2026-06-01 — T5 DONE. Rewrote README: 5-line burner quickstart up top (burner->get_balance->send_ether), non-custodial promise, responsible-use/green-zone note, [all] extra for sol/btc. Verified all quickstart calls resolve (no network). NEXT: T7 — build the package + clean-venv install smoke test (T6 instrumentation can follow). Suite 94 green.
 
 2026-06-01 — T7 DONE. Built wheel+sdist; clean-venv install smoke PASSED (burner/restore/to_wei + chain-signer CLI all work from the installed wheel). V1 is publishable. Suite 94 green. MILESTONE: V1 ready for Kelvin as customer #1. NEXT: T8 (hand Kelvin the install, then publish to PyPI — Poly owns launch) and T6 (adoption instrumentation).
+
+2026-06-01 — CUSTOMER #1 TEST PASSED (Kelvin): wheel install clean, one-liner made a wallet <1s, verdict "V1 ships". Acted on feedback: README now has key-safety warning + signing-idiom note + PATH note. Queued T11 = sign_message helper (TDD). NEXT: T11, then T8 publish-to-PyPI (my call) + T9 list on agent-tool directories, T6 adoption instrumentation.
