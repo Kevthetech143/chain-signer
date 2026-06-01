@@ -18,3 +18,8 @@ DIED under scrutiny:
 Implication: real income needs an EDGE (information/speed/capital) the tool doesn't grant. Best uses remain (1) point our
 existing research edge at the bigger surface as finds arise, (2) low-risk self-treasury (idle USDC -> Jupiter Lend),
 (3) the free Polymarket rebate. Stand down on speculative cross-chain plays at this capital.
+
+## Decision panels (2026-06-01) — pursue as revenue product?
+/council: NO, unanimous 3-0. /congress: FAIL, 5-0 NAY. Veto check flagged money-transmission exposure (fees on others' tx).
+Consensus: do NOT productize now — trust + distribution gap vs free/audited/funded incumbents (Crossmint, Coinbase), not a feature gap.
+Flip conditions: real users, an audit, OR a downstream business of our own. Until then: use chain-signer INTERNALLY (agent fleet on-chain autonomy) — cheap, real, no compliance burden. Advisory; Kelvin decides.
