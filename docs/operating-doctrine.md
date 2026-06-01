@@ -15,3 +15,11 @@ For those three, "build it" becomes "test it / earn it / respect it." Everything
 
 ## Three pillars (track every cycle)
 This venture also keeps ~/agents/polymarket-brain/businesses/02-chain-signer/pillars.md with three live sections: Distribution, Security, Competition. Read it each cycle; when new intel lands (a real install number, a security fix, a competitor move), update the matching pillar. Stale pillars = silent risk. Current standouts: Distribution = the real gate (PyPI is a listing, not distribution); Security = V1.1 must-fix the plain private_key (encrypted-at-rest + keychain) before any real-funds tier; Competition = wedge is thin (one-line burner) — sharpen via multi-chain-by-default + drop-in framework module.
+
+## PIPELINE + reuse upkeep (every cron session — added 2026-06-01)
+This venture is the reference instance for the /venture-cycle skill (idea -> revenue-viability end to end).
+Each cron fire: update docs/PIPELINE.md (stage progress + any new receipt/gotcha). If a new reusable tool
+sequence or workflow was built this cycle, SAVE it for reuse — command playbook -> ~/agents/global/tools/<category>/,
+code pattern -> /audit-patterns, workflow skill -> /skill-transfer — then link it in /venture-cycle and PIPELINE.md.
+Stale pipeline = lost compounding. Skill: ~/.claude/skills/venture-cycle/skill.md. Saved sequences:
+~/agents/global/tools/version-control/{pypi-publish-sequence,mcp-registry-publish-sequence}.md
