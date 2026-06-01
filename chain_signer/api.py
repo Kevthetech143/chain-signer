@@ -42,6 +42,23 @@ def sign_message(wallet, text: str) -> str:
     return signed.signature.to_0x_hex()
 
 
+def export_encrypted(wallet, password: str) -> dict:
+    """Encrypt the wallet's key into a standard keystore dict (eth_account / Web3 Secret Storage).
+
+    Store THIS at rest instead of the plaintext key. Decrypt later with load_encrypted + the password.
+    EVM wallets only.
+    """
+    from eth_account import Account
+    return Account.encrypt(wallet.private_key, password)
+
+
+def load_encrypted(keystore: dict, password: str):
+    """Decrypt a keystore dict (from export_encrypted) back into a Wallet. Wrong password raises."""
+    from eth_account import Account
+    key = Account.decrypt(keystore, password)
+    return create_wallet("evm", private_key=key.hex())
+
+
 def send_ether(wallet, to, amount_ether, *, chain="evm", chain_id=DEFAULT_CHAIN_ID, fetch=None):
     """One-call send: convert ether->wei, fetch nonce+gas, sign with the owner's key, broadcast.
 
