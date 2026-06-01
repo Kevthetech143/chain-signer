@@ -41,9 +41,10 @@ stored by this library. You hold the key; we never touch your funds. That is the
 - To reuse a wallet later, store the key in a secret manager / env var, then `restore(key)`.
 
 ## Signing idiom (note for web3.py users)
-The wallet does not expose `sign_transaction` / `sign_message` methods. Signing is done by the
-action helpers — e.g. `send_ether(w, to, amount)` signs and broadcasts for you. You pass the wallet
-to a function; the function signs with its key. (Message signing helper is on the roadmap.)
+The wallet does not expose `sign_transaction` / `sign_message` methods. Signing is done by
+function helpers you pass the wallet to — e.g. `send_ether(w, to, amount)` signs and broadcasts,
+and `sign_message(w, "text")` returns an EIP-191 signature for auth / sign-in flows
+(recoverable via eth_account `Account.recover_message`).
 
 ## CLI on PATH
 `pip install` may warn that the `chain-signer` script dir isn't on your PATH. The library works

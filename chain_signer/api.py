@@ -30,6 +30,18 @@ def to_wei(amount_ether) -> int:
     return int(Decimal(str(amount_ether)) * WEI_PER_ETHER)
 
 
+def sign_message(wallet, text: str) -> str:
+    """Sign a plain-text message with the wallet's key (EIP-191 personal_sign).
+
+    Returns the 0x signature hex. Recoverable via eth_account Account.recover_message.
+    For auth / sign-in-with-ethereum style flows. EVM wallets only.
+    """
+    from eth_account import Account
+    from eth_account.messages import encode_defunct
+    signed = Account.sign_message(encode_defunct(text=text), private_key=wallet.private_key)
+    return signed.signature.to_0x_hex()
+
+
 def send_ether(wallet, to, amount_ether, *, chain="evm", chain_id=DEFAULT_CHAIN_ID, fetch=None):
     """One-call send: convert ether->wei, fetch nonce+gas, sign with the owner's key, broadcast.
 
