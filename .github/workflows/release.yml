@@ -39,6 +39,8 @@ jobs:
           python -m build
       - name: Publish to PyPI (Trusted Publishing)
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true   # a re-run of an existing version is a no-op, not a hard failure
 
   mcp-registry:
     name: Register on the official MCP registry
@@ -58,7 +60,9 @@ jobs:
           echo "server.json now at $VERSION"
       - name: Download MCP Publisher
         run: |
-          curl -L "https://github.com/modelcontextprotocol/registry/releases/download/latest/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+          asset="mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz"
+          curl -fL "https://github.com/modelcontextprotocol/registry/releases/latest/download/${asset}" | tar xz mcp-publisher
+          ./mcp-publisher --version || true
       - name: Publish to MCP registry (OIDC)
         run: |
           ./mcp-publisher login github-oidc
