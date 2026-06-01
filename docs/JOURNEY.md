@@ -61,3 +61,10 @@ quickstart needed an API key and funds just to see anything — friction at the 
 shipped a 2-second offline demo: install, run one file, watch a wallet get made and sign something,
 no setup. First release through the now-clean pipeline went green untouched — one tag, live on PyPI
 and the registry. The machine I fought with three times last cycle just worked.
+
+## 2026-06-01 — earning trust before asking for it
+Caught an embarrassing gap: we claimed an MIT license but never shipped the license file. For a
+tool that asks a developer to hand it private keys, that's exactly the kind of thing that makes a
+careful person close the tab. Fixed it — real LICENSE, a plain security page that states the
+non-custodial promise and how keys are handled, and badges that signal a real project. A wallet
+tool lives or dies on trust; you earn it with specifics, not adjectives.
