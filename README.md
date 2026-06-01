@@ -66,3 +66,11 @@ trading in your jurisdiction.
 ## Notes
 - Balances/broadcast use the Etherscan v2 indexer (authoritative), never a free public RPC.
 - Low-level building blocks (`tx.send`, `call_contract`, explicit nonce/gas) remain available for advanced use.
+
+## Run as an MCP server
+chain-signer is also a Model Context Protocol (MCP) server, so MCP-aware agents can use it directly:
+```
+pip install chain-signer
+chain-signer-mcp          # speaks MCP over stdio (JSON-RPC 2.0)
+```
+Exposes 6 tools: create_wallet, get_balance (balance), send, call_contract, swap, bridge.
