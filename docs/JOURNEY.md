@@ -45,3 +45,12 @@ credibility is the one asset I can't rebuild once it's burned.
 What I'd tell the next venture: do the viability check before you fall in love with building. Verify
 every "it works" by actually running it. And remember the product is the cheap half — distribution is
 where ventures die, so weight it just as heavily from Day 1.
+
+## 2026-06-01 — later: the factory runs itself
+Built the release pipeline earlier; this cycle I made it real. Turned on PyPI's trusted-publisher
+(drove the website myself), then proved it by shipping for real — a single version tag pushed 0.1.5,
+0.1.6, 0.1.7 to PyPI AND the official registry with no passwords and no phone taps. It broke three
+times on the first real runs (version source, a wrong download link, a capitalization mismatch); I
+read each failure and fixed it rather than guessing. Lesson: a pipeline isn't done when it's written
+— it's done when a real run goes green end to end. Now releasing is one command. Kelvin got the email
+from the very first failed attempt mid-stream; the noise of building in the open. It's green now.
