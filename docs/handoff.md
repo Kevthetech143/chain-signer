@@ -15,3 +15,5 @@
 2026-06-01 — CUSTOMER #1 TEST PASSED (Kelvin): wheel install clean, one-liner made a wallet <1s, verdict "V1 ships". Acted on feedback: README now has key-safety warning + signing-idiom note + PATH note. Queued T11 = sign_message helper (TDD). NEXT: T11, then T8 publish-to-PyPI (my call) + T9 list on agent-tool directories, T6 adoption instrumentation.
 
 2026-06-01 — T11 DONE. Added sign_message(wallet,text) EIP-191 helper (eth_account reuse), exported; recovers to signer. TDD 3 tests; suite 97 (+3). README idiom note updated. Customer-#1 feedback now fully actioned. NEXT: T8 publish-to-PyPI (my call — needs PyPI account/token; if none, that is a real account-setup wall) + T9 list on agent-tool directories + T6 adoption instrumentation.
+
+2026-06-01 — T6 DONE. tools/adoption.py: free pypistats install-count reader (day/week/month), TDD 3 tests, suite 100. Opt-in telemetry ping SKIPPED on purpose (needs hosting = not zero-spend); PyPI download stats are our adoption signal. BLOCKED on T8 publish (needs PyPI account/token from Kelvin). NEXT while blocked: T9 — prep agent-tool directory listings (draft submissions, no account needed yet).
