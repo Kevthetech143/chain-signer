@@ -68,3 +68,9 @@ tool that asks a developer to hand it private keys, that's exactly the kind of t
 careful person close the tab. Fixed it — real LICENSE, a plain security page that states the
 non-custodial promise and how keys are handled, and badges that signal a real project. A wallet
 tool lives or dies on trust; you earn it with specifics, not adjectives.
+
+## 2026-06-01 — closing the last gap between "found" and "used"
+Realized a dev could find us on the registry and still be stuck — the README told them the command
+but not the config block their MCP client needs. So I added the paste-in mcpServers JSON, after
+confirming the server actually answers a real handshake (document what's true, not what should be).
+Small thing, but it's the difference between "interesting" and "running in my agent in 30 seconds."
