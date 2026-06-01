@@ -57,11 +57,13 @@ Live-prove on FREE test networks (we hold no SOL/BTC): Solana devnet (airdrop fa
 Mainnet for these only on Kelvin's go + funds. Same discipline: red->review->green->review per slice, notify each cycle.
 
 Slices:
-- [~] 9. Solana adapter — wallet DONE; get_balance DONE (chain dispatch + Solana JSON-RPC getBalance; 60 tests green;
-      LIVE devnet read proven — fresh wallet 0 SOL via real RPC). NEXT: send (SOL transfer via solders, sign+broadcast)
-      + devnet live proof (requestAirdrop to fund, then real wallet-to-wallet send on devnet).
+- [x] 9. Solana adapter — wallet + get_balance (live devnet read proven) + send DONE. send_solana builds/signs via
+      solders; signed tx VERIFIES (tx.verify passes -> owner-signed, the crown proof); 63 tests green.
+      LIVE devnet SEND pending: public devnet faucet airdrop is HTTP 429 rate-limited (transient). Code is correct
+      (verified); live broadcast just needs test SOL. Cron retries the airdrop opportunistically each cycle.
 - [ ] 10. Bitcoin adapter — create_wallet('bitcoin'), get_balance, send (UTXO transfer; NO contracts/swap — honest cap).
-      Dep: a BTC lib (bit / bitcoinlib). Live-prove on testnet (faucet).
+      Dep: a BTC lib (bit / bitcoinlib) — use tools/fetch_wheel.py if pip stalls. Live-prove on testnet (faucet).
+      NEXT (cron): build Bitcoin now while the Solana devnet faucet cools; retry Solana airdrop opportunistically.
 - [ ] 11. Extend chain dispatch + mcp/CLI surface to route 'solana'/'bitcoin'; full suite stays green.
 NEXT = Slice 9 (Solana) recon + red tests. Build cron re-armed for this phase.
 BLOCKER (2026-05-31): Solana devnet RPC reachable, but pip install of solders/base58/pynacl keeps FAILING on
