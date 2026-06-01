@@ -12,3 +12,6 @@ THE HONEST LIMIT (walls that are NOT code-shaped — don't pretend "build it" so
 - LEGAL / CUSTODY / REAL-MONEY lines: decision walls needing Kelvin's sign-off + staying non-custodial,
   not a script. Respect them, don't "build through" them.
 For those three, "build it" becomes "test it / earn it / respect it." Everything else: build it.
+
+## Three pillars (track every cycle)
+This venture also keeps ~/agents/polymarket-brain/businesses/02-chain-signer/pillars.md with three live sections: Distribution, Security, Competition. Read it each cycle; when new intel lands (a real install number, a security fix, a competitor move), update the matching pillar. Stale pillars = silent risk. Current standouts: Distribution = the real gate (PyPI is a listing, not distribution); Security = V1.1 must-fix the plain private_key (encrypted-at-rest + keychain) before any real-funds tier; Competition = wedge is thin (one-line burner) — sharpen via multi-chain-by-default + drop-in framework module.
