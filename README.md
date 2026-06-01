@@ -39,6 +39,7 @@ stored by this library. You hold the key; we never touch your funds. That is the
 - NEVER log it, print it in production, or write it into notes/memory/chat. Anyone who has it controls the funds.
 - For a burner holding a few dollars this is low-stakes by design — but the rule still holds.
 - To reuse a wallet later, store the key in a secret manager / env var, then `restore(key)`.
+- Better: `export_encrypted(w, password)` gives a password-protected keystore dict to store at rest; `load_encrypted(keystore, password)` brings the wallet back. Never store the raw key if you can store the keystore.
 
 ## Signing idiom (note for web3.py users)
 The wallet does not expose `sign_transaction` / `sign_message` methods. Signing is done by
