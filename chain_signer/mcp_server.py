@@ -6,6 +6,7 @@ caller's own private_key per call, use it transiently, and never store it.
 """
 from .balance import get_balance
 from .bitcoin import send_bitcoin
+from .bridge import bridge_evm, get_bridge_quote
 from .solana import send_solana
 from .swap import swap
 from .tx import call_contract, send
@@ -17,6 +18,7 @@ TOOL_SPECS = (
     {"name": "send", "description": "Sign and post a native-coin transfer with the caller's own key."},
     {"name": "call_contract", "description": "Sign and post a call to any contract/app function."},
     {"name": "swap", "description": "Swap tokens via a DEX aggregator with our built-in fee; non-custodial."},
+    {"name": "bridge", "description": "Move value across chains via LI.FI (EVM/Solana/Bitcoin); signs the route tx with the owner's key."},
 )
 TOOL_NAMES = tuple(t["name"] for t in TOOL_SPECS)
 
@@ -78,6 +80,17 @@ def call_tool(name, arguments, *, fetch=None, broadcast=None, rpc=None):
             max_priority_fee_per_gas=a["max_priority_fee_per_gas"],
             gas=a.get("gas", 300000), chain_id=a.get("chain_id", 137),
             fetch=fetch, broadcast=broadcast,
+        )
+
+    if name == "bridge":
+        w = _wallet(a)
+        quote = get_bridge_quote(
+            a["from_chain"], a["to_chain"], a["from_token"], a["to_token"], a["amount"], w.address,
+            integrator=a.get("integrator", "chain-signer"), fee=a.get("fee"), fetch=fetch,
+        )
+        return bridge_evm(
+            w, quote, nonce=a["nonce"], max_fee_per_gas=a["max_fee_per_gas"],
+            max_priority_fee_per_gas=a["max_priority_fee_per_gas"], gas=a.get("gas"), broadcast=broadcast,
         )
 
     raise ValueError(f"unknown tool {name!r}; available: {', '.join(TOOL_NAMES)}")
