@@ -50,7 +50,21 @@ Custody + fee model: NON-CUSTODIAL + tiny per-tx fee (he confirmed).
 KLEVER AT LAUNCH? Default = defer Klever to phase 2; launch on EVM + Solana + Bitcoin via the MoonPay standard.
 If Klever is required at launch, add a from-scratch Klever signing path (extra build). Override if needed; else review-plan proceeds on the default.
 
-## ===== DONE — MERGE-READY (2026-05-31) =====
+## ===== PHASE 1.5 — ADD SOLANA + BITCOIN (Kelvin 2026-05-31) =====
+Phase 1 (EVM/Polygon) is DONE + merged. Now add the other two chains as a go-to multi-chain AI wallet.
+This is real new code: different keypair + tx models. Make the wallet/balance/tx layer dispatch by chain.
+Live-prove on FREE test networks (we hold no SOL/BTC): Solana devnet (airdrop faucet) + Bitcoin testnet (faucet).
+Mainnet for these only on Kelvin's go + funds. Same discipline: red->review->green->review per slice, notify each cycle.
+
+Slices:
+- [ ] 9. Solana adapter — create_wallet('solana') [ed25519 via solders], get_balance (Solana RPC), send (SOL transfer).
+      Dep: solders/solana (pip). Live-prove on devnet (free airdrop).
+- [ ] 10. Bitcoin adapter — create_wallet('bitcoin'), get_balance, send (UTXO transfer; NO contracts/swap — honest cap).
+      Dep: a BTC lib (bit / bitcoinlib). Live-prove on testnet (faucet).
+- [ ] 11. Extend chain dispatch + mcp/CLI surface to route 'solana'/'bitcoin'; full suite stays green.
+NEXT = Slice 9 (Solana) recon + red tests. Build cron re-armed for this phase.
+
+## ===== DONE — PHASE 1 MERGE-READY (2026-05-31) =====
 ALL 5 functions proven LIVE on Polygon mainnet, fully autonomous (no human, no seed). Full suite 50 green.
 - send (real wallet-to-wallet, the DONE bonus): tx 0x42ecea87...231943d4 — block 87729872, status SUCCESS.
 - call_contract (WPOL deposit): tx 0x103ebfdc...27ea5f28 — block 87730560, status SUCCESS.
