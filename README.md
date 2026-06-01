@@ -2,6 +2,9 @@
 
 <!-- mcp-name: io.github.Kevthetech143/chain-signer -->
 
+![PyPI](https://img.shields.io/pypi/v/chain-signer) ![Python](https://img.shields.io/pypi/pyversions/chain-signer) ![License](https://img.shields.io/pypi/l/chain-signer) ![Release](https://github.com/Kevthetech143/chain-signer/actions/workflows/release.yml/badge.svg)
+
+
 Give your AI agent its own non-custodial wallet in one line. Make a fresh (burner) wallet,
 check balance, send, and swap — your agent holds its own key and signs locally. No MetaMask,
 no browser, no account, no custody.
