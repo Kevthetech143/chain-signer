@@ -64,7 +64,12 @@ Slices:
 - [x] 10. Bitcoin adapter — wallet + get_balance (live testnet read proven) + send DONE. send_bitcoin builds+signs a
       real UTXO tx via bit (signed raw v1 tx), injectable broadcast; 75 tests green. NO contracts/swap (honest cap).
       LIVE testnet SEND pending: needs testnet BTC from a faucet (try next). Code path is real bit signing.
-- [ ] 11. Extend chain dispatch + mcp/CLI surface to route 'solana'/'bitcoin'; full suite stays green.
+- [x] 11. Tool surface (call_tool) now routes ALL chains — create_wallet/get_balance/send for evm/solana/bitcoin
+      (rpc/testnet/broadcast threaded). 80 tests green. PHASE 1.5 CODE COMPLETE.
+
+REMAINING for phase-1.5 merge: live testnet SEND proofs only (read paths already live-proven both chains; sends
+unit-proven — Solana verified, Bitcoin real bit signing). Solana devnet faucet = HTTP 429 (retry). Bitcoin testnet
+faucet = needs a web/API faucet (try). Then /review-work + merge to main on Kelvin's go.
 NEXT = Slice 9 (Solana) recon + red tests. Build cron re-armed for this phase.
 BLOCKER (2026-05-31): Solana devnet RPC reachable, but pip install of solders/base58/pynacl keeps FAILING on
 network ("connectivity" errors mid-download); no ed25519 libs pre-installed. UNBLOCKED (2026-06-01): the 25MB issue was the connection dropping LONG transfers, not size. Fix: download in
