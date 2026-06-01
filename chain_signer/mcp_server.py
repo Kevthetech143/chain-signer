@@ -5,6 +5,9 @@ CLI all wrap this same surface — wired at packaging. Non-custodial: signing to
 caller's own private_key per call, use it transiently, and never store it.
 """
 from .balance import get_balance
+from .bitcoin import send_bitcoin
+from .bridge import bridge_evm, get_bridge_quote
+from .solana import send_solana
 from .swap import swap
 from .tx import call_contract, send
 from .wallet import create_wallet
@@ -15,6 +18,7 @@ TOOL_SPECS = (
     {"name": "send", "description": "Sign and post a native-coin transfer with the caller's own key."},
     {"name": "call_contract", "description": "Sign and post a call to any contract/app function."},
     {"name": "swap", "description": "Swap tokens via a DEX aggregator with our built-in fee; non-custodial."},
+    {"name": "bridge", "description": "Move value across chains via LI.FI (EVM/Solana/Bitcoin); signs the route tx with the owner's key."},
 )
 TOOL_NAMES = tuple(t["name"] for t in TOOL_SPECS)
 
@@ -25,26 +29,33 @@ def list_tools():
 
 
 def _wallet(args):
-    return create_wallet(args.get("chain", "evm"), private_key=args.get("private_key"))
+    return create_wallet(args.get("chain", "evm"), private_key=args.get("private_key"),
+                         testnet=args.get("testnet", False))
 
 
-def call_tool(name, arguments, *, fetch=None, broadcast=None):
+def call_tool(name, arguments, *, fetch=None, broadcast=None, rpc=None):
     """Dispatch a tool call by name to the underlying function. Returns a JSON-able dict."""
     a = dict(arguments or {})
     chain = a.get("chain", "evm")
 
     if name == "create_wallet":
-        w = create_wallet(chain)
+        w = create_wallet(chain, testnet=a.get("testnet", False))
         return {"address": w.address, "private_key": w.private_key}
 
     if name == "get_balance":
         bal = get_balance(
             a["address"], token=a.get("token"), chain=chain,
-            decimals=a.get("decimals", 18), fetch=fetch,
+            decimals=a.get("decimals", 18), fetch=fetch, rpc=rpc, testnet=a.get("testnet", False),
         )
         return {"balance": bal}
 
     if name == "send":
+        if chain == "solana":
+            return send_solana(_wallet(a), a["to"], a["lamports"],
+                               recent_blockhash=a.get("recent_blockhash"), rpc=rpc, broadcast=broadcast)
+        if chain == "bitcoin":
+            return send_bitcoin(_wallet(a), a["to"], a["amount_btc"],
+                                unspents=a.get("unspents"), fee=a.get("fee"), broadcast=broadcast)
         return send(
             _wallet(a), a["to"], a["value_wei"], chain=chain,
             nonce=a["nonce"], max_fee_per_gas=a["max_fee_per_gas"],
@@ -69,6 +80,17 @@ def call_tool(name, arguments, *, fetch=None, broadcast=None):
             max_priority_fee_per_gas=a["max_priority_fee_per_gas"],
             gas=a.get("gas", 300000), chain_id=a.get("chain_id", 137),
             fetch=fetch, broadcast=broadcast,
+        )
+
+    if name == "bridge":
+        w = _wallet(a)
+        quote = get_bridge_quote(
+            a["from_chain"], a["to_chain"], a["from_token"], a["to_token"], a["amount"], w.address,
+            integrator=a.get("integrator", "chain-signer"), fee=a.get("fee"), fetch=fetch,
+        )
+        return bridge_evm(
+            w, quote, nonce=a["nonce"], max_fee_per_gas=a["max_fee_per_gas"],
+            max_priority_fee_per_gas=a["max_priority_fee_per_gas"], gas=a.get("gas"), broadcast=broadcast,
         )
 
     raise ValueError(f"unknown tool {name!r}; available: {', '.join(TOOL_NAMES)}")
