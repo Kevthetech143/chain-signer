@@ -7,8 +7,22 @@ nonce/gas and broadcast. Non-custodial throughout — the agent's key never leav
 from decimal import Decimal
 
 from .live import DEFAULT_CHAIN_ID, send_live
+from .wallet import create_wallet
 
 WEI_PER_ETHER = 10**18
+
+
+def burner(chain="evm", *, testnet=False):
+    """Make a fresh throwaway wallet for one task. The agent holds the key; discard when done.
+
+    Same call as create_wallet() with no key — named for the burner-per-task pattern.
+    """
+    return create_wallet(chain, testnet=testnet)
+
+
+def restore(private_key, chain="evm", *, testnet=False):
+    """Reload a wallet from its exported private key. Same key -> same address (deterministic)."""
+    return create_wallet(chain, private_key=private_key, testnet=testnet)
 
 
 def to_wei(amount_ether) -> int:
