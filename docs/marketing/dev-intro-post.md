@@ -25,3 +25,7 @@ That makes a wallet, signs a message, and proves the signature recovers the addr
 It's on PyPI and listed in the official MCP registry, so it shows up for MCP-aware tooling out of the box.
 
 If you build agents and want a clean, non-custodial wallet primitive, I'd genuinely like your eyes on it — especially the key-handling. Tear it apart.
+
+
+---
+POSTED (genuine, on-topic): MCP registry Show-and-tell -> https://github.com/modelcontextprotocol/registry/discussions/1327 (2026-06-01)

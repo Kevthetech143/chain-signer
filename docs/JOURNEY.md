@@ -84,3 +84,6 @@ verified by querying the directory, not by trusting an article that says it'll h
 
 ## 2026-06-01 — Glama gate
 Glama add-server needs login; auto-index is the real path and we qualify. Chose not to burn a cycle on an OAuth signup for one directory.
+
+## 2026-06-01 — first real outreach
+Posted chain-signer in the MCP registry Show-and-tell — the right room, asking for key-handling feedback, not pitching. First time in front of real agent devs.
