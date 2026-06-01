@@ -31,3 +31,12 @@ Flip conditions: real users, an audit, OR a downstream business of our own. Unti
 - Evidence-based read: paid DIY wallet kit sits on the commoditized free layer; comparable kits mostly earn little without an audience we lack. Scarce paid layer = compliance+rails (big build, not our edge).
 - STILL UNVERIFIED: demand for OUR specific kit (this is comparable-market data, not us).
 NOTE: earlier "no one will pay / trust gap / pocket change" were ASSUMPTIONS; Kelvin flagged it; role rule 'evidence_over_assertion_when_planning' added (v12).
+
+## /business-think competitor reality check (2026-06-01, VERIFIED traction — corrects earlier headline read)
+- Coinbase AgentKit: ACTIVE THREAT — @coinbase/agentkit 40,659 npm dl/mo, pushed 2026-05-28, 1241*.
+- Crossmint GOAT: ACTIVE THREAT but TS-only — @goat-sdk/core ~11,916 npm dl/mo; PyPI goat-sdk just 211 dl/mo (Python barely served); pushed 2026-05-30, 993*.
+- Polymarket/agents (official): 3614* BUT pushed 2024-11-05 = ABANDONED ~19mo. Headline rival, dead in reality. (The exact catch.)
+- caiovicentino/polymarket-mcp-server (active Polymarket trading MCP): pushed 2026-06-01, 534*, single maintainer = ACTIVE but NICHE/small.
+- MoonPay MoonAgents / Trust Wallet TWAK / Turnkey: UNVERIFIED (closed products; announcements, no adoption numbers pulled) — not counted as confirmed threats.
+VERDICT: general wallet space = won by AgentKit/GOAT (stand down head-on). Prediction-market vertical in PYTHON = NOT crowded (official tool dead, active one tiny, GOAT Python near-empty) = real narrow opening. -> TEST-CHEAPLY-FIRST: publish a focused Python Polymarket/prediction-market agent kit (BYO-wallet, traps solved) to PyPI + MCP/awesome-polymarket lists; measure pulls. Flip-to-pursue: real downloads/users. Flip-to-standdown: crickets or caiovicentino MCP already covers it well (check its fit next).
+NOTE: this corrects the earlier headline-driven STAND-DOWN; verified data moved it to TEST-FIRST on the vertical.
