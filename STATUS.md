@@ -221,3 +221,10 @@ Engine: LI.FI (keyless quotes via browser UA header — Cloudflare 1010 gotcha; 
 - [ ] LIVE cross-chain proof — needs Kelvin go + funds (real money across chains). HOLDING.
 Build cron 12274437 DELETED (build done; remaining items need Kelvin). 
 Pending Kelvin: (a) live bridge proof go+route, (b) merge feature branches (solana-bitcoin + cross-chain-bridge) to main.
+
+## CROSS-CHAIN BRIDGE — LIVE PROOF CONFIRMED (2026-06-01)
+Real bridge via our tool: 3 POL on Polygon -> ETH on Arbitrum, same wallet 0x01F5404f, via LI.FI (gasZipBridge).
+- Source tx (Polygon): 0xc62269e56e7ce6eb6930945bb3b61bccd323c2443fbf25812c5d096c208ef1e4 — MINED block 87763644 status 0x1.
+- Destination ARRIVED: our Arbitrum ETH balance = 0.000138744900526521 (matches quote). Value crossed chains, funds ours.
+PHASE 2 COMPLETE. Note: LI.FI fee collection needs portal.li.fi integrator signup (like the 0x key) — bridging works
+fee-free now; register to monetize. Everything (phases 1, 1.5, 2) now built+tested+live-proven. Branches awaiting merge.
