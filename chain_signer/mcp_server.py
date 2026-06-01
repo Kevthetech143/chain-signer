@@ -12,13 +12,87 @@ from .swap import swap
 from .tx import call_contract, send
 from .wallet import create_wallet
 
+# Shared building blocks so every tool advertises consistent, typed params.
+_CHAIN = {"type": "string", "enum": ["evm", "solana", "bitcoin"], "default": "evm",
+          "description": "Which chain family to act on."}
+_KEY = {"type": "string", "description": "The caller's own private key. Used transiently to sign; never stored (non-custodial)."}
+# EVM transactions are caller-built: the agent supplies nonce + EIP-1559 gas fields.
+_EVM_TX = {
+    "nonce": {"type": "integer", "description": "Account nonce for this transaction."},
+    "max_fee_per_gas": {"type": "integer", "description": "EIP-1559 max fee per gas (wei)."},
+    "max_priority_fee_per_gas": {"type": "integer", "description": "EIP-1559 priority fee per gas (wei)."},
+    "gas": {"type": "integer", "description": "Gas limit."},
+    "chain_id": {"type": "integer", "default": 137, "description": "EVM chain id (137 = Polygon)."},
+}
+_EVM_TX_REQUIRED = ["private_key", "nonce", "max_fee_per_gas", "max_priority_fee_per_gas"]
+
+
+def _schema(properties, required=()):
+    return {"type": "object", "properties": properties, "required": list(required),
+            "additionalProperties": True}
+
+
 TOOL_SPECS = (
-    {"name": "create_wallet", "description": "Create or restore a non-custodial wallet; returns the address and the private key (caller keeps the key)."},
-    {"name": "get_balance", "description": "Read a wallet/address balance from the live chain (read-only)."},
-    {"name": "send", "description": "Sign and post a native-coin transfer with the caller's own key."},
-    {"name": "call_contract", "description": "Sign and post a call to any contract/app function."},
-    {"name": "swap", "description": "Swap tokens via a DEX aggregator with our built-in fee; non-custodial."},
-    {"name": "bridge", "description": "Move value across chains via LI.FI (EVM/Solana/Bitcoin); signs the route tx with the owner's key."},
+    {"name": "create_wallet",
+     "description": "Create or restore a non-custodial wallet; returns the address and the private key (caller keeps the key).",
+     "inputSchema": _schema({
+         "chain": _CHAIN,
+         "testnet": {"type": "boolean", "default": False, "description": "Use the chain's testnet."},
+     })},
+    {"name": "get_balance",
+     "description": "Read a wallet/address balance from the live chain (read-only).",
+     "inputSchema": _schema({
+         "address": {"type": "string", "description": "Address to read the balance of."},
+         "token": {"type": "string", "description": "Optional token/mint address; omit for the native coin."},
+         "chain": _CHAIN,
+         "decimals": {"type": "integer", "default": 18, "description": "Token decimals for formatting."},
+         "testnet": {"type": "boolean", "default": False},
+     }, required=["address"])},
+    {"name": "send",
+     "description": "Sign and post a native-coin transfer with the caller's own key. EVM uses value_wei + nonce/gas; Solana uses lamports; Bitcoin uses amount_btc.",
+     "inputSchema": _schema({
+         "private_key": _KEY,
+         "chain": _CHAIN,
+         "to": {"type": "string", "description": "Recipient address."},
+         "value_wei": {"type": "integer", "description": "EVM: amount to send in wei."},
+         "lamports": {"type": "integer", "description": "Solana: amount to send in lamports."},
+         "amount_btc": {"type": "string", "description": "Bitcoin: amount to send in BTC."},
+         **_EVM_TX,
+     }, required=["private_key", "to"])},
+    {"name": "call_contract",
+     "description": "Sign and post a call to any contract/app function.",
+     "inputSchema": _schema({
+         "private_key": _KEY,
+         "chain": _CHAIN,
+         "contract": {"type": "string", "description": "Target contract address."},
+         "function_signature": {"type": "string", "description": "e.g. 'transfer(address,uint256)'."},
+         "args": {"type": "array", "description": "Positional arguments for the function.", "items": {}},
+         "value": {"type": "integer", "default": 0, "description": "Native value to attach (wei)."},
+         **_EVM_TX,
+     }, required=["private_key", "contract", "function_signature"] + _EVM_TX_REQUIRED[1:])},
+    {"name": "swap",
+     "description": "Swap tokens via a DEX aggregator with our built-in fee; non-custodial.",
+     "inputSchema": _schema({
+         "private_key": _KEY,
+         "chain": _CHAIN,
+         "sell_token": {"type": "string", "description": "Token address to sell."},
+         "buy_token": {"type": "string", "description": "Token address to buy."},
+         "sell_amount": {"type": "string", "description": "Amount of sell_token (base units)."},
+         "fee_recipient": {"type": "string", "description": "Optional address to receive the integrator fee."},
+         **_EVM_TX,
+     }, required=["private_key", "sell_token", "buy_token", "sell_amount"] + _EVM_TX_REQUIRED[1:])},
+    {"name": "bridge",
+     "description": "Move value across chains via LI.FI; signs the route tx with the owner's key.",
+     "inputSchema": _schema({
+         "private_key": _KEY,
+         "from_chain": {"type": "string", "description": "Source chain."},
+         "to_chain": {"type": "string", "description": "Destination chain."},
+         "from_token": {"type": "string", "description": "Token address on the source chain."},
+         "to_token": {"type": "string", "description": "Token address on the destination chain."},
+         "amount": {"type": "string", "description": "Amount to bridge (base units)."},
+         "integrator": {"type": "string", "default": "chain-signer"},
+         **_EVM_TX,
+     }, required=["private_key", "from_chain", "to_chain", "from_token", "to_token", "amount"] + _EVM_TX_REQUIRED[1:])},
 )
 TOOL_NAMES = tuple(t["name"] for t in TOOL_SPECS)
 

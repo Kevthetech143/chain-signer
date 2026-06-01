@@ -21,14 +21,14 @@ def _version():
 
 
 def _tools_for_mcp():
-    # Our descriptors are {name, description}; MCP requires an inputSchema. Tools take a
-    # free-form object of arguments (validated downstream by call_tool), so advertise that.
+    # Surface the real typed inputSchema from the shared tool surface (one source of truth).
+    # Fall back to a permissive object only if a spec somehow lacks one.
     out = []
     for t in list_tools():
         out.append({
             "name": t["name"],
             "description": t.get("description", ""),
-            "inputSchema": {"type": "object", "additionalProperties": True},
+            "inputSchema": t.get("inputSchema") or {"type": "object", "additionalProperties": True},
         })
     return out
 
