@@ -61,9 +61,9 @@ Slices:
       solders; signed tx VERIFIES (tx.verify passes -> owner-signed, the crown proof); 63 tests green.
       LIVE devnet SEND pending: public devnet faucet airdrop is HTTP 429 rate-limited (transient). Code is correct
       (verified); live broadcast just needs test SOL. Cron retries the airdrop opportunistically each cycle.
-- [ ] 10. Bitcoin adapter — create_wallet('bitcoin'), get_balance, send (UTXO transfer; NO contracts/swap — honest cap).
-      Dep: a BTC lib (bit / bitcoinlib) — use tools/fetch_wheel.py if pip stalls. Live-prove on testnet (faucet).
-      NEXT (cron): build Bitcoin now while the Solana devnet faucet cools; retry Solana airdrop opportunistically.
+- [~] 10. Bitcoin adapter — wallet DONE (bit 0.8.0 + coincurve installed; mainnet+testnet; 7 tests; key-secrecy held;
+      70 total green). create_wallet('bitcoin', testnet=bool). NEXT: get_balance + send (UTXO via bit) + testnet
+      faucet live proof. (NO contracts/swap — honest cap.) Also retry Solana devnet airdrop opportunistically.
 - [ ] 11. Extend chain dispatch + mcp/CLI surface to route 'solana'/'bitcoin'; full suite stays green.
 NEXT = Slice 9 (Solana) recon + red tests. Build cron re-armed for this phase.
 BLOCKER (2026-05-31): Solana devnet RPC reachable, but pip install of solders/base58/pynacl keeps FAILING on
