@@ -9,10 +9,12 @@ import os
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-SUPPORTED_CHAINS = ("evm", "solana")
+SUPPORTED_CHAINS = ("evm", "solana", "bitcoin")
 CHAIN_IDS = {"evm": 137}  # Polygon mainnet
 ETHERSCAN_V2_BASE = "https://api.etherscan.io/v2/api"
 SOLANA_RPC = "https://api.mainnet-beta.solana.com"
+BLOCKSTREAM = "https://blockstream.info/api"
+BLOCKSTREAM_TESTNET = "https://blockstream.info/testnet/api"
 
 
 def _default_fetch(url: str) -> dict:
@@ -38,10 +40,18 @@ def get_solana_balance(target, *, rpc=None):
     return res["value"] / 1e9
 
 
-def get_balance(target, token=None, *, chain="evm", decimals=18, fetch=None, rpc=None):
+def get_bitcoin_balance(target, *, testnet=False, fetch=None):
+    """Return native BTC balance (read-only) via the keyless Blockstream API."""
+    base = BLOCKSTREAM_TESTNET if testnet else BLOCKSTREAM
+    data = (fetch or _default_fetch)(f"{base}/address/{_resolve_address(target)}")
+    cs = data["chain_stats"]
+    return (cs["funded_txo_sum"] - cs["spent_txo_sum"]) / 1e8
+
+
+def get_balance(target, token=None, *, chain="evm", decimals=18, fetch=None, rpc=None, testnet=False):
     """Return the balance of `target` (a Wallet or address) in human units.
 
-    EVM: token=None reads native (POL); a token address reads that ERC-20. Solana: native SOL.
+    EVM: token=None reads native (POL); a token address reads that ERC-20. Solana: native SOL. Bitcoin: BTC.
     """
     if chain not in SUPPORTED_CHAINS:
         raise ValueError(
@@ -49,6 +59,8 @@ def get_balance(target, token=None, *, chain="evm", decimals=18, fetch=None, rpc
         )
     if chain == "solana":
         return get_solana_balance(target, rpc=rpc)
+    if chain == "bitcoin":
+        return get_bitcoin_balance(target, testnet=testnet, fetch=fetch)
     fetch = fetch or _default_fetch
     params = {
         "chainid": CHAIN_IDS[chain],
