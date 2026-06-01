@@ -213,3 +213,11 @@ we already hold on Polygon (deposit wallet 0x0a94...), and report the tx hash be
 A 15-min cron (id 14a00c11) drives the next pending step, runs tests, reports status each cycle, and self-ends only
 when the DEFINITION OF DONE above is fully met.
 Spec: ~/agents/global/cron/polymarket/chain-signer-build.md
+
+## ===== PHASE 2 — CROSS-CHAIN BRIDGING (2026-06-01) =====
+Engine: LI.FI (keyless quotes via browser UA header — Cloudflare 1010 gotcha; intel docs/research/2026-06-01-bridge.md).
+- [x] bridge.py — get_bridge_quote (LI.FI) + bridge_evm (signs the route tx with owner key, recovers to owner). 
+- [x] "bridge" wired into call_tool / tool surface. 85 tests green. Branch feature/cross-chain-bridge.
+- [ ] LIVE cross-chain proof — needs Kelvin go + funds (real money across chains). HOLDING.
+Build cron 12274437 DELETED (build done; remaining items need Kelvin). 
+Pending Kelvin: (a) live bridge proof go+route, (b) merge feature branches (solana-bitcoin + cross-chain-bridge) to main.
