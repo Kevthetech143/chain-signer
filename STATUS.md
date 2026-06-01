@@ -73,6 +73,12 @@ Live testnet SEND proofs (Solana devnet + Bitcoin testnet) remain BLOCKED on fre
 automated client (Solana devnet airdrop returns null/429; Bitcoin testnet faucets need captcha). NOT code issues:
 read paths live-proven both chains; Solana send cryptographically verified; Bitcoin send is real bit signing.
 EVM/Polygon already proven with a real on-chain transfer (phase 1). Faucets retried opportunistically.
+
+/stuck angle log on the faucet blocker (2026-06-01): (1) devnet api.devnet.solana.com requestAirdrop -> 429/null;
+(2) testnet api.testnet.solana.com requestAirdrop -> -32603 internal error; (3) faucet.solana.com web API -> 403
+Forbidden (browser/captcha gated). Public faucets refuse automated clients. 4th angle available but not auto-run:
+drive faucet.solana.com in our signed-in browser (/web) to clear the captcha — heavy for a marginal proof.
+Specific ask to Kelvin: merge now (sends proven-in-tests) OR I run the browser-faucet angle / you drop test funds.
 NEXT = Slice 9 (Solana) recon + red tests. Build cron re-armed for this phase.
 BLOCKER (2026-05-31): Solana devnet RPC reachable, but pip install of solders/base58/pynacl keeps FAILING on
 network ("connectivity" errors mid-download); no ed25519 libs pre-installed. UNBLOCKED (2026-06-01): the 25MB issue was the connection dropping LONG transfers, not size. Fix: download in
