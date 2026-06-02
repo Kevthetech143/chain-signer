@@ -188,3 +188,6 @@ Clean-venv `pip install chain-signer` -> 0.2.7. Ran real drain txs through the P
 
 ## 2026-06-02 — DISTRIBUTION: official registry listing verified current (propagation source healthy)
 Checked the official MCP registry (the source all downstream directories auto-ingest from, incl. Glama). io.github.Kevthetech143/chain-signer is live with v0.2.7 isLatest=TRUE (pub 18:09); all 18 prior versions correctly isLatest=false. So the source is correct — Glama (still 404) just has not run its ingest yet; nothing broken on our end. No action needed but the cheap recheck each cycle.
+
+## 2026-06-02 — DISTRIBUTION: README/PyPI landing now leads with the wedge (v0.2.8)
+The hero + feature list predated NFT/permit/multicall coverage — undersold the tool. Fixed: current pattern list, dedicated "Safety preflight (the wedge)" section with concrete preflight() output + honest limits, preflight/assert_safe added to feature list. Docs-only release refreshes the PyPI landing page (real conversion surface). Live on PyPI + registry. Glama still 404 (auto-ingest pending).
