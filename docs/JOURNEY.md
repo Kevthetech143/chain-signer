@@ -152,3 +152,6 @@ preflight now unwraps multicall(bytes[]) and runs the rule engine on each inner 
 
 ## 2026-06-02 — SECURITY: on-chain permit() allowance rule (v0.2.5)
 Preflight now flags an unlimited/large-allowance permit() call (ERC-2612, selector 0xd505accf) — a real drain setup (permit then transferFrom). Reuses the shared rule engine, so it is caught top-level and inside multicall. Off-chain EIP-712 permit signatures remain out of scope (sign_typed_data, not a tx). 163 tests.
+
+## 2026-06-02 — DISTRIBUTION: awesome-mcp-servers PR drafted (held for go)
+Kelvin authorized his GitHub (Kevthetech143) for distribution. Verified the canonical MCP directory punkpeye/awesome-mcp-servers (88k stars, maintained) + read its contributing rules (alphabetical, concise). Drafted the exact entry leading with the safety wedge, recommended SECURITY category (peers: aegis/agentward/nobulex — guardrails that check risk before a tool runs). Draft + one-go fire sequence saved to docs/distribution/awesome-mcp-pr-draft.md. NOT fired — public + in his name, holding for his wording/category ok. Honesty gate: one well-fit list first, no mass-submit.
