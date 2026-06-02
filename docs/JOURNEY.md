@@ -167,3 +167,6 @@ Independent bypass hunt (agent read the raw file, proved each with running code)
 
 ## 2026-06-02 — COMPETITION: wedge re-verified (evidence, not assertion)
 Live search confirmed no off-the-shelf Python lib decodes an unsigned tx + flags drains before signing. Rivals gate on amount/whitelist (waiaas, agoragentic) or are custodial platforms (OKX) / MPC custody (Cobo, Turnkey) — different axes. Our calldata-intent niche unfilled. NEW positioning: complementary to policy engines (the "what does this call DO" layer), not a replacement — a real integration/distribution angle.
+
+## 2026-06-02 — DISTRIBUTION: cleared the technical half of the awesome-mcp-servers gate
+PR #7298 bot (glama-check) requires: server listed on Glama + passing build/introspection check + a score badge on the entry. Shipped a Dockerfile (python:3.12-slim, installs from source, runs chain-signer-mcp as non-root) — VERIFIED locally: initialize + tools/list respond, 6 tools. That is exactly what Glama's check runs. NEXT (bounded web task): submit chain-signer at glama.ai/mcp/servers under Kelvin GitHub (OAuth login), point it at the repo+Dockerfile, wait for the score, then add the badge to PR #7298 and reply to the bot. chain-signer NOT yet on Glama (that owner path currently maps to his Hivemind repo). Doing the Glama submission via /web as its own focused run.
