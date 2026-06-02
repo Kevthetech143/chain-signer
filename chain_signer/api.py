@@ -55,6 +55,38 @@ def sign_typed_data(wallet, domain: dict, types: dict, message: dict) -> str:
     return signed.signature.to_0x_hex()
 
 
+def sign_x402_payment(wallet, *, token, to, value, valid_before, valid_after=0,
+                      nonce=None, chain_id, token_name="USD Coin", token_version="2") -> dict:
+    """Build + sign an x402 payment authorization (EIP-3009 TransferWithAuthorization) in one call.
+
+    Returns the header-ready payload {"signature", "authorization"} an agent puts in the x402
+    payment header. The agent signs locally with its own key — non-custodial, no password prompt.
+
+    token: the stablecoin contract (USDC/EURC). value: amount in base units (int). valid_before:
+    unix expiry. nonce: random 32-byte hex; generated if omitted. token_name/token_version must match
+    the token contract's EIP-712 domain (read its name()/version(); USDC is often "USD Coin"/"2").
+    Spec: coinbase/x402 specs/schemes/exact/scheme_exact_evm.md.
+    """
+    import os
+    nonce_bytes = os.urandom(32) if nonce is None else bytes.fromhex(str(nonce)[2:] if str(nonce).startswith("0x") else str(nonce))
+    domain = {"name": token_name, "version": token_version, "chainId": int(chain_id), "verifyingContract": token}
+    types = {"TransferWithAuthorization": [
+        {"name": "from", "type": "address"}, {"name": "to", "type": "address"},
+        {"name": "value", "type": "uint256"}, {"name": "validAfter", "type": "uint256"},
+        {"name": "validBefore", "type": "uint256"}, {"name": "nonce", "type": "bytes32"}]}
+    message = {"from": wallet.address, "to": to, "value": int(value),
+               "validAfter": int(valid_after), "validBefore": int(valid_before), "nonce": nonce_bytes}
+    signature = sign_typed_data(wallet, domain, types, message)
+    return {
+        "signature": signature,
+        "authorization": {
+            "from": wallet.address, "to": to, "value": str(value),
+            "validAfter": int(valid_after), "validBefore": int(valid_before),
+            "nonce": "0x" + nonce_bytes.hex(),
+        },
+    }
+
+
 def export_encrypted(wallet, password: str) -> dict:
     """Encrypt the wallet's key into a standard keystore dict (eth_account / Web3 Secret Storage).
 

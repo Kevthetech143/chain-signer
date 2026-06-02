@@ -78,6 +78,16 @@ trading in your jurisdiction.
 - Balances/broadcast use the Etherscan v2 indexer (authoritative), never a free public RPC.
 - Low-level building blocks (`tx.send`, `call_contract`, explicit nonce/gas) remain available for advanced use.
 
+## Pay an x402 API in one call
+```python
+from chain_signer import burner, sign_x402_payment
+w = burner()
+payload = sign_x402_payment(w, token=USDC, to=PAY_TO, value=1000, valid_before=EXPIRES, chain_id=8453)
+# -> {"signature", "authorization"} ready for the x402 payment header. Signed locally, no prompt.
+```
+Builds + signs the EIP-3009 authorization x402 expects (the "exact" scheme). Your agent pays a
+paid API by itself — no password prompt, no signup, no custody.
+
 ## Sign typed data (EIP-712) — for agent payments / x402
 ```python
 from chain_signer import burner, sign_typed_data
