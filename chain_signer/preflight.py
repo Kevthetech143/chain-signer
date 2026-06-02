@@ -14,6 +14,12 @@ _KNOWN = {
     "0xa22cb465": ("setApprovalForAll", ["address", "bool"]),
     "0xa9059cbb": ("transfer", ["address", "uint256"]),
     "0x23b872dd": ("transferFrom", ["address", "address", "uint256"]),
+    # ERC-721 / ERC-1155 safe transfers — same drain shape as transferFrom (from -> to). Only the
+    # first two words (from, to) are needed; trailing dynamic args are ignored.
+    "0x42842e0e": ("safeTransferFrom", ["address", "address"]),         # ERC-721
+    "0xb88d4fde": ("safeTransferFrom", ["address", "address"]),         # ERC-721 with data
+    "0xf242432a": ("safeTransferFrom", ["address", "address"]),         # ERC-1155
+    "0x2eb2c2d6": ("safeBatchTransferFrom", ["address", "address"]),    # ERC-1155 batch
     "0x3659cfe6": ("upgradeTo", ["address"]),
     "0x4f1ef286": ("upgradeToAndCall", ["address"]),
     # ERC-2612 permit submitted on-chain — grants an allowance to `spender` like approve does.
@@ -54,7 +60,7 @@ def _to_int(v):
             return int(v, 16) if v[:2].lower() == "0x" else int(v)
         if isinstance(v, (bytes, bytearray)):
             return int.from_bytes(v, "big")
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, OverflowError):  # OverflowError: int(float('inf'))
         return None
     return None
 
@@ -122,10 +128,11 @@ def _call_flags(decoded, prefix=""):
         flags.append({"code": "approval_for_all", "severity": "HIGH",
                       "detail": f"{prefix}setApprovalForAll grants {args[0]} control of EVERY token in this "
                                 "collection — a common NFT-drain approval."})
-    elif fn == "transferFrom" and len(args) >= 3:
+    elif fn in ("transferFrom", "safeTransferFrom", "safeBatchTransferFrom") and len(args) >= 2:
+        asset = "an NFT/token" if fn != "transferFrom" else "tokens"
         flags.append({"code": "token_transfer_from", "severity": "HIGH",
-                      "detail": f"{prefix}transferFrom moves tokens OUT of {args[0]} to {args[1]} — this is the call a "
-                                "malicious spender uses to drain an approved wallet. Confirm you intend it."})
+                      "detail": f"{prefix}{fn} moves {asset} OUT of {args[0]} to {args[1]} — this is the call a "
+                                "malicious spender uses to drain an approved wallet/collection. Confirm you intend it."})
     elif fn == "transfer" and len(args) >= 2 and args[1] >= _LARGE_APPROVAL:
         flags.append({"code": "large_transfer", "severity": "MED",
                       "detail": f"{prefix}transfer of a very large amount to {args[0]}; confirm the amount/recipient."})
@@ -170,7 +177,14 @@ def _collect_flags(data, prefix="", depth=0):
         for c in inner:
             flags.extend(_collect_flags(c, prefix="(inside multicall) ", depth=depth + 1))
         return flags
-    return _call_flags(_decode(data), prefix)
+    decoded = _decode(data)
+    flags = _call_flags(decoded, prefix)
+    # An unknown inner call is just as opaque as a top-level one — surface it (LOW), don't swallow it.
+    if depth > 0 and decoded is not None and decoded.get("function") is None and s not in ("", "0x"):
+        flags.append({"code": "opaque_calldata", "severity": "LOW",
+                      "detail": f"{prefix}calls an unknown function ({decoded.get('selector')}); "
+                                "can't tell what it does — review before signing."})
+    return flags
 
 
 def preflight(tx, *, fetch=None, sim=None, max_value=None):
