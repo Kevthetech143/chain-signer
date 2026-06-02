@@ -1,95 +1,144 @@
 """Transaction preflight — decode an unsigned EVM tx and flag danger BEFORE signing.
 
-chain-signer's safety wedge: "the agent signer that won't sign a dangerous transaction."
-Given an unsigned tx ({to, data, value, ...}), preflight() decodes the calldata and returns
-risk flags so an agent (or our send path) can refuse a drain/unlimited-approval/etc. before it
-signs. Pure, offline, deterministic — no network needed for the static checks (richer simulation
-is injectable). Non-custodial: we only inspect and warn; the caller stays in control.
+chain-signer's safety layer: a FIRST-LINE check that catches common drain patterns (unlimited
+approvals, approve-all, transferFrom pulls, proxy upgrades, reverts) before an agent signs. It is
+a guard, NOT a guarantee — static calldata can lie, and signed-message (permit/Permit2) phishing
+flows through sign_typed_data, not here. Fail-SAFE: never crashes on bad input; when unsure it
+flags rather than waving through. Non-custodial: we only inspect and warn; the caller decides.
 """
 
-# selector -> (name, [arg types]). 4-byte function selectors (keccak of the signature, first 4 bytes).
+# selector -> (name, [arg types]). 4-byte function selectors.
 _KNOWN = {
-    "0x095ea7b3": ("approve", ["address", "uint256"]),            # ERC-20 approve(spender, amount)
-    "0x39509351": ("increaseAllowance", ["address", "uint256"]),  # ERC-20 increaseAllowance(spender, added)
-    "0xa22cb465": ("setApprovalForAll", ["address", "bool"]),     # ERC-721/1155 setApprovalForAll(op, approved)
+    "0x095ea7b3": ("approve", ["address", "uint256"]),
+    "0x39509351": ("increaseAllowance", ["address", "uint256"]),
+    "0xa22cb465": ("setApprovalForAll", ["address", "bool"]),
+    "0xa9059cbb": ("transfer", ["address", "uint256"]),
+    "0x23b872dd": ("transferFrom", ["address", "address", "uint256"]),
+    "0x3659cfe6": ("upgradeTo", ["address"]),
+    "0x4f1ef286": ("upgradeToAndCall", ["address"]),
 }
 
-# "Infinite-intent" approval: >= 2**255 is half the entire uint256 space — unmistakably unlimited,
-# and far beyond any real token's supply. Catches uint-max AND the 2**255 half-max evasion.
-_UNLIMITED_THRESHOLD = 1 << 255
-# Large-but-finite approvals can't be judged precise without token decimals/supply, but an approval
-# this big still deserves a "confirm this" warning rather than passing silently.
-_LARGE_APPROVAL = 10 ** 24
+_UNLIMITED_THRESHOLD = 1 << 255       # effectively-infinite approval (catches uint-max + half-max)
+_LARGE_APPROVAL = 10 ** 24            # large-but-finite: warn, don't claim infinite
+
+
+def _norm_hex(data):
+    if isinstance(data, (bytes, bytearray)):
+        return data.hex()
+    if not isinstance(data, str):
+        return None
+    return data[2:] if data[:2].lower() == "0x" else data
+
+
+def _to_int(v):
+    try:
+        if v is None:
+            return 0
+        if isinstance(v, bool):
+            return int(v)
+        if isinstance(v, (int, float)):
+            return int(v)
+        if isinstance(v, str):
+            return int(v, 16) if v[:2].lower() == "0x" else int(v)
+        if isinstance(v, (bytes, bytearray)):
+            return int.from_bytes(v, "big")
+    except (ValueError, TypeError):
+        return None
+    return None
 
 
 def _decode(data):
-    """Decode calldata into {function, selector, args} for known functions, else None."""
-    if not data or data == "0x":
+    """Decode calldata -> {function, selector, args, malformed}. Never raises."""
+    s = _norm_hex(data)
+    if not s:
         return None
-    hexstr = data[2:] if data.startswith("0x") else data
-    selector = "0x" + hexstr[:8].lower()
+    selector = "0x" + s[:8].lower()
     spec = _KNOWN.get(selector)
     if not spec:
-        return {"function": None, "selector": selector, "args": []}
+        return {"function": None, "selector": selector, "args": [], "malformed": False}
     name, types = spec
-    body = hexstr[8:]
-    args = []
+    body = s[8:]
+    args, malformed = [], False
     for i, t in enumerate(types):
         word = body[i * 64:(i + 1) * 64]
-        if not word:
+        if len(word) < 64:           # missing / truncated argument
+            malformed = True
+            break
+        try:
+            raw = int(word, 16)
+        except ValueError:           # non-hex garbage in an arg word
+            malformed = True
             break
         if t == "address":
             args.append("0x" + word[-40:])
         elif t == "bool":
-            args.append(int(word, 16) != 0)
-        else:  # uint256 and friends
-            args.append(int(word, 16))
-    return {"function": name, "selector": selector, "args": args}
+            args.append(raw != 0)
+        else:
+            args.append(raw)
+    return {"function": name, "selector": selector, "args": args, "malformed": malformed}
 
 
 def preflight(tx, *, fetch=None, sim=None, max_value=None):
-    """Inspect an unsigned EVM tx and return a risk report. Does NOT sign or send.
+    """Inspect an unsigned EVM tx and return a risk report. Never signs/sends; never crashes."""
+    if not isinstance(tx, dict):
+        return {"decoded": None, "simulation": None, "ok": False,
+                "risk_flags": [{"code": "unparseable", "severity": "HIGH",
+                                "detail": "transaction is not a readable object — refusing to vouch for it."}]}
 
-    sim: optional callable(tx)->{"will_revert": bool, ...} for richer simulation (injectable, so
-    tests/offline use need no chain). max_value: flag native sends above this (wei).
-    """
-    decoded = _decode(tx.get("data"))
     data = tx.get("data") or "0x"
+    decoded = _decode(data)
     flags = []
 
-    if decoded and decoded["function"] in ("approve", "increaseAllowance") and len(decoded["args"]) >= 2:
-        amount = decoded["args"][1]
-        spender = decoded["args"][0]
-        if isinstance(amount, int) and amount >= _UNLIMITED_THRESHOLD:
-            flags.append({"code": "unlimited_approval", "severity": "HIGH",
-                          "detail": f"{decoded['function']}() grants an effectively-unlimited allowance to "
-                                    f"{spender} — a spender that turns malicious can drain that token."})
-        elif isinstance(amount, int) and amount >= _LARGE_APPROVAL:
-            flags.append({"code": "large_approval", "severity": "MED",
-                          "detail": f"{decoded['function']}() grants a very large allowance to {spender}; "
-                                    "confirm this is intended (consider approving only what you'll spend)."})
-
-    if decoded and decoded["function"] == "setApprovalForAll" and len(decoded["args"]) >= 2:
-        if decoded["args"][1] is True:
+    if decoded and decoded.get("malformed"):
+        flags.append({"code": "malformed_call", "severity": "MED",
+                      "detail": f"calldata for {decoded.get('function') or 'a known function'} is truncated or "
+                                "non-hex — its real effect can't be trusted; review before signing."})
+    elif decoded and decoded.get("function"):
+        fn, args = decoded["function"], decoded["args"]
+        if fn in ("approve", "increaseAllowance") and len(args) >= 2:
+            amt, spender = args[1], args[0]
+            if amt >= _UNLIMITED_THRESHOLD:
+                flags.append({"code": "unlimited_approval", "severity": "HIGH",
+                              "detail": f"{fn}() grants an effectively-unlimited allowance to {spender} — "
+                                        "a spender that turns malicious can drain that token."})
+            elif amt >= _LARGE_APPROVAL:
+                flags.append({"code": "large_approval", "severity": "MED",
+                              "detail": f"{fn}() grants a very large allowance to {spender}; confirm it's intended."})
+        elif fn == "setApprovalForAll" and len(args) >= 2 and args[1] is True:
             flags.append({"code": "approval_for_all", "severity": "HIGH",
-                          "detail": f"setApprovalForAll grants {decoded['args'][0]} control of EVERY token "
-                                    "in this collection — a common NFT-drain approval."})
+                          "detail": f"setApprovalForAll grants {args[0]} control of EVERY token in this "
+                                    "collection — a common NFT-drain approval."})
+        elif fn == "transferFrom" and len(args) >= 3:
+            flags.append({"code": "token_transfer_from", "severity": "HIGH",
+                          "detail": f"transferFrom moves tokens OUT of {args[0]} to {args[1]} — this is the call a "
+                                    "malicious spender uses to drain an approved wallet. Confirm you intend it."})
+        elif fn == "transfer" and len(args) >= 2 and args[1] >= _LARGE_APPROVAL:
+            flags.append({"code": "large_transfer", "severity": "MED",
+                          "detail": f"transfer of a very large amount to {args[0]}; confirm the amount/recipient."})
+        elif fn in ("upgradeTo", "upgradeToAndCall"):
+            flags.append({"code": "proxy_upgrade", "severity": "HIGH",
+                          "detail": f"{fn}() repoints a proxy's logic to {args[0] if args else '?'} — this can "
+                                    "replace the contract's entire behavior. Only sign if you control that address."})
 
-    # native value over the caller's comfort threshold
-    value = int(tx.get("value") or 0)
-    if max_value is not None and value > max_value:
-        flags.append({"code": "large_native_value", "severity": "MED",
-                      "detail": f"about to send {value} wei to {tx.get('to')} — above your set limit; confirm."})
-
-    # non-empty calldata to a function we can't decode = we can't tell what it does
     if decoded is not None and decoded.get("function") is None and data not in ("0x", ""):
         flags.append({"code": "opaque_calldata", "severity": "LOW",
                       "detail": f"calldata calls an unknown function ({decoded.get('selector')}); "
                                 "can't tell what it does — review before signing."})
 
+    value = _to_int(tx.get("value"))
+    if value is None:
+        flags.append({"code": "unreadable_value", "severity": "MED",
+                      "detail": "transaction value couldn't be read — review before signing."})
+    elif max_value is not None and value > max_value:
+        flags.append({"code": "large_native_value", "severity": "MED",
+                      "detail": f"about to send {value} wei to {tx.get('to')} — above your set limit; confirm."})
+
     simulation = None
     if sim is not None:
-        simulation = sim(tx)
+        try:
+            simulation = sim(tx)
+        except Exception as e:  # a broken simulator must not break the safety check
+            simulation = {"will_revert": None, "error": f"simulation failed: {e}"}
         if simulation and simulation.get("will_revert"):
             flags.append({"code": "will_revert", "severity": "HIGH",
                           "detail": "simulation says this transaction will revert (fail) — signing wastes gas "
@@ -100,11 +149,7 @@ def preflight(tx, *, fetch=None, sim=None, max_value=None):
 
 
 def assert_safe(tx, *, force=False, **kw):
-    """Run preflight(tx); raise ValueError if a HIGH flag is present (unless force=True).
-
-    The send-path guard: build a tx, assert_safe() it, then sign. Returns the report either way.
-    force=True signs anyway but still returns the (not-ok) report so the caller has the warnings.
-    """
+    """Run preflight(tx); raise ValueError on a HIGH flag unless force=True. Returns the report."""
     report = preflight(tx, **kw)
     if not force:
         highs = [f for f in report["risk_flags"] if f["severity"] == "HIGH"]
