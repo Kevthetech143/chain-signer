@@ -1,15 +1,20 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Kevthetech143/chain-signer",
-  "description": "Non-custodial burner wallet for AI agents: make a wallet, check balance, send, swap.",
+  "description": "Non-custodial agent wallet with a preflight safety check that flags drain txs before signing.",
   "version": "0.1.4",
-  "repository": { "url": "https://github.com/Kevthetech143/chain-signer", "source": "github" },
+  "repository": {
+    "url": "https://github.com/Kevthetech143/chain-signer",
+    "source": "github"
+  },
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "chain-signer",
       "version": "0.1.4",
-      "transport": { "type": "stdio" }
+      "transport": {
+        "type": "stdio"
+      }
     }
   ]
 }
