@@ -99,3 +99,6 @@ Built an end-to-end tester that installs the published package fresh and exercis
 
 ## 2026-06-01 — discipline: hold
 Flat signals. V1 is done and self-testing. The honest move is to wait and respond, not keep shipping into the void. Held.
+
+## 2026-06-01 — fix the first-minute failure
+The most basic call, balance, crashed cryptically with no API key — the exact wall a first user hits. Made it say what to set. Small, but it is the difference between a dev fixing it in 10 seconds and closing the tab.
