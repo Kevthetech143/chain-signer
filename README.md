@@ -78,6 +78,14 @@ trading in your jurisdiction.
 - Balances/broadcast use the Etherscan v2 indexer (authoritative), never a free public RPC.
 - Low-level building blocks (`tx.send`, `call_contract`, explicit nonce/gas) remain available for advanced use.
 
+## Sign typed data (EIP-712) — for agent payments / x402
+```python
+from chain_signer import burner, sign_typed_data
+w = burner()
+sig = sign_typed_data(w, domain, types, message)  # EIP-712; for x402 / EIP-3009 authorizations
+```
+Your agent can authorize a payment by signing typed data locally — no password prompt, no signup.
+
 ## Run as an MCP server
 chain-signer is also a Model Context Protocol (MCP) server, so MCP-aware agents can use it directly:
 ```
