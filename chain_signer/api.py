@@ -42,6 +42,19 @@ def sign_message(wallet, text: str) -> str:
     return signed.signature.to_0x_hex()
 
 
+def sign_typed_data(wallet, domain: dict, types: dict, message: dict) -> str:
+    """Sign EIP-712 typed structured data with the wallet's key (the agent-payments format).
+
+    Used by x402 / EIP-3009 style flows where an agent authorizes a payment by signing typed data
+    rather than plain text. Returns the 0x signature hex; recover via eth_account encode_typed_data +
+    Account.recover_message. EVM wallets only. Non-custodial: key used transiently, never stored.
+    """
+    from eth_account import Account
+    signed = Account.sign_typed_data(wallet.private_key, domain_data=domain,
+                                     message_types=types, message_data=message)
+    return signed.signature.to_0x_hex()
+
+
 def export_encrypted(wallet, password: str) -> dict:
     """Encrypt the wallet's key into a standard keystore dict (eth_account / Web3 Secret Storage).
 
