@@ -164,3 +164,6 @@ Kelvin gave explicit pre-approval. Opened PR to punkpeye/awesome-mcp-servers (88
 
 ## 2026-06-02 — SECURITY: adversarial review fixes (v0.2.7)
 Independent bypass hunt (agent read the raw file, proved each with running code) found 3 real holes, all fixed TDD: (1) HIGH — ERC-721/1155 safeTransferFrom NFT drains were only LOW/opaque; now HIGH like transferFrom, incl. inside multicall. (2) fail-unsafe — value=float(inf) crashed via int(inf) OverflowError; now caught -> unreadable_value, never raises. (3) LOW — unknown selector inside multicall now surfaced as opaque instead of swallowed. 172 tests. Logged-not-dropped: Multicall3 aggregate3/tryAggregate + Universal Router execute() batchers use other encodings, future slice.
+
+## 2026-06-02 — COMPETITION: wedge re-verified (evidence, not assertion)
+Live search confirmed no off-the-shelf Python lib decodes an unsigned tx + flags drains before signing. Rivals gate on amount/whitelist (waiaas, agoragentic) or are custodial platforms (OKX) / MPC custody (Cobo, Turnkey) — different axes. Our calldata-intent niche unfilled. NEW positioning: complementary to policy engines (the "what does this call DO" layer), not a replacement — a real integration/distribution angle.
