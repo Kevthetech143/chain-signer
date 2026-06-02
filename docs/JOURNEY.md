@@ -140,3 +140,6 @@ Built the whole preflight safety layer straight through (tasks 31-36), shipped 0
 
 ## 2026-06-02 — SECURITY pillar: hardened (v0.2.1)
 Adversarially tested our own safety tool, found 2 bypasses (2^255 half-max approval, increaseAllowance dodge), fixed both + added MED warning for large finite approvals. A safety tool must not be bypassable. 153 tests, shipped hands-free.
+
+## 2026-06-02 — stress test -> hardened (v0.2.2)
+3 adversarial agents broke v0.2.1: crash on hex value (fail-open), crash on malformed calldata, no transferFrom/proxy-upgrade rules, truncated approve passed clean. Fixed ALL TDD: fail-safe (never crash; flag unreadable/malformed), added transferFrom (HIGH), upgradeTo/upgradeToAndCall (HIGH), transfer-large (MED), malformed_call (MED), sim-exception guard. Reframed README honestly: "first-line guard, not a guarantee" (no permit-sig phishing). 159 tests. Known remaining (documented, not claimed): multicall-inner-decode + permit/Permit2 signature phishing are out of scope. SECURITY pillar materially stronger + honest.
