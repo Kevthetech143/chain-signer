@@ -149,3 +149,6 @@ Updated registry manifest + GitHub description/topics to lead with the safety ch
 
 ## 2026-06-02 — SECURITY: multicall bypass closed (v0.2.4)
 preflight now unwraps multicall(bytes[]) and runs the rule engine on each inner call — closes the hidden-approval drain the stress test found. Shared _call_flags engine for nested+top-level. 161 tests.
+
+## 2026-06-02 — SECURITY: on-chain permit() allowance rule (v0.2.5)
+Preflight now flags an unlimited/large-allowance permit() call (ERC-2612, selector 0xd505accf) — a real drain setup (permit then transferFrom). Reuses the shared rule engine, so it is caught top-level and inside multicall. Off-chain EIP-712 permit signatures remain out of scope (sign_typed_data, not a tx). 163 tests.
