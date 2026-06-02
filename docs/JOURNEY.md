@@ -137,3 +137,6 @@ Kelvin said go. Built preflight unit 1: decode calldata + flag unlimited token a
 
 ## 2026-06-02 — SHIPPED v0.2.0 (the wedge, live)
 Built the whole preflight safety layer straight through (tasks 31-36), shipped 0.2.0 hands-free. chain-signer is now "the agent wallet that won\047t sign a dangerous transaction." 149 tests. Repositioned README around safety. Next: get it in front of agent builders.
+
+## 2026-06-02 — SECURITY pillar: hardened (v0.2.1)
+Adversarially tested our own safety tool, found 2 bypasses (2^255 half-max approval, increaseAllowance dodge), fixed both + added MED warning for large finite approvals. A safety tool must not be bypassable. 153 tests, shipped hands-free.
