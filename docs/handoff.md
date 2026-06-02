@@ -77,3 +77,5 @@
 2026-06-01 — v0.1.15 HARDENING (from 3-agent stress test). Fixed HIGH key-leak (bad Bitcoin WIF echoed via bit + MCP wrapper -> now fixed-message at source + scrub), x402 non-bytes32 nonce (reject), x402 float-value signed/advertised divergence (coerce int once), balance non-dict guard. TDD, suite 130. Agents confirmed core invariants solid; only error edges leaked. Lower-pri left: cli traceback (same bit fix now covers it), no-id notification response, py.typed, create_wallet restore-via-MCP, to_wei negative.
 
 2026-06-01 — v0.1.16: closed remaining stress-test findings (no-id notification, create_wallet restore-via-MCP, to_wei negative guard, py.typed). TDD, suite 134, hands-free. Stress-test loop fully closed.
+
+2026-06-01 — Launched HACKATHON workflow (Kelvin idea): 8 hacker agents each invent + code-sketch a creative chain-signer use (distinct angles), 3 judges/entry score creativity+feasibility+grounded+surprise, synth crowns winner + flags surprises + feasible-today vs needs-feature. Background task w0wrllkdh / run wf_5a283d34-d16. Honest frame: generates IDEAS to then demand-check, not proven demand. Will write standouts to docs/research on completion.
