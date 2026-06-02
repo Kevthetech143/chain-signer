@@ -209,3 +209,5 @@ Root cause: cron-fire reply text was not reaching Kelvin; I had been relying on 
 
 ## 2026-06-02 — DISTRIBUTION: confirmed LIVE on PulseMCP (real discovery presence)
 PulseMCP search shows "Chain Signer by Kevthetech143" — auto-ingested from the official registry. So we DO have real directory presence beyond our own repo (contradicts "zero reach"). Caveat: PulseMCP shows a STALE description (old "burner wallet...swapping") from an earlier version; the registry source is correct at 0.2.8 ("preflight safety check that flags drain txs before signing") with isLatest=true, so PulseMCP will refresh on its next ingest — no fix needed on our end. Glama still 404 (slower ingest), PR #7298 open, GitHub stars 0. Downstream propagation is working; Glama is just lagging.
+
+## 2026-06-02 — WATCH (hourly): no change (Glama 404, PR open, 0 stars). Notify sent.
