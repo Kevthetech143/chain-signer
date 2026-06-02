@@ -42,9 +42,14 @@ def _decode(data):
     return {"function": name, "selector": selector, "args": args}
 
 
-def preflight(tx, *, fetch=None, sim=None):
-    """Inspect an unsigned EVM tx and return a risk report. Does NOT sign or send."""
+def preflight(tx, *, fetch=None, sim=None, max_value=None):
+    """Inspect an unsigned EVM tx and return a risk report. Does NOT sign or send.
+
+    sim: optional callable(tx)->{"will_revert": bool, ...} for richer simulation (injectable, so
+    tests/offline use need no chain). max_value: flag native sends above this (wei).
+    """
     decoded = _decode(tx.get("data"))
+    data = tx.get("data") or "0x"
     flags = []
 
     if decoded and decoded["function"] == "approve" and len(decoded["args"]) >= 2:
@@ -54,5 +59,48 @@ def preflight(tx, *, fetch=None, sim=None):
                           "detail": f"approve() grants a near-unlimited allowance to {decoded['args'][0]} "
                                     "— a spender that turns malicious can drain that token."})
 
+    if decoded and decoded["function"] == "setApprovalForAll" and len(decoded["args"]) >= 2:
+        if decoded["args"][1] is True:
+            flags.append({"code": "approval_for_all", "severity": "HIGH",
+                          "detail": f"setApprovalForAll grants {decoded['args'][0]} control of EVERY token "
+                                    "in this collection — a common NFT-drain approval."})
+
+    # native value over the caller's comfort threshold
+    value = int(tx.get("value") or 0)
+    if max_value is not None and value > max_value:
+        flags.append({"code": "large_native_value", "severity": "MED",
+                      "detail": f"about to send {value} wei to {tx.get('to')} — above your set limit; confirm."})
+
+    # non-empty calldata to a function we can't decode = we can't tell what it does
+    if decoded is not None and decoded.get("function") is None and data not in ("0x", ""):
+        flags.append({"code": "opaque_calldata", "severity": "LOW",
+                      "detail": f"calldata calls an unknown function ({decoded.get('selector')}); "
+                                "can't tell what it does — review before signing."})
+
+    simulation = None
+    if sim is not None:
+        simulation = sim(tx)
+        if simulation and simulation.get("will_revert"):
+            flags.append({"code": "will_revert", "severity": "HIGH",
+                          "detail": "simulation says this transaction will revert (fail) — signing wastes gas "
+                                    f"and may not do what you expect. {simulation.get('error', '')}".strip()})
+
     ok = not any(f["severity"] == "HIGH" for f in flags)
-    return {"decoded": decoded, "risk_flags": flags, "simulation": None, "ok": ok}
+    return {"decoded": decoded, "risk_flags": flags, "simulation": simulation, "ok": ok}
+
+
+def assert_safe(tx, *, force=False, **kw):
+    """Run preflight(tx); raise ValueError if a HIGH flag is present (unless force=True).
+
+    The send-path guard: build a tx, assert_safe() it, then sign. Returns the report either way.
+    force=True signs anyway but still returns the (not-ok) report so the caller has the warnings.
+    """
+    report = preflight(tx, **kw)
+    if not force:
+        highs = [f for f in report["risk_flags"] if f["severity"] == "HIGH"]
+        if highs:
+            codes = ", ".join(f["code"] for f in highs)
+            raise ValueError(f"preflight blocked this transaction (HIGH risk: {codes}). "
+                             "Review the flags; pass force=True to sign anyway. "
+                             + " | ".join(f["detail"] for f in highs))
+    return report
