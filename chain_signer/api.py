@@ -69,6 +69,10 @@ def sign_x402_payment(wallet, *, token, to, value, valid_before, valid_after=0,
     """
     import os
     nonce_bytes = os.urandom(32) if nonce is None else bytes.fromhex(str(nonce)[2:] if str(nonce).startswith("0x") else str(nonce))
+    if len(nonce_bytes) != 32:
+        raise ValueError("x402 nonce must be exactly 32 bytes (EIP-3009 bytes32); got "
+                         f"{len(nonce_bytes)} bytes")
+    value = int(value)  # coerce once so the signed amount and the advertised amount can never diverge
     domain = {"name": token_name, "version": token_version, "chainId": int(chain_id), "verifyingContract": token}
     types = {"TransferWithAuthorization": [
         {"name": "from", "type": "address"}, {"name": "to", "type": "address"},

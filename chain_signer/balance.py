@@ -76,6 +76,9 @@ def get_balance(target, token=None, *, chain="evm", decimals=18, fetch=None, rpc
         params["contractaddress"] = token
     url = ETHERSCAN_V2_BASE + "?" + urlencode(params)
     data = fetch(url)
+    if not isinstance(data, dict):
+        raise ValueError(f"Etherscan returned an unexpected (non-JSON-object) response: {data!r}. "
+                         "Check ETHERSCAN_API_KEY and the network.")
     result = data.get("result")
     # Etherscan returns status "0" + a human message in `result` on error (bad/missing key, rate
     # limit, etc.). Surface that as an actionable error instead of a cryptic int() crash.

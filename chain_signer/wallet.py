@@ -90,7 +90,12 @@ class BitcoinWallet:
     def __init__(self, private_key: str | None = None, testnet: bool = False):
         from bit import Key, PrivateKeyTestnet
         cls = PrivateKeyTestnet if testnet else Key
-        self._k = cls(private_key) if private_key else cls()
+        try:
+            self._k = cls(private_key) if private_key else cls()
+        except Exception:
+            # NEVER include the supplied key in the error — bit echoes it verbatim, which would
+            # leak the secret into MCP responses / logs. Fixed message only (key-leak guard).
+            raise ValueError("invalid bitcoin private key (expected a valid WIF)") from None
         self._testnet = testnet
         self._private_key = self._k.to_wif()
         self._address = self._k.address
