@@ -65,3 +65,5 @@
 2026-06-01 — Demand-hunt workflow in flight (E2E gate SKIP 3/5). Holding — not spawning conflicting work alongside a heavy run. Will process verified findings + brief into docs/marketing/ and report top demand pockets when it completes.
 
 2026-06-01 — Demand-hunt DONE (21 agents, 37 found, 12 verified+cited). WEDGE: x402 terminal/coding agents need a non-interactive local key — 0xKoda/x402-wallet proves the exact pain (keystores break agent automation). Lead: "burner wallet for agents paying x402 APIs." RISK (cited): raw-key = test-only per Google Cloud; incumbents own safe-lane via MPC/TEE — never claim production safety, lead testnet/burner. Demand-justified next build: sign_typed_data (EIP-712/3009) for x402. Actions queued: awesome-x402 PR, honest HN reply (id 47736831), x402-wallet PR. Findings: docs/research/2026-06-01-demand-hunt.md.
+
+2026-06-01 — v0.1.13: sign_typed_data (EIP-712) shipped hands-free — the x402/agent-payments signing the demand hunt verified we lacked. TDD, suite 123. Built to cited demand, not speculation. E2E gate runs next fire (5/5).

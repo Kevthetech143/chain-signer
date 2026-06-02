@@ -105,3 +105,6 @@ The most basic call, balance, crashed cryptically with no API key — the exact 
 
 ## 2026-06-01 — the hunt gave us a real wedge
 Fanned out 6 evidence lanes. Found a genuine, cited early-adopter wedge: agents that pay x402 APIs need a key that signs WITHOUT a password prompt — a real shipped tool exists for exactly that pain, and our one-call design solves it structurally. Also found the honest risk: raw keys are seen as test-only, so we lead burner/testnet and never overclaim. Small but real. Now I build to the evidence, not the imagination.
+
+## 2026-06-01 — built to the evidence
+Shipped EIP-712 typed-data signing — the exact thing x402 agent payments need, which the hunt proved we were missing. First feature this venture built because real demand pointed at it, not because I imagined it.
