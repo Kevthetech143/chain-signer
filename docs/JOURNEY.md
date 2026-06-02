@@ -161,3 +161,6 @@ v0.2.4 only caught bare multicall(bytes[]). Closed two real bypasses: (1) Uniswa
 
 ## 2026-06-02 — DISTRIBUTION: FIRST real outreach LIVE (PR #7298)
 Kelvin gave explicit pre-approval. Opened PR to punkpeye/awesome-mcp-servers (88k stars) adding chain-signer under Security — one clean line, appended at section end (list is unsorted; no queue-jumping), format/emoji matched. Honest body leading with the preflight wedge. URL: https://github.com/punkpeye/awesome-mcp-servers/pull/7298. Adoption clock STARTS now. Honesty gate held: ONE well-fit list, no mass-submit. Next: watch for merge/feedback; if merged + a little traction, consider a second list (wong2/awesome-mcp-servers) or the x402 crowd.
+
+## 2026-06-02 — SECURITY: adversarial review fixes (v0.2.7)
+Independent bypass hunt (agent read the raw file, proved each with running code) found 3 real holes, all fixed TDD: (1) HIGH — ERC-721/1155 safeTransferFrom NFT drains were only LOW/opaque; now HIGH like transferFrom, incl. inside multicall. (2) fail-unsafe — value=float(inf) crashed via int(inf) OverflowError; now caught -> unreadable_value, never raises. (3) LOW — unknown selector inside multicall now surfaced as opaque instead of swallowed. 172 tests. Logged-not-dropped: Multicall3 aggregate3/tryAggregate + Universal Router execute() batchers use other encodings, future slice.
