@@ -55,3 +55,5 @@
 2026-06-01 — v0.1.11: MCP send tool now truly one-call (auto nonce+gas when omitted) — fixed a schema/code contract bug that KeyErrored the headline use. TDD, suite 117, hands-free ship. No market engagement yet (0 stars, 1 upvote).
 
 2026-06-01 — Added E2E tester (Kelvin ask): tools/e2e_smoke.sh installs the LIVE PyPI package in a clean venv + checks wallet/sign/recover/encrypt + MCP handshake; tools/e2e_gate.sh fires it every 5th cron cycle via a tester subagent; notify only on FAIL. First run PASS on 0.1.11 (caught a bug in the test itself, not the product). Wired into doctrine + both cron records.
+
+2026-06-01 — Monitor cycle. E2E gate SKIP (1/5). Engagement flat (0 stars, 1 upvote=likely me, 0 comments, pypistats 404, Glama not indexed, mcp.so #2605 pending). V1 feature-complete; holding — not manufacturing features for a 0-user product. Win/kill clock to ~2026-07-01.

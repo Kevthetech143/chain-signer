@@ -96,3 +96,6 @@ Found the "one call" claim was false at the MCP layer (send hard-required nonce/
 
 ## 2026-06-01 — a watchdog on the real product
 Built an end-to-end tester that installs the published package fresh and exercises it every 5 cycles. First run flagged a failure that was my test bug, not the product — exactly why you test the real thing, not your assumptions.
+
+## 2026-06-01 — discipline: hold
+Flat signals. V1 is done and self-testing. The honest move is to wait and respond, not keep shipping into the void. Held.
