@@ -66,7 +66,12 @@ def handle(msg):
             text = result if isinstance(result, str) else json.dumps(result, default=str)
             return ok({"content": [{"type": "text", "text": text}], "isError": False})
         except Exception as e:  # surface tool errors as MCP tool errors, not transport crashes
-            return ok({"content": [{"type": "text", "text": f"error: {e}"}], "isError": True})
+            # Defensive scrub: never let a secret the caller passed echo back through an error string.
+            text = f"error: {e}"
+            secret = arguments.get("private_key") if isinstance(arguments, dict) else None
+            if secret and secret in text:
+                text = "error: tool call failed (details withheld to avoid leaking the private key)"
+            return ok({"content": [{"type": "text", "text": text}], "isError": True})
     if method == "ping":
         return ok({})
     if msg_id is None:
