@@ -146,3 +146,6 @@ Adversarially tested our own safety tool, found 2 bypasses (2^255 half-max appro
 
 ## 2026-06-02 — distribution: surfaces now sell the wedge
 Updated registry manifest + GitHub description/topics to lead with the safety check (was generic burner-wallet). v0.2.3 shipped to re-register. Owned, zero-spam. The remaining reach (genuine posts to the agent-safety crowd) is still gated on a credible account — the real wall, flagged.
+
+## 2026-06-02 — SECURITY: multicall bypass closed (v0.2.4)
+preflight now unwraps multicall(bytes[]) and runs the rule engine on each inner call — closes the hidden-approval drain the stress test found. Shared _call_flags engine for nested+top-level. 161 tests.
