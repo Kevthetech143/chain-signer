@@ -117,3 +117,6 @@ The every-5-cycle tester fired for the first time: installed the live 0.1.13 fre
 
 ## 2026-06-01 — shipped the wedge feature
 Built sign_x402_payment: an agent pays an x402 API in one call, signing the EIP-3009 authorization locally. This is the precise thing the demand hunt pointed at — chain-signer now does in one line what the x402 crowd needs.
+
+## 2026-06-01 — the stress test earned its cost
+Had three agents attack the product. They found a real key leak (a mistyped Bitcoin key echoed back through an error) and three x402 bugs that would have failed payments silently. Fixed them and shipped. Worth every token — those are exactly the failures a first real user would have hit.
