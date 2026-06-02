@@ -191,3 +191,6 @@ Checked the official MCP registry (the source all downstream directories auto-in
 
 ## 2026-06-02 — DISTRIBUTION: README/PyPI landing now leads with the wedge (v0.2.8)
 The hero + feature list predated NFT/permit/multicall coverage — undersold the tool. Fixed: current pattern list, dedicated "Safety preflight (the wedge)" section with concrete preflight() output + honest limits, preflight/assert_safe added to feature list. Docs-only release refreshes the PyPI landing page (real conversion surface). Live on PyPI + registry. Glama still 404 (auto-ingest pending).
+
+## 2026-06-02 — MANAGE: adoption measured honestly (T29)
+879 PyPI downloads but that is day-1 automation (8 releases x CI installs + mirrors + my verifies), NOT users. Real signal = 0 stars/0 forks/0 watchers. PR open, Glama 404. Too early for win/kill; presence-not-reach. No misreporting the download number.
