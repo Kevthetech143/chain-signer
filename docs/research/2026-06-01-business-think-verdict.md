@@ -21,3 +21,11 @@ One real, unprompted builder/user expressing a need our SPECIFIC differentiator 
 
 ## Systemic note (to Primary/Kelvin)
 The 15-min "BUILD PUSH" cron now conflicts with the evidence (stop building). Recommend throttling it to a slow WATCH cadence (e.g. 1-2x/day: check stars/installs/PR/inbound, run E2E, report only on change) until a flip signal. Building every 15 min into a commoditized space burns tokens for no return.
+
+## 2026-06-02 — WEDGE HUNT (Kelvin "find a reason"): DROP, premise was false
+Verified the non-EVM/multi-chain lead. It FAILS:
+- My "x402 SDK is EVM-only, Solana is the gap" premise is FACTUALLY WRONG: the official Coinbase x402 SDK ships CAIP-2 multi-network incl. Solana (6 SVM e2e tests; Coinbase facilitator settles Solana); Solana joined the x402 Foundation (Apr 2026) and led ~65% of x402 volume.
+- Solana agent-wallet niche is already OWNED: SendAI Solana Agent Kit (TS+Python, 100k+ downloads, 1,400 stars) is the default; Coinbase AgentKit (CdpSolanaWalletProvider), Crossmint GOAT (Python, multi-chain), Turnkey (SVM+BTC+EVM, one call), MoonPay Agents (EVM+SOL+BTC+TON+Tron, PayPal/Circle-backed), Privy all cover it in production.
+- Bitcoin-agent demand is thin (CoinDesk May 2026: little commercial activity); non-custodial BTC slot also taken (Turnkey/MoonPay/Privy/Trust Wallet).
+- Our raw-local-key design is on the WRONG side of the documented pain ("raw key in agent code is dangerous"); market answer is MPC/TEE/enclaves — opposite of ours.
+VERDICT: DROP. No defensible reason-to-switch exists. Disarmed the wedge-hunt cron (71baa0cd) per its own honesty gate. chain-signer stays a finished/listed tool + the closed-loop build proof; new energy -> caregiver venture (real demand).
