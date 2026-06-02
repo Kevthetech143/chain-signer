@@ -134,3 +134,6 @@ chain-signer's real cost was building before checking the protocol foundation al
 
 ## 2026-06-02 — started building the wedge
 Kelvin said go. Built preflight unit 1: decode calldata + flag unlimited token approval (HIGH) before signing. The agent-wallet-that-wont-sign-a-drain begins. TDD, suite 137. Cron builds the rest (setApprovalForAll, delegatecall, unknown recipient, will-revert) unit by unit.
+
+## 2026-06-02 — SHIPPED v0.2.0 (the wedge, live)
+Built the whole preflight safety layer straight through (tasks 31-36), shipped 0.2.0 hands-free. chain-signer is now "the agent wallet that won\047t sign a dangerous transaction." 149 tests. Repositioned README around safety. Next: get it in front of agent builders.
