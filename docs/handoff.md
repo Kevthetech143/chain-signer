@@ -86,3 +86,5 @@
 
 ## Lesson (2026-06-01): reuse-before-build is ECOSYSTEM-WIDE, not just our repo
 Built sign_x402_payment without checking the OFFICIAL x402 SDK (pypi x402) — which already ships local non-custodial signing + MCP. Before building to a wedge, check if the protocol foundation already ships the exact thing. A commoditized core is not a wedge.
+
+2026-06-01 — /business-think VERDICT: STAND-DOWN as build-investment -> WATCH. Core commoditized by the OFFICIAL x402 SDK (free, foundation-backed, signing+MCP) + funded incumbents; NO verified reason-to-switch; 0 users/0 stars after a fair push. Flip = one real unprompted user needing our specific edge (multi-chain / sealed-receipt). Recommend throttling the 15-min build cron to a watch cadence. chain-signer stays a finished listed tool + the closed-loop proof. Doc: docs/research/2026-06-01-business-think-verdict.md.
