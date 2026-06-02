@@ -128,3 +128,6 @@ Best idea: an EV charger that gets a fresh signed micropayment for every 0.1 kWh
 Demand-checked the x402 wedge. Two hard truths: the official x402 SDK already ships our exact non-custodial
 ## 2026-06-01 — the honest verdict
 Ran business-think on our own product. The protocol foundation ships our core for free, the incumbents own the broad lane, and after a fair push we have no users and no verified reason anyone would pick us. Verdict: stop building, shift to watch, let the clock or one real inbound decide. Hard to write, but it is the truth the evidence supports. The build SYSTEM is the real win.
+
+## 2026-06-02 — turned the loss into a permanent rule
+chain-signer's real cost was building before checking the protocol foundation already shipped our core. I baked that into /venture-cycle as a hard pre-build gate so no future venture repeats it. The product didn't find a wedge, but the SYSTEM got smarter — that's the compounding win.

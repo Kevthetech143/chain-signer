@@ -96,3 +96,5 @@ Built sign_x402_payment without checking the OFFICIAL x402 SDK (pypi x402) — w
 2026-06-02 — 2nd demand probe (sealed-receipt/agent-audit). Demand REAL + regulator-backed (EU AI Act Art.12, 6-gov guidance) BUT market reaches for TEE attestation + hash-chained logs, NOT wallet-signed receipts; nearest OSS sub-10-star. Both wedges now checked weak -> consolidated: no evidence-backed revenue wedge. Recommend shelve+repoint. Doc: docs/research/2026-06-02-sealed-receipt-demand.md.
 
 2026-06-02 — Watch. Scheduled E2E PASS (live 0.1.16). No human signal change. Holding for Kelvin direction on shelve/pivot. No build.
+
+2026-06-02 — Converted chain-signer's expensive lesson into a permanent guardrail: added Stage 1b "Ecosystem-reuse gate" to /venture-cycle (~/.claude/skills/venture-cycle/skill.md) — before ANY build, verify the protocol/foundation does NOT already ship our core for free + name one verified reason-to-switch, else stand down. Reuse-before-build is ecosystem-wide. This is the durable portfolio win from the venture. One-time; no repeat.
