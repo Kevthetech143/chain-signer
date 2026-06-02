@@ -123,3 +123,6 @@ Had three agents attack the product. They found a real key leak (a mistyped Bitc
 
 ## 2026-06-01 — the hackathon surprised us
 Best idea: an EV charger that gets a fresh signed micropayment for every 0.1 kWh — the signature is permission to keep delivering. Genuinely not something I had reached for. The "sealed-receipt burner per task" is the most uniquely-ours. Holding the build; demand-check the machine-payments angle first.
+
+## 2026-06-01 — the honest gut-check
+Demand-checked the x402 wedge. Two hard truths: the official x402 SDK already ships our exact non-custodial
