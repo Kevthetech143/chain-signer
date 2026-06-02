@@ -6,6 +6,8 @@ NEVER logged, serialized, or transmitted by this library. No MetaMask, no GUI.
 from .wallet import Wallet, create_wallet
 from .api import (to_wei, send_ether, burner, restore, sign_message, sign_typed_data,
                   sign_x402_payment, export_encrypted, load_encrypted)
+from .preflight import preflight, assert_safe
 
 __all__ = ["Wallet", "create_wallet", "to_wei", "send_ether", "burner", "restore",
-           "sign_message", "sign_typed_data", "sign_x402_payment", "export_encrypted", "load_encrypted"]
+           "sign_message", "sign_typed_data", "sign_x402_payment", "export_encrypted", "load_encrypted",
+           "preflight", "assert_safe"]

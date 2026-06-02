@@ -5,9 +5,15 @@
 ![PyPI](https://img.shields.io/pypi/v/chain-signer) ![Python](https://img.shields.io/pypi/pyversions/chain-signer) ![License](https://img.shields.io/pypi/l/chain-signer) ![Release](https://github.com/Kevthetech143/chain-signer/actions/workflows/release.yml/badge.svg)
 
 
-Give your AI agent its own non-custodial wallet in one line. Make a fresh (burner) wallet,
-check balance, send, and swap — your agent holds its own key and signs locally. No MetaMask,
-no browser, no account, no custody.
+The agent wallet that won't sign a dangerous transaction. Give your AI agent its own
+non-custodial wallet in one line — and a preflight safety check that decodes + flags drains
+(unlimited approvals, NFT approve-all, reverts) BEFORE it signs. Make a burner wallet, check
+balance, send, swap; the agent holds its own key and signs locally. No MetaMask, no account, no custody.
+
+```python
+from chain_signer import assert_safe
+assert_safe(tx)   # raises if the tx is a drain/unlimited-approval/revert — review before signing
+```
 
 ## Install
 ```
