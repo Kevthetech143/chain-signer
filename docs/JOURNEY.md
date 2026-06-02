@@ -197,3 +197,5 @@ The hero + feature list predated NFT/permit/multicall coverage — undersold the
 
 ## 2026-06-02 — MANAGE: product essentially complete; remaining lever is REACH (recommend cron slowdown)
 State: 172 tests green, L4-verified live, README/PyPI lead with the wedge, registry current at 0.2.8 isLatest, competition wedge re-verified. Build is tapped — remaining gaps are non-vectors (Multicall3 runs in contract context) or complex/low-yield (Universal Router execute). Distribution gated on others: PR #7298 awaiting maintainer/Glama badge; Glama auto-ingest pending; organic adoption 0 (honest). The 10-min build cron is now generating marginal work. RECOMMENDATION to Kelvin: dial the 10-min cron down to the daily WATCH (dee81275-style) and re-engage build only on a real trigger (PR merges, user feedback, new threat class, or a warm-intro reach push). The growth lever now is his warm intro / the list merge, not more code.
+
+## 2026-06-02 — WATCH: no change (Glama 404, PR #7298 open, 0 stars). Holding for Kelvin's call on cron cadence. No build churn.
