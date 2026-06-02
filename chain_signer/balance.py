@@ -76,4 +76,18 @@ def get_balance(target, token=None, *, chain="evm", decimals=18, fetch=None, rpc
         params["contractaddress"] = token
     url = ETHERSCAN_V2_BASE + "?" + urlencode(params)
     data = fetch(url)
-    return int(data["result"]) / (10 ** decimals)
+    result = data.get("result")
+    # Etherscan returns status "0" + a human message in `result` on error (bad/missing key, rate
+    # limit, etc.). Surface that as an actionable error instead of a cryptic int() crash.
+    try:
+        raw = int(result)
+    except (TypeError, ValueError):
+        detail = str(result or data.get("message") or "unknown error")
+        low = detail.lower()
+        if "rate limit" in low:
+            raise ValueError(f"Etherscan rate limit: {detail}. Set or upgrade ETHERSCAN_API_KEY, or retry.")
+        if "api key" in low or "apikey" in low:
+            raise ValueError("Etherscan rejected the request (Missing/Invalid API Key). "
+                             "Set ETHERSCAN_API_KEY — get a free key at https://etherscan.io/apis.")
+        raise ValueError(f"Etherscan balance read failed: {detail}. Check ETHERSCAN_API_KEY and the address/chain.")
+    return raw / (10 ** decimals)
