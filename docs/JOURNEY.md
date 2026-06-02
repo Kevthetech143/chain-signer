@@ -131,3 +131,6 @@ Ran business-think on our own product. The protocol foundation ships our core fo
 
 ## 2026-06-02 — turned the loss into a permanent rule
 chain-signer's real cost was building before checking the protocol foundation already shipped our core. I baked that into /venture-cycle as a hard pre-build gate so no future venture repeats it. The product didn't find a wedge, but the SYSTEM got smarter — that's the compounding win.
+
+## 2026-06-02 — started building the wedge
+Kelvin said go. Built preflight unit 1: decode calldata + flag unlimited token approval (HIGH) before signing. The agent-wallet-that-wont-sign-a-drain begins. TDD, suite 137. Cron builds the rest (setApprovalForAll, delegatecall, unknown recipient, will-revert) unit by unit.
