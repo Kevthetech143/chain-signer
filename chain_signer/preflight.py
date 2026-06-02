@@ -20,6 +20,7 @@ _KNOWN = {
 
 _UNLIMITED_THRESHOLD = 1 << 255       # effectively-infinite approval (catches uint-max + half-max)
 _LARGE_APPROVAL = 10 ** 24            # large-but-finite: warn, don't claim infinite
+_MULTICALL = "0xac9650d8"             # multicall(bytes[]) — batches inner calls; drains hide here
 
 
 def _norm_hex(data):
@@ -78,6 +79,54 @@ def _decode(data):
     return {"function": name, "selector": selector, "args": args, "malformed": malformed}
 
 
+def _call_flags(decoded, prefix=""):
+    """Risk flags for ONE decoded call. prefix tags calls found nested (e.g. inside multicall)."""
+    flags = []
+    if not decoded:
+        return flags
+    if decoded.get("malformed"):
+        return [{"code": "malformed_call", "severity": "MED",
+                 "detail": f"{prefix}calldata for {decoded.get('function') or 'a known function'} is truncated or "
+                           "non-hex — its real effect can't be trusted; review before signing."}]
+    fn, args = decoded.get("function"), decoded.get("args", [])
+    if fn in ("approve", "increaseAllowance") and len(args) >= 2:
+        amt, spender = args[1], args[0]
+        if amt >= _UNLIMITED_THRESHOLD:
+            flags.append({"code": "unlimited_approval", "severity": "HIGH",
+                          "detail": f"{prefix}{fn}() grants an effectively-unlimited allowance to {spender} — "
+                                    "a spender that turns malicious can drain that token."})
+        elif amt >= _LARGE_APPROVAL:
+            flags.append({"code": "large_approval", "severity": "MED",
+                          "detail": f"{prefix}{fn}() grants a very large allowance to {spender}; confirm it's intended."})
+    elif fn == "setApprovalForAll" and len(args) >= 2 and args[1] is True:
+        flags.append({"code": "approval_for_all", "severity": "HIGH",
+                      "detail": f"{prefix}setApprovalForAll grants {args[0]} control of EVERY token in this "
+                                "collection — a common NFT-drain approval."})
+    elif fn == "transferFrom" and len(args) >= 3:
+        flags.append({"code": "token_transfer_from", "severity": "HIGH",
+                      "detail": f"{prefix}transferFrom moves tokens OUT of {args[0]} to {args[1]} — this is the call a "
+                                "malicious spender uses to drain an approved wallet. Confirm you intend it."})
+    elif fn == "transfer" and len(args) >= 2 and args[1] >= _LARGE_APPROVAL:
+        flags.append({"code": "large_transfer", "severity": "MED",
+                      "detail": f"{prefix}transfer of a very large amount to {args[0]}; confirm the amount/recipient."})
+    elif fn in ("upgradeTo", "upgradeToAndCall"):
+        flags.append({"code": "proxy_upgrade", "severity": "HIGH",
+                      "detail": f"{prefix}{fn}() repoints a proxy's logic to {args[0] if args else '?'} — this can "
+                                "replace the contract's entire behavior. Only sign if you control that address."})
+    return flags
+
+
+def _multicall_inner(data):
+    """Return the inner calldata strings of a multicall(bytes[]), or None if not decodable."""
+    try:
+        from eth_abi import decode as _abidecode
+        body = bytes.fromhex(_norm_hex(data)[8:])
+        (calls,) = _abidecode(["bytes[]"], body)
+        return ["0x" + c.hex() for c in calls]
+    except Exception:
+        return None
+
+
 def preflight(tx, *, fetch=None, sim=None, max_value=None):
     """Inspect an unsigned EVM tx and return a risk report. Never signs/sends; never crashes."""
     if not isinstance(tx, dict):
@@ -86,44 +135,26 @@ def preflight(tx, *, fetch=None, sim=None, max_value=None):
                                 "detail": "transaction is not a readable object — refusing to vouch for it."}]}
 
     data = tx.get("data") or "0x"
+    s = _norm_hex(data) or ""
+    selector = "0x" + s[:8].lower()
     decoded = _decode(data)
     flags = []
 
-    if decoded and decoded.get("malformed"):
-        flags.append({"code": "malformed_call", "severity": "MED",
-                      "detail": f"calldata for {decoded.get('function') or 'a known function'} is truncated or "
-                                "non-hex — its real effect can't be trusted; review before signing."})
-    elif decoded and decoded.get("function"):
-        fn, args = decoded["function"], decoded["args"]
-        if fn in ("approve", "increaseAllowance") and len(args) >= 2:
-            amt, spender = args[1], args[0]
-            if amt >= _UNLIMITED_THRESHOLD:
-                flags.append({"code": "unlimited_approval", "severity": "HIGH",
-                              "detail": f"{fn}() grants an effectively-unlimited allowance to {spender} — "
-                                        "a spender that turns malicious can drain that token."})
-            elif amt >= _LARGE_APPROVAL:
-                flags.append({"code": "large_approval", "severity": "MED",
-                              "detail": f"{fn}() grants a very large allowance to {spender}; confirm it's intended."})
-        elif fn == "setApprovalForAll" and len(args) >= 2 and args[1] is True:
-            flags.append({"code": "approval_for_all", "severity": "HIGH",
-                          "detail": f"setApprovalForAll grants {args[0]} control of EVERY token in this "
-                                    "collection — a common NFT-drain approval."})
-        elif fn == "transferFrom" and len(args) >= 3:
-            flags.append({"code": "token_transfer_from", "severity": "HIGH",
-                          "detail": f"transferFrom moves tokens OUT of {args[0]} to {args[1]} — this is the call a "
-                                    "malicious spender uses to drain an approved wallet. Confirm you intend it."})
-        elif fn == "transfer" and len(args) >= 2 and args[1] >= _LARGE_APPROVAL:
-            flags.append({"code": "large_transfer", "severity": "MED",
-                          "detail": f"transfer of a very large amount to {args[0]}; confirm the amount/recipient."})
-        elif fn in ("upgradeTo", "upgradeToAndCall"):
-            flags.append({"code": "proxy_upgrade", "severity": "HIGH",
-                          "detail": f"{fn}() repoints a proxy's logic to {args[0] if args else '?'} — this can "
-                                    "replace the contract's entire behavior. Only sign if you control that address."})
-
-    if decoded is not None and decoded.get("function") is None and data not in ("0x", ""):
-        flags.append({"code": "opaque_calldata", "severity": "LOW",
-                      "detail": f"calldata calls an unknown function ({decoded.get('selector')}); "
-                                "can't tell what it does — review before signing."})
+    if selector == _MULTICALL:
+        inner = _multicall_inner(data)
+        if inner is None:
+            flags.append({"code": "malformed_call", "severity": "MED",
+                          "detail": "multicall calldata couldn't be decoded — its inner calls can't be checked; review."})
+        else:
+            for c in inner:
+                flags.extend(_call_flags(_decode(c), prefix="(inside multicall) "))
+        decoded = {"function": "multicall", "selector": selector, "args": [], "malformed": False}
+    else:
+        flags.extend(_call_flags(decoded))
+        if decoded is not None and decoded.get("function") is None and data not in ("0x", ""):
+            flags.append({"code": "opaque_calldata", "severity": "LOW",
+                          "detail": f"calldata calls an unknown function ({decoded.get('selector')}); "
+                                    "can't tell what it does — review before signing."})
 
     value = _to_int(tx.get("value"))
     if value is None:
