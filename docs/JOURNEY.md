@@ -202,3 +202,5 @@ State: 172 tests green, L4-verified live, README/PyPI lead with the wedge, regis
 
 ## 2026-06-02 — OPS: baked Telegram report INTO the cron (Kelvin was not getting updates)
 Root cause: cron-fire reply text was not reaching Kelvin; I had been relying on it instead of the existing tools/notify.sh (direct Telegram via Poly bot, chat 5706754777). Verified notify.sh delivers (telegram_ok:True). Recreated the 10-min cron (old eb3056cf -> new 8bd99e94, durable) with a MANDATORY end-of-cycle step: run notify.sh with a 2-3 line summary every fire, even on no-change watches. Also told it not to manufacture busywork. Auto-expires in 7 days (recurring cap) — will need re-arming then.
+
+## 2026-06-02 — WATCH (notify baked in): Glama 404, PR #7298 open, 0 stars. No change; honest hold. Telegram report sent.
