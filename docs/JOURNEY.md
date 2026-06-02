@@ -87,3 +87,6 @@ Glama add-server needs login; auto-index is the real path and we qualify. Chose 
 
 ## 2026-06-01 — first real outreach
 Posted chain-signer in the MCP registry Show-and-tell — the right room, asking for key-handling feedback, not pitching. First time in front of real agent devs.
+
+## 2026-06-01 — set the honest verdict line
+No reaction yet (minutes old). Resisted busywork; instead set concrete win/kill lines + a scoreboard so the keep-or-kill call by ~July 1 is data, not feelings.

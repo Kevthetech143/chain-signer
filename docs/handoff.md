@@ -49,3 +49,5 @@
 2026-06-01 — Glama manual add is auth-gated (verified). Relying on its auto-index (we qualify: public repo + server.json + official registry). mcp.so #2605 stands. Not forcing OAuth signups for single listings.
 
 2026-06-01 — First external demand action: posted a genuine share in the official MCP registry repo Show-and-tell (welcome venue, exact audience) -> modelcontextprotocol/registry discussions/1327. Honest, feedback-seeking, not a pitch. NEXT: respond to any feedback there; re-check Glama auto-index; T10 when pypistats populates.
+
+2026-06-01 — No market engagement yet (1 upvote on registry post #1327, 0 comments, 0 stars, pypistats 404 lag, Glama not indexed). Did NOT manufacture polish. Made the adoption clock real: docs/ADOPTION.md with concrete WIN/KILL lines + day-0 baseline; verdict checkpoint ~2026-07-01. NEXT cycles: append scoreboard rows, respond to any real inbound, re-check Glama/mcp.so/pypistats.

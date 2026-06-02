@@ -23,3 +23,5 @@ sequence or workflow was built this cycle, SAVE it for reuse — command playboo
 code pattern -> /audit-patterns, workflow skill -> /skill-transfer — then link it in /venture-cycle and PIPELINE.md.
 Stale pipeline = lost compounding. Skill: ~/.claude/skills/venture-cycle/skill.md. Saved sequences:
 ~/agents/global/tools/version-control/{pypi-publish-sequence,mcp-registry-publish-sequence}.md
+
+## Adoption scoreboard (T10): append a dated row to docs/ADOPTION.md when checking signals; honor the concrete WIN/KILL lines set there (verdict ~2026-07-01).
