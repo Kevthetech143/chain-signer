@@ -155,3 +155,6 @@ Preflight now flags an unlimited/large-allowance permit() call (ERC-2612, select
 
 ## 2026-06-02 — DISTRIBUTION: awesome-mcp-servers PR drafted (held for go)
 Kelvin authorized his GitHub (Kevthetech143) for distribution. Verified the canonical MCP directory punkpeye/awesome-mcp-servers (88k stars, maintained) + read its contributing rules (alphabetical, concise). Drafted the exact entry leading with the safety wedge, recommended SECURITY category (peers: aegis/agentward/nobulex — guardrails that check risk before a tool runs). Draft + one-go fire sequence saved to docs/distribution/awesome-mcp-pr-draft.md. NOT fired — public + in his name, holding for his wording/category ok. Honesty gate: one well-fit list first, no mass-submit.
+
+## 2026-06-02 — SECURITY: all multicall variants + nesting (v0.2.6)
+v0.2.4 only caught bare multicall(bytes[]). Closed two real bypasses: (1) Uniswap V3/V4 router multicall shapes — multicall(uint256,bytes[]) 0x5ae401dc and multicall(bytes32,bytes[]) 0x1f0464d1 — the most common real batching path, was a blind spot; (2) multicall nested in a multicall escaped the one-level unwrap. Now _collect_flags recurses through every known variant, depth-capped at 5. 167 tests. Live.
