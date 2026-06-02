@@ -16,6 +16,8 @@ _KNOWN = {
     "0x23b872dd": ("transferFrom", ["address", "address", "uint256"]),
     "0x3659cfe6": ("upgradeTo", ["address"]),
     "0x4f1ef286": ("upgradeToAndCall", ["address"]),
+    # ERC-2612 permit submitted on-chain — grants an allowance to `spender` like approve does.
+    "0xd505accf": ("permit", ["address", "address", "uint256", "uint256", "uint8", "bytes32", "bytes32"]),
 }
 
 _UNLIMITED_THRESHOLD = 1 << 255       # effectively-infinite approval (catches uint-max + half-max)
@@ -98,6 +100,15 @@ def _call_flags(decoded, prefix=""):
         elif amt >= _LARGE_APPROVAL:
             flags.append({"code": "large_approval", "severity": "MED",
                           "detail": f"{prefix}{fn}() grants a very large allowance to {spender}; confirm it's intended."})
+    elif fn == "permit" and len(args) >= 3:
+        spender, value = args[1], args[2]
+        if value >= _UNLIMITED_THRESHOLD:
+            flags.append({"code": "unlimited_approval", "severity": "HIGH",
+                          "detail": f"{prefix}permit() grants an effectively-unlimited allowance to {spender} via a "
+                                    "signed permit — a spender that turns malicious can drain that token."})
+        elif value >= _LARGE_APPROVAL:
+            flags.append({"code": "large_approval", "severity": "MED",
+                          "detail": f"{prefix}permit() grants a very large allowance to {spender}; confirm it's intended."})
     elif fn == "setApprovalForAll" and len(args) >= 2 and args[1] is True:
         flags.append({"code": "approval_for_all", "severity": "HIGH",
                       "detail": f"{prefix}setApprovalForAll grants {args[0]} control of EVERY token in this "
