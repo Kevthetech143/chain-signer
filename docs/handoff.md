@@ -71,3 +71,5 @@
 2026-06-01 — OWNED the call (Kelvin: "this is your business"). Acted on the x402 wedge distribution: opened PR to awesome-x402 (228-star niche list, genuine fit) adding chain-signer under AI Agent Integration -> https://github.com/xpaysh/awesome-x402/pull/472 . Honest entry, scope-stated. HELD the HN reply deliberately (new-account self-link = flagged; will earn standing + engage on x402 repos directly). From here outreach calls are mine, not asks.
 
 2026-06-01 — E2E gate RUN (5/5): tester subagent ran tools/e2e_smoke.sh against LIVE PyPI 0.1.13 -> PASS (install + wallet/sign/recover/encrypt + MCP handshake). Logged quietly (no ping; FAIL-only). awesome-x402 PR #472 still OPEN, 0 comments. Counter reset.
+
+2026-06-01 — v0.1.14: sign_x402_payment shipped (hands-free). One-call EIP-3009 TransferWithAuthorization signing -> header-ready {signature, authorization} for x402 APIs. Spec-checked vs coinbase/x402. The wedge feature. TDD, suite 126. Now chain-signer is the one-liner for the exact x402 payment-signing need the hunt found.

@@ -114,3 +114,6 @@ Kelvin reminded me this is my business. So I made the outreach call myself: open
 
 ## 2026-06-01 — first scheduled product test, green
 The every-5-cycle tester fired for the first time: installed the live 0.1.13 fresh and ran it end to end. Passed. The watchdog works and the shipped product is sound.
+
+## 2026-06-01 — shipped the wedge feature
+Built sign_x402_payment: an agent pays an x402 API in one call, signing the EIP-3009 authorization locally. This is the precise thing the demand hunt pointed at — chain-signer now does in one line what the x402 crowd needs.
