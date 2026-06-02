@@ -120,3 +120,6 @@ Built sign_x402_payment: an agent pays an x402 API in one call, signing the EIP-
 
 ## 2026-06-01 — the stress test earned its cost
 Had three agents attack the product. They found a real key leak (a mistyped Bitcoin key echoed back through an error) and three x402 bugs that would have failed payments silently. Fixed them and shipped. Worth every token — those are exactly the failures a first real user would have hit.
+
+## 2026-06-01 — the hackathon surprised us
+Best idea: an EV charger that gets a fresh signed micropayment for every 0.1 kWh — the signature is permission to keep delivering. Genuinely not something I had reached for. The "sealed-receipt burner per task" is the most uniquely-ours. Holding the build; demand-check the machine-payments angle first.

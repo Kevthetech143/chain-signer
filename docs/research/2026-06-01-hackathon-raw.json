@@ -1,0 +1,93 @@
+{
+  "summary": "Hackathon: creative agents each invent + sketch a novel use of chain-signer; judges score creativity+feasibility; surface the standout.",
+  "agentCount": 33,
+  "logs": [
+    "Hack: 8 proposals"
+  ],
+  "result": {
+    "total": 8,
+    "grounded": 3,
+    "winner": {
+      "idea": "A wall EV charger that signs an x402 micropayment for every kilowatt-hour it physically delivers, so you pay per pulse from the meter instead of a pre-auth hold or a monthly account.",
+      "audience": "Curbside and apartment EV charger operators, fleet depots, and anyone deploying chargers who hates running custodial billing accounts and chargeback-prone pre-auth holds.",
+      "uses_functions": [
+        "burner",
+        "load_encrypted",
+        "sign_x402_payment",
+        "get_balance"
+      ],
+      "code_sketch": "import time\n\n# Car's onboard agent holds its OWN key (non-custodial) loaded from the\n# encrypted keystore baked into the vehicle's secure element.\ncar = load_encrypted(open(\"/secure/car.keystore\").read(), os.environ[\"CAR_PIN\"])\n\n# Charger streams a metered pulse every 0.1 kWh. The car signs a tiny\n# x402 authorization per pulse — settlement is the charger's problem.\nPRICE_PER_KWH_USDC = 350000          # $0.35 in 6-decimal USDC\nCHARGER_WALLET     = charger_handshake()[\"address\"]\nsession_cap        = 25_000000        # car refuses to authorize past $25\n\nspent = 0\nfor pulse in meter.stream():          # fires on each 0.1 kWh delivered\n    amount = int(PRICE_PER_KWH_USDC * pulse.kwh)\n    if spent + amount > session_cap:\n        break                         # autonomous spend ceiling, no human\n    auth = sign_x402_payment(\n        car,\n        token=\"0xA0b8...USDC\",\n        to=CHARGER_WALLET,\n        value=amount,\n        valid_before=int(time.time()) + 60,   # auth dies in 60s if unused\n        chain_id=8453,                          # Base\n        token_name=\"USD Coin\",\n        token_version=\"2\",\n    )\n    meter.release_next_pulse(auth)    # charger keeps charging only while paid\n    spent += amount\n\n# Car never moves coins itself — it only signs spend-permission for energy\n# it actually received. If the charger lies, it just stops getting signatures.",
+      "why_creative": "Most \"machine pays per use\" demos do one payment at the end, or pre-authorize a big hold — both require trust. This flips it: the signature IS the meter's permission to keep delivering, issued continuously, one per physical pulse, each expiring in seconds. The car pays only for energy already in the battery and can halt instantly by withholding the next signature. It uses x402/EIP-3009's gasless authorizations (not actual transfers) so the car signs thousands of times with zero gas and zero on-chain footprint until the charger batches settlement. Trust collapses to \"did I get this 0.1 kWh,\" not \"will this stranger's charger refund my hold.\"",
+      "feasible_today": true,
+      "angle": "Machine & IoT micropayments: devices/robots paying per-use autonomously",
+      "score": 7.5,
+      "grounded": true,
+      "surprise": true,
+      "votes": [
+        {
+          "creativity": 8,
+          "feasibility": 7,
+          "grounded": true,
+          "surprise": true,
+          "note": "Real per-pulse x402/EIP-3009 metering; sign_x402_payment + load_encrypted called with correct signatures, non-custodial, no banned uses — though burner/get_balance are listed but never actually called."
+        },
+        {
+          "creativity": 8,
+          "feasibility": 7,
+          "grounded": true,
+          "surprise": true,
+          "note": "Non-custodial per-pulse x402/EIP-3009 metering; correct gasless-auth usage, but omits per-auth nonce and never calls listed burner."
+        },
+        {
+          "creativity": 8,
+          "feasibility": 7,
+          "grounded": true,
+          "surprise": true,
+          "note": "Grounded: sign_x402_payment called with exact real keyword-only params; non-custodial framing matches the actual EIP-3009 sign-only behavior; no custodial/prediction-market/fee-skim violation. Minor sloppiness (load_encrypted wants a dict not a raw string; burner/get_balance listed in USES but unused) but the load-bearing call is correct. Per-pulse signature-as-delivery-permission is a genuinely fresh framing."
+        }
+      ]
+    },
+    "surprises": [
+      {
+        "idea": "A wall EV charger that signs an x402 micropayment for every kilowatt-hour it physically delivers, so you pay per pulse from the meter instead of a pre-auth hold or a monthly account.",
+        "score": 7.5,
+        "feasible_today": true
+      },
+      {
+        "idea": "Per-task \"sealed receipt\" wallets: spawn a fresh burner per agent job that signs a typed-data attestation of exactly what it did and spent, so every task carries its own tamper-proof, self-contained audit trail.",
+        "score": 7.17,
+        "feasible_today": true,
+        "needs": ""
+      },
+      {
+        "idea": "A \"bounty escrow handshake\" where a buyer agent signs a future-dated, capped x402 payment authorization that only becomes spendable AFTER a worker agent returns a result the buyer cryptographically pre-committed to accept — turning the payment signature itself into the settlement receipt.",
+        "score": 6.5,
+        "feasible_today": true
+      }
+    ],
+    "ranked": [
+      {
+        "idea": "A wall EV charger that signs an x402 micropayment for every kilowatt-hour it physically delivers, so you pay per pulse from the meter instead of a pre-auth hold or a monthly account.",
+        "angle": "Machine & IoT micropayments: devices/robots paying per-use autonomously",
+        "score": 7.5,
+        "surprise": true,
+        "feasible_today": true
+      },
+      {
+        "idea": "Per-task \"sealed receipt\" wallets: spawn a fresh burner per agent job that signs a typed-data attestation of exactly what it did and spent, so every task carries its own tamper-proof, self-contained audit trail.",
+        "angle": "Per-task disposable identity: a fresh burner per job for privacy/accounting/isolation",
+        "score": 7.17,
+        "surprise": true,
+        "feasible_today": true
+      },
+      {
+        "idea": "A \"bounty escrow handshake\" where a buyer agent signs a future-dated, capped x402 payment authorization that only becomes spendable AFTER a worker agent returns a result the buyer cryptographically pre-committed to accept — turning the payment signature itself into the settlement receipt.",
+        "angle": "Agent-to-agent commerce: one AI agent paying another for a service/result",
+        "score": 6.5,
+        "surprise": true,
+        "feasible_today": true
+      }
+    ],
+    "brief": "WINNER: EV per-kWh micropayment charger (score 7.5)\nWhy: Highest grounded score and the only entry all three judges agreed runs against the real API with the load-bearing call correct. The per-pulse signature-as-delivery-permission flips the trust model — pay only for energy already in the battery, halt instantly by withholding the next signature. Clean fit for chain-signer's actual EIP-3009 sign-only behavior.\n\nSURPRISES (uses the owner likely had not considered):\n- EV charger per-kWh metering — signature as the meter's permission to keep delivering, not an end-of-session payment.\n- Sealed-receipt burner-per-task — the throwaway key doubles as the notary, signing an EIP-712 attestation that binds spend to result hash. Address becomes the task's primary key.\n- Bounty escrow handshake — collapsing escrow into a single pre-signed capped authorization instead of a contract.\nAll three were flagged surprise by judges.\n\nBUILDABLE TODAY vs NEEDS A FEATURE:\n- EV charger: buildable today. Uses sign_x402_payment + load_encrypted correctly. Note: burner and get_balance are listed but never called (cosmetic), and load_encrypted wants a dict, not a raw string (minor fix).\n- Sealed-receipt and Bounty escrow: split verdict. Two judges say buildable today; one judge on each flagged a hard strike — sign_typed_data and sign_x402_payment do not exist as public exports in their version of chain-signer (only a private _sign_eip712). This needs resolving before either is \"today.\"\n  - Feature needed if the strike is right: promote EIP-712 typed-data signing and x402 payment signing to public, supported functions (public sign_typed_data + sign_x402_payment). If they are already public in the shipping version, no feature needed — just a version-alignment check.\n\nHONEST LINE ON DEMAND:\nThe EV charger is the one worth a real demand-check — curbside and fleet operators genuinely hate pre-auth holds and chargeback-prone custodial billing, so there is a named, paying pain. The two agent-to-agent ideas are elegant but presuppose a liquid autonomous-agent commerce market that does not yet exist at scale.\n\nOne caveat to verify first: confirm whether sign_typed_data and sign_x402_payment are public exports in the current shipping version — two judges assumed yes, two flagged ImportError. That single fact decides whether two of the three entries are buildable today."
+  }
+}
