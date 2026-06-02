@@ -23,6 +23,15 @@ _KNOWN = {
 _UNLIMITED_THRESHOLD = 1 << 255       # effectively-infinite approval (catches uint-max + half-max)
 _LARGE_APPROVAL = 10 ** 24            # large-but-finite: warn, don't claim infinite
 _MULTICALL = "0xac9650d8"             # multicall(bytes[]) — batches inner calls; drains hide here
+# Every multicall variant we know maps selector -> ABI arg types; the bytes[] arg holds inner calls.
+# Routers in the wild use more than the bare form — Uniswap V3/V4 use the deadline/blockhash variants.
+_MULTICALL_VARIANTS = {
+    "0xac9650d8": ["bytes[]"],                       # multicall(bytes[])
+    "0x5ae401dc": ["uint256", "bytes[]"],            # multicall(uint256 deadline, bytes[])  — Uniswap
+    "0x1f0464d1": ["bytes32", "bytes[]"],            # multicall(bytes32 prevBlockhash, bytes[]) — Uniswap
+    "0x525f7b5e": ["uint256", "bytes32", "bytes[]"], # multicall(uint256, bytes32, bytes[])
+}
+_MAX_MULTICALL_DEPTH = 5              # guard against a malicious deeply-nested multicall bomb
 
 
 def _norm_hex(data):
@@ -128,14 +137,40 @@ def _call_flags(decoded, prefix=""):
 
 
 def _multicall_inner(data):
-    """Return the inner calldata strings of a multicall(bytes[]), or None if not decodable."""
+    """Return the inner calldata strings of any known multicall variant, or None if not decodable."""
+    s = _norm_hex(data) or ""
+    types = _MULTICALL_VARIANTS.get("0x" + s[:8].lower())
+    if not types:
+        return None
     try:
         from eth_abi import decode as _abidecode
-        body = bytes.fromhex(_norm_hex(data)[8:])
-        (calls,) = _abidecode(["bytes[]"], body)
+        decoded = _abidecode(types, bytes.fromhex(s[8:]))
+        calls = decoded[-1]              # the bytes[] component is always last
         return ["0x" + c.hex() for c in calls]
     except Exception:
         return None
+
+
+def _collect_flags(data, prefix="", depth=0):
+    """Risk flags for one call. If it's a multicall (any variant), recurse into its inner calls
+    so a drain hidden inside — even nested — is caught. Depth-capped against nesting bombs."""
+    s = _norm_hex(data) or ""
+    selector = "0x" + s[:8].lower()
+    if selector in _MULTICALL_VARIANTS:
+        if depth >= _MAX_MULTICALL_DEPTH:
+            return [{"code": "malformed_call", "severity": "MED",
+                     "detail": f"{prefix}multicall nested deeper than {_MAX_MULTICALL_DEPTH} levels — "
+                               "refusing to keep unwrapping; review before signing."}]
+        inner = _multicall_inner(data)
+        if inner is None:
+            return [{"code": "malformed_call", "severity": "MED",
+                     "detail": f"{prefix}multicall calldata couldn't be decoded — its inner calls can't be "
+                               "checked; review before signing."}]
+        flags = []
+        for c in inner:
+            flags.extend(_collect_flags(c, prefix="(inside multicall) ", depth=depth + 1))
+        return flags
+    return _call_flags(_decode(data), prefix)
 
 
 def preflight(tx, *, fetch=None, sim=None, max_value=None):
@@ -151,14 +186,8 @@ def preflight(tx, *, fetch=None, sim=None, max_value=None):
     decoded = _decode(data)
     flags = []
 
-    if selector == _MULTICALL:
-        inner = _multicall_inner(data)
-        if inner is None:
-            flags.append({"code": "malformed_call", "severity": "MED",
-                          "detail": "multicall calldata couldn't be decoded — its inner calls can't be checked; review."})
-        else:
-            for c in inner:
-                flags.extend(_call_flags(_decode(c), prefix="(inside multicall) "))
+    if selector in _MULTICALL_VARIANTS:
+        flags.extend(_collect_flags(data))
         decoded = {"function": "multicall", "selector": selector, "args": [], "malformed": False}
     else:
         flags.extend(_call_flags(decoded))
