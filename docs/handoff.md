@@ -83,3 +83,6 @@
 2026-06-01 — HACKATHON done (8 hackers, 3 judges/entry, 3 grounded surprises). WINNER: EV charger per-kWh x402 micropayment (signature = permission to deliver the next pulse; real operator pain w/ pre-auth holds). Also: sealed-receipt burner-per-task (our most us-only idea: burner + EIP-712 attestation = self-contained audit trail), bounty-escrow handshake. All feasible today. Judge false-strike on sign_typed_data/x402 = stale-version artifact (both PUBLIC since 0.1.13/0.1.14). NEXT (owner call): demand-check the machine/per-use-payment angle before building. Saved: docs/research/2026-06-01-hackathon.md.
 
 2026-06-01 — E2E gate RUN (5/5): tester subagent PASS on live 0.1.16 (post-hardening: key-leak guard, x402, protocol fixes all verified in a clean install). Logged quietly. Counter reset. No new market signal (awesome-x402 PR #472 + mcp.so #2605 still pending).
+
+## Lesson (2026-06-01): reuse-before-build is ECOSYSTEM-WIDE, not just our repo
+Built sign_x402_payment without checking the OFFICIAL x402 SDK (pypi x402) — which already ships local non-custodial signing + MCP. Before building to a wedge, check if the protocol foundation already ships the exact thing. A commoditized core is not a wedge.
