@@ -94,3 +94,5 @@ Built sign_x402_payment without checking the OFFICIAL x402 SDK (pypi x402) — w
 2026-06-02 — Watch cycle. Scheduled E2E PASS on live 0.1.16 (product still sound). Real human signals unchanged (stars 0, all PR/issue/post comments 0). No build (stand-down verdict holds). No ping (no change).
 
 2026-06-02 — 2nd demand probe (sealed-receipt/agent-audit). Demand REAL + regulator-backed (EU AI Act Art.12, 6-gov guidance) BUT market reaches for TEE attestation + hash-chained logs, NOT wallet-signed receipts; nearest OSS sub-10-star. Both wedges now checked weak -> consolidated: no evidence-backed revenue wedge. Recommend shelve+repoint. Doc: docs/research/2026-06-02-sealed-receipt-demand.md.
+
+2026-06-02 — Watch. Scheduled E2E PASS (live 0.1.16). No human signal change. Holding for Kelvin direction on shelve/pivot. No build.
