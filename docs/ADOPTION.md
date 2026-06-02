@@ -27,3 +27,4 @@ and write the lesson. "Crickets after a fair push" is a real, acceptable verdict
 | Date | Version | Result |
 |------|---------|--------|
 | 2026-06-01 | 0.1.11 | PASS (clean-install + wallet/sign/recover/encrypt + MCP handshake) |
+| 2026-06-01 | 0.1.13 | PASS (independent tester subagent: install + wallet/sign/recover/encrypt + MCP handshake) |
