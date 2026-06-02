@@ -49,7 +49,7 @@ TOOL_SPECS = (
          "testnet": {"type": "boolean", "default": False},
      }, required=["address"])},
     {"name": "send",
-     "description": "Sign and post a native-coin transfer with the caller's own key. EVM uses value_wei + nonce/gas; Solana uses lamports; Bitcoin uses amount_btc.",
+     "description": "Sign and post a native-coin transfer with the caller's own key. EVM one-call: omit nonce/gas and they are auto-fetched + broadcast (or supply them to control the tx). Solana uses lamports; Bitcoin uses amount_btc.",
      "inputSchema": _schema({
          "private_key": _KEY,
          "chain": _CHAIN,
@@ -130,6 +130,12 @@ def call_tool(name, arguments, *, fetch=None, broadcast=None, rpc=None):
         if chain == "bitcoin":
             return send_bitcoin(_wallet(a), a["to"], a["amount_btc"],
                                 unspents=a.get("unspents"), fee=a.get("fee"), broadcast=broadcast)
+        # One-call (honors the tool schema: nonce/gas optional): auto-fetch nonce+gas and broadcast.
+        if "nonce" not in a:
+            from .live import send_live
+            return send_live(_wallet(a), a["to"], a["value_wei"], chain=chain,
+                             chain_id=a.get("chain_id", 137), fetch=fetch)
+        # Explicit path: caller supplied nonce + gas (deterministic, no RPC).
         return send(
             _wallet(a), a["to"], a["value_wei"], chain=chain,
             nonce=a["nonce"], max_fee_per_gas=a["max_fee_per_gas"],
