@@ -90,3 +90,6 @@ Posted chain-signer in the MCP registry Show-and-tell — the right room, asking
 
 ## 2026-06-01 — set the honest verdict line
 No reaction yet (minutes old). Resisted busywork; instead set concrete win/kill lines + a scoreboard so the keep-or-kill call by ~July 1 is data, not feelings.
+
+## 2026-06-01 — fixed the promise at the real interface
+Found the "one call" claim was false at the MCP layer (send hard-required nonce/gas, crashed without them). Fixed: omit them and it auto-fetches. Not feature-creep — the core promise was broken for the primary buyer.
