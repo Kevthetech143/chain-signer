@@ -25,3 +25,5 @@ Stale pipeline = lost compounding. Skill: ~/.claude/skills/venture-cycle/skill.m
 ~/agents/global/tools/version-control/{pypi-publish-sequence,mcp-registry-publish-sequence}.md
 
 ## Adoption scoreboard (T10): append a dated row to docs/ADOPTION.md when checking signals; honor the concrete WIN/KILL lines set there (verdict ~2026-07-01).
+
+## E2E product test every 5 fires (Kelvin 2026-06-01): each fire run `bash tools/e2e_gate.sh`; if it prints RUN, spawn a tester subagent (Agent/general-purpose) to run `bash tools/e2e_smoke.sh` (installs the LIVE PyPI package in a clean venv; wallet+sign+recover+encrypt + MCP handshake). Log PASS to docs/ADOPTION.md; on FAIL, notify Kelvin immediately.
