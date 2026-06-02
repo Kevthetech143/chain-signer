@@ -29,3 +29,4 @@ and write the lesson. "Crickets after a fair push" is a real, acceptable verdict
 | 2026-06-01 | 0.1.11 | PASS (clean-install + wallet/sign/recover/encrypt + MCP handshake) |
 | 2026-06-01 | 0.1.13 | PASS (independent tester subagent: install + wallet/sign/recover/encrypt + MCP handshake) |
 | 2026-06-01 | 0.1.16 | PASS (tester subagent: install + wallet/sign/recover/encrypt + MCP handshake; post-hardening) |
+| 2026-06-01 | 0 | 0 | 879 (NOT real: mirrors + scanners + our own 16 publishes & E2E/clean-venv installs today; pypistats 'recent' includes mirror traffic) | live | not indexed | #2605 open | post 1 upvote/0 comments | downloads non-zero but self-inflated; human signals still ZERO. Verdict unchanged: WATCH |
