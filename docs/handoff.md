@@ -59,3 +59,5 @@
 2026-06-01 — Monitor cycle. E2E gate SKIP (1/5). Engagement flat (0 stars, 1 upvote=likely me, 0 comments, pypistats 404, Glama not indexed, mcp.so #2605 pending). V1 feature-complete; holding — not manufacturing features for a 0-user product. Win/kill clock to ~2026-07-01.
 
 2026-06-01 — v0.1.12: clear balance errors. get_balance with no ETHERSCAN_API_KEY crashed with cryptic int() error; now names the env var (+ free-key link) or surfaces rate-limit. Real first-user fix. TDD, suite 120, hands-free ship. Engagement still flat. E2E gate 2/5.
+
+2026-06-01 — Launched demand-hunt Workflow (Kelvin go): 6 evidence lanes (agent frameworks, MCP ecosystem, agent-payments/x402, crypto-AI projects, dev forums, competitor gaps) -> dedupe -> adversarial verify (real+reachable, default-false) -> synthesis brief. Background task w6bdb96nx / run wf_b9fc91a7-f8e. Will write verified findings to docs/marketing/ on completion + report top pockets. NOT brainstorm — cited real demand only.
