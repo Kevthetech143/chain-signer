@@ -119,3 +119,34 @@ def test_assert_safe_force_overrides():
 def test_preflight_exported_from_package():
     import chain_signer
     assert hasattr(chain_signer, "preflight") and hasattr(chain_signer, "assert_safe")
+
+
+# --- SECURITY hardening: close approval-evasion bypasses ---
+def _approve_amt(amount):
+    return _approve(amount)
+
+
+def test_half_max_approval_is_still_high():
+    # 2**255 is "effectively infinite" and slipped under a near-uint-max threshold — must be HIGH
+    r = preflight(_approve_amt(1 << 255))
+    assert "unlimited_approval" in _codes(r) and r["ok"] is False
+
+
+def test_increase_allowance_unlimited_is_high():
+    # attacker dodges approve() by using increaseAllowance(spender, huge) — must also be caught
+    data = "0x39509351" + SPENDER[2:].rjust(64, "0") + format((1 << 256) - 1, "064x")
+    r = preflight({"to": "0x" + "22" * 20, "data": data, "value": 0})
+    assert "unlimited_approval" in _codes(r) and r["ok"] is False
+
+
+def test_large_but_finite_approval_warns_med():
+    # a big approval that isn't "infinite" should at least warn (MED), not pass silently
+    r = preflight(_approve_amt(10**30))
+    codes = _codes(r)
+    assert "large_approval" in codes
+    assert next(f for f in r["risk_flags"] if f["code"] == "large_approval")["severity"] == "MED"
+
+
+def test_normal_small_approval_is_clean():
+    r = preflight(_approve_amt(100 * 10**6))  # 100 USDC
+    assert not r["risk_flags"] and r["ok"] is True

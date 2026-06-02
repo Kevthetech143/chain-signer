@@ -9,12 +9,17 @@ is injectable). Non-custodial: we only inspect and warn; the caller stays in con
 
 # selector -> (name, [arg types]). 4-byte function selectors (keccak of the signature, first 4 bytes).
 _KNOWN = {
-    "0x095ea7b3": ("approve", ["address", "uint256"]),          # ERC-20 approve(spender, amount)
-    "0xa22cb465": ("setApprovalForAll", ["address", "bool"]),   # ERC-721/1155 setApprovalForAll(op, approved)
+    "0x095ea7b3": ("approve", ["address", "uint256"]),            # ERC-20 approve(spender, amount)
+    "0x39509351": ("increaseAllowance", ["address", "uint256"]),  # ERC-20 increaseAllowance(spender, added)
+    "0xa22cb465": ("setApprovalForAll", ["address", "bool"]),     # ERC-721/1155 setApprovalForAll(op, approved)
 }
 
-# An approval at/near uint256-max is the classic "infinite approval" drain vector.
-_UNLIMITED_THRESHOLD = (1 << 256) - (1 << 240)  # ~uint256 max; tolerant of common max-ish values
+# "Infinite-intent" approval: >= 2**255 is half the entire uint256 space — unmistakably unlimited,
+# and far beyond any real token's supply. Catches uint-max AND the 2**255 half-max evasion.
+_UNLIMITED_THRESHOLD = 1 << 255
+# Large-but-finite approvals can't be judged precise without token decimals/supply, but an approval
+# this big still deserves a "confirm this" warning rather than passing silently.
+_LARGE_APPROVAL = 10 ** 24
 
 
 def _decode(data):
@@ -52,12 +57,17 @@ def preflight(tx, *, fetch=None, sim=None, max_value=None):
     data = tx.get("data") or "0x"
     flags = []
 
-    if decoded and decoded["function"] == "approve" and len(decoded["args"]) >= 2:
+    if decoded and decoded["function"] in ("approve", "increaseAllowance") and len(decoded["args"]) >= 2:
         amount = decoded["args"][1]
+        spender = decoded["args"][0]
         if isinstance(amount, int) and amount >= _UNLIMITED_THRESHOLD:
             flags.append({"code": "unlimited_approval", "severity": "HIGH",
-                          "detail": f"approve() grants a near-unlimited allowance to {decoded['args'][0]} "
-                                    "— a spender that turns malicious can drain that token."})
+                          "detail": f"{decoded['function']}() grants an effectively-unlimited allowance to "
+                                    f"{spender} — a spender that turns malicious can drain that token."})
+        elif isinstance(amount, int) and amount >= _LARGE_APPROVAL:
+            flags.append({"code": "large_approval", "severity": "MED",
+                          "detail": f"{decoded['function']}() grants a very large allowance to {spender}; "
+                                    "confirm this is intended (consider approving only what you'll spend)."})
 
     if decoded and decoded["function"] == "setApprovalForAll" and len(decoded["args"]) >= 2:
         if decoded["args"][1] is True:
