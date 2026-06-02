@@ -75,3 +75,5 @@
 2026-06-01 — v0.1.14: sign_x402_payment shipped (hands-free). One-call EIP-3009 TransferWithAuthorization signing -> header-ready {signature, authorization} for x402 APIs. Spec-checked vs coinbase/x402. The wedge feature. TDD, suite 126. Now chain-signer is the one-liner for the exact x402 payment-signing need the hunt found.
 
 2026-06-01 — v0.1.15 HARDENING (from 3-agent stress test). Fixed HIGH key-leak (bad Bitcoin WIF echoed via bit + MCP wrapper -> now fixed-message at source + scrub), x402 non-bytes32 nonce (reject), x402 float-value signed/advertised divergence (coerce int once), balance non-dict guard. TDD, suite 130. Agents confirmed core invariants solid; only error edges leaked. Lower-pri left: cli traceback (same bit fix now covers it), no-id notification response, py.typed, create_wallet restore-via-MCP, to_wei negative.
+
+2026-06-01 — v0.1.16: closed remaining stress-test findings (no-id notification, create_wallet restore-via-MCP, to_wei negative guard, py.typed). TDD, suite 134, hands-free. Stress-test loop fully closed.
