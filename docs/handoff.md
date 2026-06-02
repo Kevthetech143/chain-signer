@@ -61,3 +61,5 @@
 2026-06-01 — v0.1.12: clear balance errors. get_balance with no ETHERSCAN_API_KEY crashed with cryptic int() error; now names the env var (+ free-key link) or surfaces rate-limit. Real first-user fix. TDD, suite 120, hands-free ship. Engagement still flat. E2E gate 2/5.
 
 2026-06-01 — Launched demand-hunt Workflow (Kelvin go): 6 evidence lanes (agent frameworks, MCP ecosystem, agent-payments/x402, crypto-AI projects, dev forums, competitor gaps) -> dedupe -> adversarial verify (real+reachable, default-false) -> synthesis brief. Background task w6bdb96nx / run wf_b9fc91a7-f8e. Will write verified findings to docs/marketing/ on completion + report top pockets. NOT brainstorm — cited real demand only.
+
+2026-06-01 — Demand-hunt workflow in flight (E2E gate SKIP 3/5). Holding — not spawning conflicting work alongside a heavy run. Will process verified findings + brief into docs/marketing/ and report top demand pockets when it completes.
