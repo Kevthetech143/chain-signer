@@ -102,3 +102,6 @@ Flat signals. V1 is done and self-testing. The honest move is to wait and respon
 
 ## 2026-06-01 — fix the first-minute failure
 The most basic call, balance, crashed cryptically with no API key — the exact wall a first user hits. Made it say what to set. Small, but it is the difference between a dev fixing it in 10 seconds and closing the tab.
+
+## 2026-06-01 — the hunt gave us a real wedge
+Fanned out 6 evidence lanes. Found a genuine, cited early-adopter wedge: agents that pay x402 APIs need a key that signs WITHOUT a password prompt — a real shipped tool exists for exactly that pain, and our one-call design solves it structurally. Also found the honest risk: raw keys are seen as test-only, so we lead burner/testnet and never overclaim. Small but real. Now I build to the evidence, not the imagination.

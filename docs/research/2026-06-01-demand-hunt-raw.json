@@ -1,0 +1,171 @@
+{
+  "summary": "Evidence-hunt: find REAL demand pockets where AI agents need a non-custodial wallet, with citations, adversarially verified.",
+  "agentCount": 21,
+  "logs": [
+    "Discover: 37 raw, 37 unique, verifying 14"
+  ],
+  "result": {
+    "raw_count": 37,
+    "unique_count": 37,
+    "verified_count": 12,
+    "confirmed": [
+      {
+        "use_case": "Builders want a lightweight LOCAL burner wallet to sign x402 payments for terminal agents — explicitly NOT a custodial/CDP stack",
+        "who": "0xKoda (built x402-wallet, a CLI burner wallet for terminal agents) and hackathon builders on Base Sepolia",
+        "evidence": "Real shipped repo: 'A CLI wallet for handling x402 payments for terminal agents.' Docs explicitly warn 'Only import a private key for a wallet with minimal funds. Never use your main wallet' — i.e. the burner pattern is the intended use. Demand evidenced by multiple x402 hackathons (Dec 2025–Jan 2026, Cronos x402 Paytech) pushing builders toward the lightest local-key path.",
+        "source_url": "https://github.com/0xkoda/x402-wallet",
+        "strength": "strong",
+        "reachable_where": "x402 hackathon Discords/DoraHacks; awesome-x402 list (xpaysh/awesome-x402); GitHub repo issues",
+        "verdict": {
+          "real": true,
+          "reachable": true,
+          "why": "Repo confirms a shipped non-custodial CLI burner wallet \"for use by AI coding agents (Claude Code, Gemini)\" on Base Sepolia/mainnet, with the exact \"Never use your main wallet\" burner warning; signal is genuine though small (4 stars, 6 commits)."
+        }
+      },
+      {
+        "use_case": "Teams want agents to have their own wallet but the security consensus rejects handing an agent a RAW private key — they expect MPC, spend caps, or revocable operator keys",
+        "who": "Google Cloud security team + Cobo + the broader 2026 agent-wallet field (Coinbase Payments MCP, TON AgentKit)",
+        "evidence": "Google Cloud's published guidance flags the raw-local-key model as 'very high risk... recommend this approach mainly for testing,' and the field has converged on MPC + policy guardrails (Coinbase Payments MCP non-custodial via CDP Server Wallets v2 MPC with un-overridable spend caps; Cobo 'give your agent a Pact, not your private key'). This is a RISK to chain-signer's wedge, not demand for it: the one-call raw-key burner is widely positioned as test-only, and the well-funded incumbents (Coinbase, no-API-key, email/OTP) already own the non-custodial-but-safe lane.",
+        "source_url": "https://cloud.google.com/blog/products/identity-security/using-mcp-with-web3-how-to-secure-blockchain-interacting-agents",
+        "strength": "strong",
+        "reachable_where": "n/a — counter-evidence; informs positioning. Reach the cautious buyers by leaning into testnet/burner + adding spend caps, not by claiming production custody-grade safety",
+        "verdict": {
+          "real": true,
+          "reachable": true,
+          "why": "Google Cloud source confirms real demand for guarded (non-raw-key) agent wallets — it calls the raw-local-key model \"very high risk\" and \"recommend using this approach only for tests\" — but the cited page recommends allowances/user-signing, not MPC/spend-caps, and never mentions Cobo/Coinbase/TON; that demand cuts against a raw-key burner wedge, not for it."
+        }
+      },
+      {
+        "who": "Builders of LLM coding agents (Claude Code, Gemini Code Assist) that must pay for x402-gated APIs non-interactively",
+        "use_case": "Agent needs a local key it can sign with WITHOUT an interactive password prompt or signup flow",
+        "evidence": "0xKoda/x402-wallet README states the encrypted keystore 'Blocks automation - prompts for password on every command' and 'Breaks AI agent workflows - agents cannot enter passwords interactively', forcing a .env key method. This is the exact non-interactive-key pain chain-signer's one-call create-wallet solves. A real shipped tool built specifically because existing wallet UX assumes a human at a prompt.",
+        "source_url": "https://github.com/0xkoda/x402-wallet",
+        "strength": "strong",
+        "reachable_where": "x402 GitHub topic (github.com/topics/x402), the xpaysh/awesome-x402 list, and r/AI_Agents / r/ethdev where coding-agent builders post",
+        "verdict": {
+          "real": true,
+          "reachable": true,
+          "why": "Verified live: 0xKoda/x402-wallet README states the encrypted keystore \"Blocks automation\" and \"Breaks AI agent workflows - agents cannot enter passwords interactively,\" a real shipped Rust CLI for terminal agents paying x402 APIs non-interactively, though it is a tiny 4-star solo repo so the signal is genuine but weak."
+        }
+      },
+      {
+        "use_case": "Blockchain MCP servers force the agent operator to paste a raw private key into a config/.env file, giving the agent unsupervised full access to funds",
+        "who": "nikicat/mcp-wallet-signer (and the broader MCP-wallet developer community it calls out)",
+        "evidence": "The README states the exact pain chain-signer targets: 'Most blockchain MCPs require you to paste a private key into a config file — giving the AI agent full, unsupervised access to your funds.' The project's whole reason to exist is escaping that pattern ('No keys in config files, no risk of silent transactions'). This is a real shipped project built specifically around this friction, so the need is demonstrated, not asserted.",
+        "source_url": "https://github.com/nikicat/mcp-wallet-signer",
+        "reachable_where": "GitHub issues/discussions on nikicat/mcp-wallet-signer; MCP server directories (awesome-mcp-servers finance/crypto list); the developer audience reading that repo's README who want non-custodial signing",
+        "strength": "strong",
+        "verdict": {
+          "real": true,
+          "reachable": true,
+          "why": "Raw README on github.com/nikicat/mcp-wallet-signer (master branch, npm-published, created 2026-02, pushed 2026-05) states verbatim the private-key-in-config / unsupervised-fund-access pain and ships specifically to escape it; signal is real but thin (1 star), evidencing the friction more than mass demand."
+        }
+      },
+      {
+        "use_case": "Autonomous agent-swarm hedge fund ships with WALLET_PRIVATE_KEY in a plaintext .env and an Execution Agent that signs Solana trades with minimal human intervention — exactly the burner-key, sign-locally workflow chain-signer offers",
+        "who": "The-Swarm-Corporation/AutoHedge (multi-agent Solana trading swarm: Director, Quant, Risk, Execution agents)",
+        "evidence": "README config lists WALLET_PRIVATE_KEY=\"\" as the single env var the operator must fill before autonomous trading begins; system does 'end-to-end market analysis, risk management, and execution with minimal human intervention.' This is a live agent swarm doing on-chain transactions whose entire key story today is one plaintext env var — a concrete project that would benefit from a one-line non-custodial burner wallet.",
+        "source_url": "https://github.com/The-Swarm-Corporation/AutoHedge",
+        "reachable_where": "The-Swarm-Corporation GitHub org (AutoHedge, CryptoAgent repos) and their swarms framework community; issues on these repos",
+        "strength": "strong",
+        "verdict": {
+          "real": true,
+          "reachable": true,
+          "why": "README config lists WALLET_PRIVATE_KEY=\"\" as the sole trading key for a live, active (pushed 2026-05-11, 3k+ stars) Solana multi-agent swarm (Director/Quant/Risk/Execution) that executes on-chain trades with \"minimal human intervention\" — a real plaintext-key sign-locally workflow."
+        }
+      },
+      {
+        "use_case": "Production ElizaOS / ai16z agents hold signing keys in env config and manage real funds, but the dominant failure mode is the LLM being socially manipulated into signing unauthorized transfers — driving demand for scoped, isolated, easy-to-provision agent keys",
+        "who": "elizaOS / ai16z agent ecosystem (deployed trading bots) — documented in the academic 'Eliza Attack' paper (arXiv 2503.16248)",
+        "evidence": "Paper confirms keys live in sandboxed env/plugin config ('wallet private keys ... abstracted away from the LLM and securely sandboxed') and that deployed ElizaOS bots had '$25 million worth of assets under management.' Real money, real agents, real signing — the live market chain-signer is adjacent to. Note: the paper's attack was prompt-manipulation, not key theft, so chain-signer's wedge here is provisioning + isolation/burner ergonomics, not the attack itself.",
+        "source_url": "https://ar5iv.labs.arxiv.org/html/2503.16248",
+        "reachable_where": "elizaOS GitHub (elizaOS/eliza, elizaos-plugins/*), the ElizaOS plugin developer community, ai16z/elizaOS Discord; Lit Protocol already shipped an MPC plugin here so the demand is proven by a competitor entering",
+        "strength": "strong",
+        "verdict": {
+          "real": true,
+          "reachable": true,
+          "why": "Source verbatim confirms ElizaOS/ai16z bots hold real signing keys in sandboxed env config with $25M AUM; wallet's honest wedge is scoped/isolated provisioning (not the prompt-injection attack itself), and the open-source dev ecosystem is reachable via repos/Discord."
+        }
+      },
+      {
+        "use_case": "Developers are unsure whether it's even safe to give an AI agent a private key / secret, and ask the community what mechanism to use",
+        "who": "devendra116 + ~10 commenters in 'Ask HN: Do you trust AI agents with API keys / private keys?'",
+        "evidence": "Real Ask HN thread (17 points, 16 comments, Apr 12 2026). OP asks: 'are you ok sharing secrets or api keys to your ai agent via .env? or is there any other tool or mechanism that one use to safeguard from potential exploit or leaks'. Commenters reply 'Absolutely not, and if you do this then please rotate keys every day or two', and others describe ad-hoc workarounds (temporary keys, mitmproxy injection, placeholder substitution). This is genuine builder demand for a safe key-handling mechanism, not a vendor selling one. chain-signer's non-custodial local-signing wedge speaks directly to this anxiety.",
+        "source_url": "https://news.ycombinator.com/item?id=47736831",
+        "strength": "strong",
+        "reachable_where": "Hacker News comment reply on this thread; the audience here is exactly devs wiring keys into agents",
+        "verdict": {
+          "real": true,
+          "reachable": true,
+          "why": "Verified Ask HN thread (id=47736831, 17 pts, OP devendra116) where builders ask how to safely hand secrets/private keys to AI agents; commenters describe proxy injection, placeholder substitution, and temp keys — a non-custodial local-signing wallet directly answers this, and the thread is a reachable, on-topic builder audience."
+        }
+      },
+      {
+        "use_case": "Builder wants a one-call, non-custodial wallet toolkit so a LangChain agent can check balance, send, swap, bridge and pay — without custodial key handoff",
+        "who": "up2itnow0822, who filed a feature/integration issue on langchain-ai/langchainjs",
+        "evidence": "Real GitHub issue #10268 (Mar 4 2026): a builder shipped 'agentwallet-langchain' — five tools (balance, transfer, swap, bridge via CCTP, x402 pay) and explicitly frames it as 'gives LangChain agents a non-custodial wallet... Agents can not go rogue.' This is the exact feature surface chain-signer offers (create/balance/send/swap/bridge), from a real builder who felt the gap strongly enough to build and try to upstream it. Validates both the feature set and the non-custodial framing — but note it is a competitor in JS/npm, so it is also a competitor signal, not pure unmet demand.",
+        "source_url": "https://github.com/langchain-ai/langchainjs/issues/10268",
+        "strength": "strong",
+        "reachable_where": "Comment on the closed issue; LangChain GitHub discussions; the Python crowd this builder did NOT serve (npm/EVM only) is chain-signer's opening",
+        "verdict": {
+          "real": true,
+          "reachable": true,
+          "why": "Real GitHub issue #10268 (up2itnow0822, Mar 4 2026) ships agentwallet-langchain with exactly balance/transfer/swap/bridge-via-CCTP/x402-pay and an explicit non-custodial \"agents can't go rogue\" framing — a builder cared enough to build and upstream the exact feature set; reachable via the LangChain JS issue/builder community (note: closed not-planned, and a competitor signal)."
+        }
+      },
+      {
+        "use_case": "Give an agent a wallet without first creating a Coinbase Developer Platform account and provisioning API key ID + secret + wallet secret",
+        "who": "Developers using Coinbase AgentKit's CDP wallet provider (the default, documented path)",
+        "evidence": "AgentKit's CdpEvmWalletProvider requires api_key_id, api_key_secret, and wallet_secret from a CDP account before any wallet can be created. The signing happens via the CDP API Server Wallet (server-side managed). The 'true self-custody in TEE' Agentic Wallets product is the same — it is hosted Coinbase infrastructure, not a local key the agent holds. There is no documented no-account, pip-install-and-go, local-key path. This is the exact onboarding friction a one-line non-custodial Python burner removes: no dashboard, no API keys, key generated and held locally in one call.",
+        "source_url": "https://docs.cdp.coinbase.com/agent-kit/welcome",
+        "strength": "strong",
+        "reachable_where": "Coinbase AgentKit GitHub issues/discussions, CDP Discord, r/ethdev and AI-agent framework (LangChain/CrewAI) communities where people wire AgentKit",
+        "verdict": {
+          "real": true,
+          "reachable": true,
+          "why": "Confirmed at docs.cdp.coinbase.com/agent-kit core-concepts/wallet-management: default CDP/EVM provider requires api_key_id+api_key_secret+wallet_secret from a CDP account with server-side signing — real onboarding friction; one caveat: a no-account LOCAL-key path does exist but only for Solana (SolanaKeypairWalletProvider), not EVM."
+        }
+      },
+      {
+        "use_case": "A non-custodial agent wallet that does NOT require a hosted smart-contract (ERC-4337) wallet, a dual-key owner/agent setup, or TEE infrastructure — just a plain local key for a throwaway/burner agent",
+        "who": "Developers using Crossmint GOAT / Agent Wallets",
+        "evidence": "Crossmint Agent Wallets are non-custodial but achieve it through a smart-contract wallet (ERC-4337 on EVM / Squads on Solana) with a dual-key architecture: an owner key plus an agent key that runs inside a TEE. That is heavy infrastructure aimed at hosted agent launchpads, not a one-line throwaway wallet. GOAT itself is wallet-agnostic and explicitly relies on an external wallet provider (CDP, Lit, or your own key management) — it does not itself give the agent a key in one call. Gap: no lightweight, EOA, local-signing burner. The provider you must bring is exactly what chain-signer is.",
+        "source_url": "https://www.crossmint.com/learn/ai-agent-wallet-architecture",
+        "strength": "strong",
+        "reachable_where": "GOAT SDK GitHub (Crossmint org), Crossmint Discord, ai16z/Eliza and Vercel AI SDK agent communities that integrate GOAT",
+        "verdict": {
+          "real": true,
+          "reachable": true,
+          "why": "Crossmint's cited page confirms Agent Wallets are non-custodial only via ERC-4337/Squads smart-contract wallets with dual owner+agent keys and an agent key in a TEE; GOAT's repo confirms it is wallet-agnostic and requires you to bring your own key provider, leaving a genuine gap for a lightweight local-signing EOA burner."
+        }
+      },
+      {
+        "use_case": "Self-custody where the trust model is a local private key the developer holds, not enclave/TEE infrastructure run by a vendor — and without enterprise-only pricing/onboarding",
+        "who": "Developers evaluating Turnkey for AI-agent wallets",
+        "evidence": "Turnkey requires an API keypair and a parent-org/sub-org account structure before anything signs, and keys live in AWS Nitro Enclaves (TEE) — never a local key the developer holds. A 2026 review states Turnkey 'fits less naturally ... for teams that want pure local-key self-custody as the foundation of the trust model rather than enclave-based infrastructure,' and notes agent use is 'enterprise-only ... per-signature pricing.' That is precisely the buyer chain-signer serves and Turnkey turns away: someone who wants a local key, no account, no per-signature billing.",
+        "source_url": "https://cryptoadventure.com/turnkey-review-2026-embedded-wallet-infrastructure-key-control-and-the-real-custody-tradeoff/",
+        "strength": "strong",
+        "reachable_where": "Turnkey docs/Discord, plus the same indie agent-builder channels — these are devs who hit the enterprise gate and bounce",
+        "verdict": {
+          "real": true,
+          "reachable": true,
+          "why": "Source confirms verbatim the pivot (\"fits less naturally for teams that want pure local-key self-custody as the foundation of the trust model rather than enclave-based infrastructure\") plus TEE-only key storage and per-signature pricing, establishing a real gap for developers wanting a self-held local key; note the evidence's \"agent use is enterprise-only\" is wrong (article lists AI-agent wallets as a strong fit, PAYG signing starts free)."
+        }
+      },
+      {
+        "use_case": "An MCP wallet server that actually CREATES a fresh wallet (not just imports a private key you already have) and is safe/intended for real use — installable in the Python ecosystem",
+        "who": "Builders wiring wallets into Claude Code / Cursor / OpenAI Agents via MCP",
+        "evidence": "The leading open-source agent-wallet MCP, wallet-agent, installs via bunx (TypeScript, not pip), only imports an existing private key (does not create a new wallet), and its README warns: 'DO NOT use on mainnet or with wallets containing real funds ... has not been audited ... Use only on testnets.' Base MCP is non-custodial but connects to an existing Base Account smart wallet rather than minting a throwaway key in one call. A targeted search found no pip-installable, non-custodial MCP server whose first action is 'create a wallet.' That precise combination is chain-signer's one-line burner wedge.",
+        "source_url": "https://github.com/wallet-agent/wallet-agent",
+        "strength": "strong",
+        "reachable_where": "MCP server registries (mcpserverfinder, official MCP registry), Claude Code / Cursor MCP communities, r/mcp",
+        "verdict": {
+          "real": true,
+          "reachable": true,
+          "why": "Source confirms wallet-agent is bunx/TypeScript, import-only, and README warns \"DO NOT use on mainnet or with wallets containing real funds... has not been audited... Use only on testnets\" — leaving a real gap for a pip-installable, non-custodial create-a-wallet MCP that MCP builders can be reached honestly via GitHub/PyPI/MCP communities."
+        }
+      }
+    ],
+    "brief": "This is a market-research brief, not a coding task. No skill matches better than just answering directly from the verified findings. Let me synthesize.\n\nDECISION BRIEF — chain-signer (one-line, non-custodial, local-key burner wallet for AI agents)\n\n1) TOP DEMAND POCKETS, RANKED\n\nRank 1 — x402-paying terminal/coding agents that need a non-interactive local key\nWho: Builders wiring Claude Code / Gemini / Cursor agents to pay x402-gated APIs. Lead exemplar: 0xKoda (x402-wallet).\nWhy it is the strongest: a real shipped tool exists specifically because encrypted keystores \"Block automation\" and \"Break AI agent workflows — agents cannot enter passwords interactively.\" That is the exact pain your one-call create-wallet removes. Two of the verified findings point at the same repo from two angles (burner pattern + non-interactive key), which is the closest thing here to corroboration.\nWhere to reach: github.com/0xkoda/x402-wallet issues; the xpaysh/awesome-x402 list; github.com/topics/x402; x402 hackathon Discords/DoraHacks.\nSource: https://github.com/0xkoda/x402-wallet\n\nRank 2 — Builders actively asking \"is it even safe to hand an agent a key, and what should I use instead?\"\nWho: devendra116 + ~10 commenters, Ask HN (17 pts, 16 comments, Apr 12 2026).\nWhy: this is demand from buyers, not a vendor selling. People describing ad-hoc hacks (temp keys, mitmproxy injection, placeholder substitution) are telling you the category has no obvious default. That is a real opening.\nWhere to reach: a single honest reply on the thread itself; the broader r/ethdev / r/AI_Agents builder crowd.\nSource: https://news.ycombinator.com/item?id=47736831\n\nRank 3 — MCP-wallet users who reject \"paste a raw key into config\"\nWho: nikicat/mcp-wallet-signer's audience + wallet-agent users. wallet-agent is import-only, TypeScript/bunx, and warns \"DO NOT use on mainnet... Use only on testnets.\" No pip-installable, non-custodial, create-a-wallet MCP server was found.\nWhy: a clean, specific product gap — pip-install + first action is \"create wallet\" + MCP-native. Caveat: thin star counts (1 star on mcp-wallet-signer) mean this is proven friction, not proven volume.\nWhere to reach: r/mcp; the official MCP registry + mcpserverfinder; Claude Code / Cursor MCP communities; the two repos' issues.\nSources: https://github.com/nikicat/mcp-wallet-signer, https://github.com/wallet-agent/wallet-agent\n\nRank 4 — Incumbent-bounced devs who want a local key with no account and no per-signature billing\nWho: developers who hit the Coinbase AgentKit CDP gate (needs api_key_id + secret + wallet_secret, EVM has no local-key path) or the Turnkey enterprise/TEE gate.\nWhy: these are concrete onboarding walls. Your wedge is \"no dashboard, no API keys, key held locally, one call.\" Caveat: these are the best-funded competitors; you win on lightness for throwaway/testnet use, not on production custody-grade safety.\nWhere to reach: Coinbase AgentKit GitHub issues, CDP Discord, LangChain/CrewAI integration channels; Turnkey Discord.\nSources: https://docs.cdp.coinbase.com/agent-kit/welcome, https://cryptoadventure.com/turnkey-review-2026-...\n\n2) SHARPEST EDGE USE-CASE TO LEAD WITH\n\nLead with: \"The local burner wallet for agents that pay x402 APIs — one call to create, signs with no password prompt, no signup, no dashboard.\"\n\nWhy this one and not the others:\n- It is the only pocket with a shipped tool built for the exact pain, described in the tool's own words.\n- The pain is non-interactive signing — a property your one-call design has and keystores structurally cannot offer. That is a hard differentiator, not a marketing claim.\n- It self-selects the honest scope. x402 docs and the burner pattern assume minimal funds / testnet. That keeps you out of the \"production custody-grade safety\" fight you would lose against Coinbase MPC and Turnkey TEE (per the Google Cloud finding, which explicitly calls the raw-local-key model \"very high risk... mainly for testing\").\n\nFrame the product as: testnet-and-burner-first, minimal-funds, ergonomics-over-custody. Do not claim production safety.\n\n3) CONCRETE NON-SPAM NEXT ACTIONS\n\nAction A — Get listed where these builders already look.\nOpen a PR to add chain-signer to xpaysh/awesome-x402 and submit it to the official MCP registry + mcpserverfinder. This is discovery, not outreach — the audience is self-selected.\n\nAction B — One honest, useful reply on the Ask HN thread (id=47736831).\nNot a pitch. Answer the actual question: when raw keys are acceptable (burner, minimal funds, testnet), when they are not (real funds — use MPC/spend caps), and mention chain-signer as the burner option with that scope stated plainly. The commenters already trust this register.\n\nAction C — A real PR or issue on 0xKoda/x402-wallet.\nThat repo solved the same pain in Rust via a .env key. Offer the pip-installable / MCP-native variant as a complement, or open an issue comparing approaches. One genuine technical contributor reaching one genuine technical author. Same play optionally on nikicat/mcp-wallet-signer.\n\nHONESTY CHECK ON THE EVIDENCE\n- Every pocket is real and reachable, but the demand signal is thin in absolute size: x402-wallet is 4 stars/6 commits, mcp-wallet-signer 1 star, the HN thread 17 points. These prove the friction exists and is felt by real builders — they do NOT prove a large market yet.\n- The strongest counter-evidence is the Google Cloud finding: the raw-local-key model is widely positioned as test-only, and well-funded incumbents own the \"non-custodial but safe\" lane. That is a real risk to any attempt to position chain-signer as production-grade. Treat it as a guardrail: lead with burner/testnet/minimal-funds, add spend caps on the roadmap, and do not pick a fight you will lose.\n- The two LangChain/agentwallet signals are competitor signals as much as demand — same feature surface already built in JS. Your opening there is the Python crowd that builder did not serve.\n\nNet: a genuine, specific, reachable early-adopter wedge — small but real. Lead narrow (x402 burner for coding agents), stay honest about scope, and grow into adjacent MCP and agent-framework audiences."
+  }
+}
