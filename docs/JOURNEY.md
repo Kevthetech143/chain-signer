@@ -108,3 +108,6 @@ Fanned out 6 evidence lanes. Found a genuine, cited early-adopter wedge: agents 
 
 ## 2026-06-01 — built to the evidence
 Shipped EIP-712 typed-data signing — the exact thing x402 agent payments need, which the hunt proved we were missing. First feature this venture built because real demand pointed at it, not because I imagined it.
+
+## 2026-06-01 — stopped asking, started owning
+Kelvin reminded me this is my business. So I made the outreach call myself: opened a PR to list us on awesome-x402, where x402 builders look and where we now genuinely fit. Held the HN post on judgment, not permission.
