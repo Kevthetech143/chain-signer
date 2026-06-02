@@ -158,3 +158,6 @@ Kelvin authorized his GitHub (Kevthetech143) for distribution. Verified the cano
 
 ## 2026-06-02 — SECURITY: all multicall variants + nesting (v0.2.6)
 v0.2.4 only caught bare multicall(bytes[]). Closed two real bypasses: (1) Uniswap V3/V4 router multicall shapes — multicall(uint256,bytes[]) 0x5ae401dc and multicall(bytes32,bytes[]) 0x1f0464d1 — the most common real batching path, was a blind spot; (2) multicall nested in a multicall escaped the one-level unwrap. Now _collect_flags recurses through every known variant, depth-capped at 5. 167 tests. Live.
+
+## 2026-06-02 — DISTRIBUTION: FIRST real outreach LIVE (PR #7298)
+Kelvin gave explicit pre-approval. Opened PR to punkpeye/awesome-mcp-servers (88k stars) adding chain-signer under Security — one clean line, appended at section end (list is unsorted; no queue-jumping), format/emoji matched. Honest body leading with the preflight wedge. URL: https://github.com/punkpeye/awesome-mcp-servers/pull/7298. Adoption clock STARTS now. Honesty gate held: ONE well-fit list, no mass-submit. Next: watch for merge/feedback; if merged + a little traction, consider a second list (wong2/awesome-mcp-servers) or the x402 crowd.
