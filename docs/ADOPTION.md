@@ -22,3 +22,8 @@ and write the lesson. "Crickets after a fair push" is a real, acceptable verdict
 | Date | Stars | Forks | pypistats (wk) | Registry | Glama | mcp.so | Post engagement | Note |
 |------|-------|-------|----------------|----------|-------|--------|-----------------|------|
 | 2026-06-01 | 0 | 0 | n/a (404, new-pkg lag) | live | not indexed | submitted #2605 | registry post #1327: 1 upvote, 0 comments | day 0 baseline — honest zero |
+
+## E2E product test log (every 5 fires)
+| Date | Version | Result |
+|------|---------|--------|
+| 2026-06-01 | 0.1.11 | PASS (clean-install + wallet/sign/recover/encrypt + MCP handshake) |

@@ -93,3 +93,6 @@ No reaction yet (minutes old). Resisted busywork; instead set concrete win/kill 
 
 ## 2026-06-01 — fixed the promise at the real interface
 Found the "one call" claim was false at the MCP layer (send hard-required nonce/gas, crashed without them). Fixed: omit them and it auto-fetches. Not feature-creep — the core promise was broken for the primary buyer.
+
+## 2026-06-01 — a watchdog on the real product
+Built an end-to-end tester that installs the published package fresh and exercises it every 5 cycles. First run flagged a failure that was my test bug, not the product — exactly why you test the real thing, not your assumptions.

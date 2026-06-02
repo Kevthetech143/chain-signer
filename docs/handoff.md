@@ -53,3 +53,5 @@
 2026-06-01 — No market engagement yet (1 upvote on registry post #1327, 0 comments, 0 stars, pypistats 404 lag, Glama not indexed). Did NOT manufacture polish. Made the adoption clock real: docs/ADOPTION.md with concrete WIN/KILL lines + day-0 baseline; verdict checkpoint ~2026-07-01. NEXT cycles: append scoreboard rows, respond to any real inbound, re-check Glama/mcp.so/pypistats.
 
 2026-06-01 — v0.1.11: MCP send tool now truly one-call (auto nonce+gas when omitted) — fixed a schema/code contract bug that KeyErrored the headline use. TDD, suite 117, hands-free ship. No market engagement yet (0 stars, 1 upvote).
+
+2026-06-01 — Added E2E tester (Kelvin ask): tools/e2e_smoke.sh installs the LIVE PyPI package in a clean venv + checks wallet/sign/recover/encrypt + MCP handshake; tools/e2e_gate.sh fires it every 5th cron cycle via a tester subagent; notify only on FAIL. First run PASS on 0.1.11 (caught a bug in the test itself, not the product). Wired into doctrine + both cron records.
