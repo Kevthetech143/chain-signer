@@ -38,8 +38,9 @@ def handle(msg):
     method = msg.get("method")
     msg_id = msg.get("id")
 
-    # Notifications (no id) get no response.
-    if msg_id is None and method and method.startswith("notifications/"):
+    # JSON-RPC: a request with no `id` member is a NOTIFICATION and MUST get no response —
+    # for ANY method, not just notifications/*. (id: 0 is a real id and is handled below.)
+    if "id" not in msg:
         return None
 
     def ok(result):

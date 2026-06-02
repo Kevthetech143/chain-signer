@@ -37,6 +37,7 @@ TOOL_SPECS = (
      "description": "Create or restore a non-custodial wallet; returns the address and the private key (caller keeps the key).",
      "inputSchema": _schema({
          "chain": _CHAIN,
+         "private_key": {"type": "string", "description": "Optional: restore an existing wallet from its key; omit to generate a fresh one."},
          "testnet": {"type": "boolean", "default": False, "description": "Use the chain's testnet."},
      })},
     {"name": "get_balance",
@@ -113,7 +114,7 @@ def call_tool(name, arguments, *, fetch=None, broadcast=None, rpc=None):
     chain = a.get("chain", "evm")
 
     if name == "create_wallet":
-        w = create_wallet(chain, testnet=a.get("testnet", False))
+        w = create_wallet(chain, private_key=a.get("private_key"), testnet=a.get("testnet", False))
         return {"address": w.address, "private_key": w.private_key}
 
     if name == "get_balance":
