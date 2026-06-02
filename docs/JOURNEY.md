@@ -185,3 +185,6 @@ Glama signup is double-gated: email path needs a captcha (skill says do NOT auto
 
 ## 2026-06-02 — SECURITY/QA: L4 verify of LIVE PyPI 0.2.7 (what users actually install)
 Clean-venv `pip install chain-signer` -> 0.2.7. Ran real drain txs through the PUBLISHED preflight: unlimited approval -> unlimited_approval HIGH, ok=False; NFT safeTransferFrom -> token_transfer_from HIGH, ok=False; assert_safe correctly RAISED. The v0.2.7 NFT rule is confirmed live in the artifact, not just in repo. Shipped 6 versions via hands-free pipeline; this is the first L4 check of the published result since — all green.
+
+## 2026-06-02 — DISTRIBUTION: official registry listing verified current (propagation source healthy)
+Checked the official MCP registry (the source all downstream directories auto-ingest from, incl. Glama). io.github.Kevthetech143/chain-signer is live with v0.2.7 isLatest=TRUE (pub 18:09); all 18 prior versions correctly isLatest=false. So the source is correct — Glama (still 404) just has not run its ingest yet; nothing broken on our end. No action needed but the cheap recheck each cycle.
