@@ -7,10 +7,12 @@
 
 A non-custodial agent wallet with a preflight safety check. Give your AI agent its own
 wallet in one line, and a first-line guard that decodes a transaction and flags common drain
-patterns BEFORE it signs — unlimited approvals, approve-all, transferFrom pulls, proxy upgrades,
-and reverts. It's a guard, not a guarantee (it won't catch permit-signature phishing, which isn't a
-transaction), and it fails safe — it flags rather than waving through what it can't read. Make a burner wallet, check
-balance, send, swap; the agent holds its own key and signs locally. No MetaMask, no account, no custody.
+patterns BEFORE it signs — unlimited approvals, approve-all, token & NFT transferFrom pulls,
+proxy upgrades, on-chain permit, approvals hidden inside multicall (including Uniswap-style router
+batches), and reverts. It's a guard, not a guarantee (it won't catch permit-signature phishing,
+which isn't a transaction), and it fails safe — it flags rather than waving through what it can't
+read. Make a burner wallet, check balance, send, swap; the agent holds its own key and signs
+locally. No MetaMask, no account, no custody.
 
 ```python
 from chain_signer import assert_safe
@@ -41,7 +43,32 @@ pip install chain-signer
 python examples/quickstart.py   # makes a wallet, signs, proves it recovers + encrypts the key
 ```
 
+## Safety preflight (the wedge)
+Before an agent signs, hand the unsigned tx to `preflight()` — it decodes the calldata and returns
+the risks, or use `assert_safe()` to hard-stop on a HIGH flag. Offline, no network, never raises.
+```python
+from chain_signer import preflight, assert_safe
+
+# an unlimited-allowance approve() to a spender — the classic drain setup
+tx = {"to": token, "data": "0x095ea7b3" + spender_padded + "f"*64, "value": 0}
+
+report = preflight(tx)
+# {'decoded': {...}, 'ok': False,
+#  'risk_flags': [{'code': 'unlimited_approval', 'severity': 'HIGH',
+#                  'detail': 'approve() grants an effectively-unlimited allowance ...'}]}
+
+assert_safe(tx)          # raises ValueError on a HIGH flag; pass force=True to override
+assert_safe(tx, sim=my_simulator)   # optional: also flag will-revert via your simulation hook
+```
+What it flags today: unlimited/large approval, `increaseAllowance`, `setApprovalForAll`,
+ERC-20 `transferFrom` + ERC-721/1155 `safeTransferFrom` (token & NFT drains), on-chain `permit`,
+proxy `upgradeTo`/`upgradeToAndCall`, approvals hidden inside `multicall` (all router variants,
+nested), large native value, opaque calldata, malformed calls, and will-revert (with a sim hook).
+Honest limits: it can't read intent it can't decode, and off-chain permit-signature phishing flows
+through `sign_typed_data`, not a transaction — so that's out of scope. A guard, not a guarantee.
+
 ## What you get
+- `preflight(tx)` / `assert_safe(tx)` — decode an unsigned tx and flag drain patterns before signing (the wedge).
 - `burner()` — a fresh wallet for a one-off task; discard it when done.
 - `restore(key)` — reload a wallet later from its exported private key (same key → same address).
 - `send_ether(w, to, amount)` — send in ETH (not wei); nonce, gas, and broadcast handled for you.
