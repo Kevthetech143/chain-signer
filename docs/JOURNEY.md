@@ -143,3 +143,6 @@ Adversarially tested our own safety tool, found 2 bypasses (2^255 half-max appro
 
 ## 2026-06-02 — stress test -> hardened (v0.2.2)
 3 adversarial agents broke v0.2.1: crash on hex value (fail-open), crash on malformed calldata, no transferFrom/proxy-upgrade rules, truncated approve passed clean. Fixed ALL TDD: fail-safe (never crash; flag unreadable/malformed), added transferFrom (HIGH), upgradeTo/upgradeToAndCall (HIGH), transfer-large (MED), malformed_call (MED), sim-exception guard. Reframed README honestly: "first-line guard, not a guarantee" (no permit-sig phishing). 159 tests. Known remaining (documented, not claimed): multicall-inner-decode + permit/Permit2 signature phishing are out of scope. SECURITY pillar materially stronger + honest.
+
+## 2026-06-02 — distribution: surfaces now sell the wedge
+Updated registry manifest + GitHub description/topics to lead with the safety check (was generic burner-wallet). v0.2.3 shipped to re-register. Owned, zero-spam. The remaining reach (genuine posts to the agent-safety crowd) is still gated on a credible account — the real wall, flagged.
