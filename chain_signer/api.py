@@ -27,7 +27,10 @@ def restore(private_key, chain="evm", *, testnet=False):
 
 def to_wei(amount_ether) -> int:
     """Exact ether -> integer wei. Accepts int, float, str, or Decimal without float drift."""
-    return int(Decimal(str(amount_ether)) * WEI_PER_ETHER)
+    wei = int(Decimal(str(amount_ether)) * WEI_PER_ETHER)
+    if wei < 0:
+        raise ValueError("amount must be non-negative")
+    return wei
 
 
 def sign_message(wallet, text: str) -> str:
