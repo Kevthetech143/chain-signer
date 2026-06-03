@@ -229,3 +229,5 @@ Logged into Glama settings/mcp/servers: lists only GitHub-auto-detected repos (H
 ## 2026-06-03 — WATCH (hourly): badge 404, PR open, 0 stars. PulseMCP desc still stale (registry source correct; self-refresh pending). Notify sent.
 
 ## 2026-06-03 — WATCH (hourly): no change. Notify sent.
+
+## 2026-06-03 — WATCH (hourly): no change. Ruled out glama.json as detection trigger (auto-detected Hivemind repos lack it too) — it is Glama crawl/review timing, not a missing config. No speculative file added. Notify sent.
