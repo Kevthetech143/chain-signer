@@ -42,12 +42,18 @@ send_ether(w, "0x...recipient", 0.001)  # auto nonce+gas, signed locally, broadc
 ```
 That's it — your agent just held a wallet and moved funds, no human in the loop.
 
-### Try it offline in 2 seconds (no key, no funds, no network)
+### Try it in 10 seconds (offline — no key, no funds, no network)
 ```
 pip install chain-signer
-python examples/agent_safety_demo.py   # the 3 guards stop 3 real attacks (drain tx, permit-phish, off-policy action)
-python examples/quickstart.py          # makes a wallet, signs, proves it recovers + encrypts the key
 ```
+```python
+from chain_signer import preflight
+spender = "0x" + "22" * 20
+tx = {"to": "0x" + "33" * 20, "data": "0x095ea7b3" + spender[2:].rjust(64, "0") + "f" * 64, "value": 0}
+print(preflight(tx))   # ok=False — flags unlimited_approval before you'd ever sign
+```
+Full runnable demos are in the repo: `examples/agent_safety_demo.py` (all three guards stop three
+real attacks) and `examples/quickstart.py` (wallet) — clone to run them, or just import as above.
 
 ## Safety preflight (the wedge)
 Before an agent signs, hand the unsigned tx to `preflight()` — it decodes the calldata and returns
