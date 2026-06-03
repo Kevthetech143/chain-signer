@@ -223,3 +223,5 @@ Kelvin signed into Glama via GitHub OAuth in the headed window; I then drove the
 
 ## 2026-06-03 — WATCH: Glama submission in moderation queue, nothing more actionable
 Logged into Glama settings/mcp/servers: lists only GitHub-auto-detected repos (Hivemind, hivemind-mcp) — chain-signer not auto-detected yet, and there is NO self-serve "add/build my repo now" control. So our "Submit for Review" sits in Glama's moderation/build queue (cannot speed it up or see a status page for it). Badge still 404, PR #7298 open. The Dockerfile-config step the bot mentioned only becomes available once Glama creates the server page (chicken-egg, resolves on their review). CONCLUSION: fully submitted, out of our hands; poll cheaply each cycle for the badge, then finish PR. No more browser thrashing.
+
+## 2026-06-03 — WATCH (hourly): no change (badge 404, PR open, 0 stars). Glama review pending. Notify sent.
