@@ -283,3 +283,4 @@ Daily competition/threat scan: wedge still clear (no drop-in decode+flag lib riv
 ## 2026-06-03 — HOLD: no human signal (stars/forks 0/0/, badge 404). Watching.
 ## 2026-06-03 — DOCS/AUDIT: added docs/THREAT-COVERAGE.md (honest vector->coverage map). Self-audit confirms no clean gap missed; deferred items (Universal Router, Permit2 SignatureTransfer, Seaport) justified (FP-prone/on-demand). Trust + leader-positioning asset. Signals flat. No notify.
 ## 2026-06-03 — HOLD: signals flat (0/0/ stars/forks, badge 404, PR OPEN). Suite complete+audited+documented. No gap, no clean reach move. Watching.
+## 2026-06-03 — SUITE: sig-inspector covers Permit2 SignatureTransfer (v0.5.1). PermitTransferFrom/Batch unlimited -> HIGH; exact amounts not flagged (low-FP). Closed a threat-coverage gap. 203 tests. Live-verify next.
