@@ -10,7 +10,7 @@ Three guards, each callable on its own (and as MCP tools), pairing with any wall
 
 - `preflight(tx)` — decode an unsigned transaction and flag drains before signing (unlimited/large
   approval, approve-all, token & NFT transferFrom, proxy upgrade, on-chain permit, approvals hidden
-  in multicall incl. Uniswap router batches, will-revert).
+  in multicall incl. Uniswap router batches, EIP-7702 account delegation, will-revert).
 - `inspect_typed_data(td)` — catch permit-phishing in an EIP-712 message before the agent signs it
   (ERC-2612, Uniswap Permit2, DAI-style permits).
 - `check_action(action, policy)` — enforce allow/forbid + value/recipient limits before the agent acts.
@@ -75,7 +75,8 @@ assert_safe(tx, sim=my_simulator)   # optional: also flag will-revert via your s
 What it flags today: unlimited/large approval, `increaseAllowance`, `setApprovalForAll`,
 ERC-20 `transferFrom` + ERC-721/1155 `safeTransferFrom` (token & NFT drains), on-chain `permit`,
 proxy `upgradeTo`/`upgradeToAndCall`, approvals hidden inside `multicall` (all router variants,
-nested), large native value, opaque calldata, malformed calls, and will-revert (with a sim hook).
+nested), EIP-7702 account delegation (the "wallet upgrade" drainer), large native value, opaque
+calldata, malformed calls, and will-revert (with a sim hook).
 Honest limits: it can't read intent it can't decode. A guard, not a guarantee.
 
 ## Signed-message inspector (the off-chain half)
