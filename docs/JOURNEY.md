@@ -218,3 +218,5 @@ PulseMCP search shows "Chain Signer by Kevthetech143" — auto-ingested from the
 
 ## 2026-06-03 — DISTRIBUTION: chain-signer SUBMITTED to Glama (Kelvin logged in, I drove)
 Kelvin signed into Glama via GitHub OAuth in the headed window; I then drove the /web flow: Add Server form -> Name "chain-signer", wedge-forward description, repo URL https://github.com/Kevthetech143/chain-signer -> "Submit for Review" (accepted, modal closed clean). Status: in Glama review/build queue (our Dockerfile lets the build+introspection check pass). NOT yet a live page (Kevthetech143/chain-signer path still routes to his Hivemind repo — Glama owner-path quirk; ours pending build). NEXT: poll Glama each cycle for the live page + score badge, then add the badge to PR #7298 + reply the bot to complete the 88k-list acceptance. Login persists in ~/.config/pw-glama-session.
+
+## 2026-06-03 — WATCH (hourly): Glama submission still processing (badge 404, owner-path canonicalizes to Hivemind not ours yet). PR open. Awaiting Glama build. Notify sent.
