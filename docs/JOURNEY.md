@@ -239,3 +239,6 @@ First slice of inspect_typed_data(): catches the off-chain drain preflight canno
 
 ## 2026-06-03 — SUITE: sig-inspector covers Permit2 (v0.3.1)
 Added Permit2 PermitSingle/PermitBatch detection with a uint160-specific unlimited threshold (the uint256 threshold would miss Permit2 max). Now catches both ERC-2612 and Uniswap Permit2 signature-phishing drains. 179 tests, live. Next: Seaport order signatures.
+
+## 2026-06-03 — SUITE: sig-inspector covers DAI-style permit (v0.3.2)
+DAI permit (allowed:bool, no value field) was waved through by the value check — real gap, DAI is major. allowed=true -> HIGH, allowed=false -> safe. Inspector now covers ALL 3 major permit shapes: ERC-2612, Permit2 (single/batch), DAI. 181 tests, live. Tool #2 now comprehensive on permit drains.
