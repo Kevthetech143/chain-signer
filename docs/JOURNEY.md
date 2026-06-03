@@ -266,3 +266,6 @@ Fresh-venv install of live PyPI 0.4.2; sub-agent exercised all 3 tools + MCP int
 
 ## 2026-06-03 — DISTRIBUTION: added examples/agent_safety_demo.py (conversion piece)
 Offline 2-second demo: all 3 guards block 3 real attacks (unlimited approval, permit-phishing signature, off-policy send). Verified runs clean. README points to it. One-time adoption asset (the "see it work instantly" piece), not a feature. No notify (routine). Signals flat: badge 404, PR open, 0 stars.
+
+## 2026-06-03 — DISTRIBUTION: fixed misleading install-page instructions (v0.4.3)
+README/PyPI told pip users to run examples/*.py, but wheel ships only chain_signer/ — those files arent installed (would error). Replaced with an inline preflight snippet that works right after pip install; described example scripts as repo files. Pre-existing mismatch (predated the demo). Honest docs match the artifact. Per BINDING rule, live-verify next.
