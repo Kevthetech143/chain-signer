@@ -77,7 +77,12 @@ ERC-20 `transferFrom` + ERC-721/1155 `safeTransferFrom` (token & NFT drains), on
 proxy `upgradeTo`/`upgradeToAndCall`, approvals hidden inside `multicall` (all router variants,
 nested), EIP-7702 account delegation (the "wallet upgrade" drainer), large native value, opaque
 calldata, malformed calls, and will-revert (with a sim hook).
-Honest limits: it can't read intent it can't decode. A guard, not a guarantee.
+Honest limits (read these): this is STATIC analysis — it decodes calldata and matches known drain
+patterns. It is NOT a transaction simulator: it won't catch a novel/obfuscated drain it can't decode
+(those get a low-severity "unknown" flag, not a block), and simulation-based scanners go deeper there.
+Safety coverage is EVM-only today (no Solana/Bitcoin tx analysis). And it is not yet field-proven at
+scale. A first-line guard for known patterns — not a guarantee. Pair it with simulation + human
+review for high-value actions.
 
 ## Signed-message inspector (the off-chain half)
 A drain doesn't need a transaction. A dApp can ask the agent to **sign** an EIP-712 message —
