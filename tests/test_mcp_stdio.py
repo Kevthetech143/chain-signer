@@ -23,9 +23,9 @@ def test_initialized_notification_yields_no_response():
 def test_tools_list_exposes_tools_with_input_schema():
     r = handle({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
     tools = r["result"]["tools"]
-    assert len(tools) == 8
+    assert len(tools) == 9
     names = {t["name"] for t in tools}
-    assert {"create_wallet", "send", "swap", "preflight", "inspect_signature"} <= names
+    assert {"create_wallet", "send", "swap", "preflight", "inspect_signature", "check_action"} <= names
     assert all("inputSchema" in t for t in tools), "every tool must advertise an inputSchema"
 
 

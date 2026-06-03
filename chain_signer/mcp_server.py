@@ -7,6 +7,7 @@ caller's own private_key per call, use it transiently, and never store it.
 from .balance import get_balance
 from .bitcoin import send_bitcoin
 from .bridge import bridge_evm, get_bridge_quote
+from .action_gate import check_action
 from .preflight import preflight
 from .sig_inspect import inspect_typed_data
 from .solana import send_solana
@@ -108,6 +109,12 @@ TOOL_SPECS = (
      "inputSchema": _schema({
          "typed_data": {"type": "object", "description": "EIP-712 typed data: {types, domain, primaryType, message}."},
      }, required=["typed_data"])},
+    {"name": "check_action",
+     "description": "SAFETY: enforce a policy on a proposed agent action (tool call) BEFORE it runs. policy supports forbid_tools/allow_tools, max_value_wei, allow_recipients. Returns {allowed, violations}. Fail-safe: denies on unreadable input. The 'inspect what the agent DOES' gate, not just who it is.",
+     "inputSchema": _schema({
+         "action": {"type": "object", "description": "Proposed action: {tool, args}."},
+         "policy": {"type": "object", "description": "Rules: forbid_tools[], allow_tools[], max_value_wei, allow_recipients[]."},
+     }, required=["action"])},
 )
 TOOL_NAMES = tuple(t["name"] for t in TOOL_SPECS)
 
@@ -133,6 +140,9 @@ def call_tool(name, arguments, *, fetch=None, broadcast=None, rpc=None):
 
     if name == "inspect_signature":
         return inspect_typed_data(a.get("typed_data"))
+
+    if name == "check_action":
+        return check_action(a.get("action"), a.get("policy"))
 
     if name == "create_wallet":
         w = create_wallet(chain, private_key=a.get("private_key"), testnet=a.get("testnet", False))

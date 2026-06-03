@@ -33,7 +33,7 @@ def _balance_fetch(result):
 def test_list_tools_exposes_all_functions():
     names = {t["name"] for t in list_tools()}
     assert names == {"create_wallet", "get_balance", "send", "call_contract", "swap", "bridge",
-                     "preflight", "inspect_signature"}, f"exposed: {names}"
+                     "preflight", "inspect_signature", "check_action"}, f"exposed: {names}"
 
 
 def test_create_wallet_tool_returns_address_and_key():
