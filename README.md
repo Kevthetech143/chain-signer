@@ -45,7 +45,8 @@ That's it — your agent just held a wallet and moved funds, no human in the loo
 ### Try it offline in 2 seconds (no key, no funds, no network)
 ```
 pip install chain-signer
-python examples/quickstart.py   # makes a wallet, signs, proves it recovers + encrypts the key
+python examples/agent_safety_demo.py   # the 3 guards stop 3 real attacks (drain tx, permit-phish, off-policy action)
+python examples/quickstart.py          # makes a wallet, signs, proves it recovers + encrypts the key
 ```
 
 ## Safety preflight (the wedge)
