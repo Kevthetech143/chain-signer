@@ -248,3 +248,6 @@ MCP server advertised only wallet ops; the wedge (preflight + sig inspector) was
 
 ## 2026-06-03 — DISTRIBUTION: README/PyPI now documents the signature inspector + MCP tools (v0.3.4)
 README falsely still said permit-phishing was "out of scope" (stale since v0.3.0). Added Signed-message inspector section (ERC-2612/Permit2/DAI), corrected limits line, noted both guards are MCP-callable, listed inspect_typed_data in features. Docs refresh so the live PyPI landing matches shipped reality. No notify (routine). Signals: badge 404, PR open, 0 stars.
+
+## 2026-06-03 — SUITE: tool #3 shipped — action-policy gate (v0.4.0)
+check_action(action, policy): enforce forbid/allow tools, max_value_wei, allow_recipients on a proposed agent tool call BEFORE it runs. The "inspect what the agent DOES" half every identity vendor + NIST named. Fail-safe (denies on bad input). Exported + MCP tool. Suite now 3 tools (preflight, inspect_signature, check_action), all MCP-callable. 192 tests.
