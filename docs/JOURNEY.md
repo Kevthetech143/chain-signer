@@ -269,3 +269,6 @@ Offline 2-second demo: all 3 guards block 3 real attacks (unlimited approval, pe
 
 ## 2026-06-03 — DISTRIBUTION: fixed misleading install-page instructions (v0.4.3)
 README/PyPI told pip users to run examples/*.py, but wheel ships only chain_signer/ — those files arent installed (would error). Replaced with an inline preflight snippet that works right after pip install; described example scripts as repo files. Pre-existing mismatch (predated the demo). Honest docs match the artifact. Per BINDING rule, live-verify next.
+
+## 2026-06-03 — VERIFY: live E2E of published 0.4.3 = PASS (binding rule)
+Sub-agent, fresh venv: 0.4.3 installs; README inline snippet works (unlimited_approval flagged); all 3 tools pass (NFT drain HIGH, Permit2 unlimited flagged, action-gate fails CLOSED on empty allowlist); MCP lists 9 tools. Note: first cold pip fetch transiently resolved 0.4.2 (PyPI CDN propagation lag), clean on retry x2 — not a packaging problem. Honest-docs fix verified live.
