@@ -10,6 +10,34 @@ never raises; flags rather than waving through what it can't read. A guard, not 
 """
 from .preflight import _to_int, _UNLIMITED_THRESHOLD, _LARGE_APPROVAL
 
+# Permit2 amounts are uint160; its "unlimited" sentinel is type(uint160).max. A uint256-scale
+# threshold would miss it, so Permit2 gets its own (catches the max + anything near it).
+_PERMIT2_UNLIMITED = 1 << 159
+
+
+def _permit2_flags(message):
+    """Flags for a Permit2 PermitSingle/PermitBatch signature. details is a dict or a list of dicts."""
+    flags = []
+    spender = message.get("spender")
+    details = message.get("details")
+    items = details if isinstance(details, list) else [details]
+    for d in items:
+        if not isinstance(d, dict):
+            continue
+        amt = _to_int(d.get("amount"))
+        if amt is None:
+            continue
+        if amt >= _PERMIT2_UNLIMITED:
+            flags.append({"code": "unlimited_permit_signature", "severity": "HIGH",
+                          "detail": f"signing this Permit2 grants an effectively-unlimited allowance for token "
+                                    f"{d.get('token')} to {spender} — the Permit2 signature-phishing drain. "
+                                    "Do not sign unless you trust the spender."})
+        elif amt >= _LARGE_APPROVAL:
+            flags.append({"code": "large_permit_signature", "severity": "MED",
+                          "detail": f"signing this Permit2 grants a very large allowance for token {d.get('token')} "
+                                    f"to {spender}; confirm it's intended."})
+    return flags
+
 
 def inspect_typed_data(td, *, max_value=None):
     """Inspect an EIP-712 typed-data object the agent is about to sign. Never raises."""
@@ -38,6 +66,10 @@ def inspect_typed_data(td, *, max_value=None):
             flags.append({"code": "large_permit_signature", "severity": "MED",
                           "detail": f"signing this permit grants a very large token allowance to {spender}; "
                                     "confirm it's intended."})
+
+    # Permit2 (Uniswap): PermitSingle / PermitBatch — same drain, uint160 amounts.
+    elif primary in ("PermitSingle", "PermitBatch"):
+        flags.extend(_permit2_flags(message))
 
     decoded = {"primaryType": primary, "verifyingContract": (td.get("domain") or {}).get("verifyingContract")}
     ok = not any(f["severity"] == "HIGH" for f in flags)
