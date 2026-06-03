@@ -20,12 +20,12 @@ def test_initialized_notification_yields_no_response():
     assert handle({"jsonrpc": "2.0", "method": "notifications/initialized"}) is None
 
 
-def test_tools_list_exposes_six_tools_with_input_schema():
+def test_tools_list_exposes_tools_with_input_schema():
     r = handle({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
     tools = r["result"]["tools"]
-    assert len(tools) == 6
+    assert len(tools) == 8
     names = {t["name"] for t in tools}
-    assert {"create_wallet", "send", "swap"} <= names
+    assert {"create_wallet", "send", "swap", "preflight", "inspect_signature"} <= names
     assert all("inputSchema" in t for t in tools), "every tool must advertise an inputSchema"
 
 

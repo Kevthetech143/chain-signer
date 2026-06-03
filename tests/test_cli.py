@@ -7,7 +7,8 @@ from chain_signer.cli import main
 def test_cli_list_prints_all_tools(capsys):
     rc = main(["list"])
     data = json.loads(capsys.readouterr().out)
-    assert {t["name"] for t in data} == {"create_wallet", "get_balance", "send", "call_contract", "swap", "bridge"}
+    assert {t["name"] for t in data} == {"create_wallet", "get_balance", "send", "call_contract", "swap", "bridge",
+                                         "preflight", "inspect_signature"}
     assert rc == 0
 
 

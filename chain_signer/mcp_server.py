@@ -7,6 +7,8 @@ caller's own private_key per call, use it transiently, and never store it.
 from .balance import get_balance
 from .bitcoin import send_bitcoin
 from .bridge import bridge_evm, get_bridge_quote
+from .preflight import preflight
+from .sig_inspect import inspect_typed_data
 from .solana import send_solana
 from .swap import swap
 from .tx import call_contract, send
@@ -94,6 +96,18 @@ TOOL_SPECS = (
          "integrator": {"type": "string", "default": "chain-signer"},
          **_EVM_TX,
      }, required=["private_key", "from_chain", "to_chain", "from_token", "to_token", "amount"] + _EVM_TX_REQUIRED[1:])},
+    # --- Safety wedge: inspect BEFORE signing. Read-only, no key, never sends. ---
+    {"name": "preflight",
+     "description": "SAFETY: decode an UNSIGNED EVM transaction and flag drain patterns (unlimited/large approval, approve-all, token & NFT transferFrom, proxy upgrade, on-chain permit, approvals hidden in multicall, opaque calldata) BEFORE signing. Returns {decoded, risk_flags, ok}. Read-only; takes no key.",
+     "inputSchema": _schema({
+         "tx": {"type": "object", "description": "Unsigned tx: {to, data (hex calldata), value}."},
+         "max_value": {"type": "integer", "description": "Optional: flag native value above this (wei)."},
+     }, required=["tx"])},
+    {"name": "inspect_signature",
+     "description": "SAFETY: inspect an EIP-712 typed-data message the agent is about to SIGN and flag permit-phishing (ERC-2612, Uniswap Permit2, DAI-style permits granting an unlimited/large allowance). Catches the off-chain drain a transaction check can't see. Returns {decoded, risk_flags, ok}. Read-only; takes no key.",
+     "inputSchema": _schema({
+         "typed_data": {"type": "object", "description": "EIP-712 typed data: {types, domain, primaryType, message}."},
+     }, required=["typed_data"])},
 )
 TOOL_NAMES = tuple(t["name"] for t in TOOL_SPECS)
 
@@ -112,6 +126,13 @@ def call_tool(name, arguments, *, fetch=None, broadcast=None, rpc=None):
     """Dispatch a tool call by name to the underlying function. Returns a JSON-able dict."""
     a = dict(arguments or {})
     chain = a.get("chain", "evm")
+
+    # Safety tools first — read-only, no key, the wedge.
+    if name == "preflight":
+        return preflight(a.get("tx"), max_value=a.get("max_value"))
+
+    if name == "inspect_signature":
+        return inspect_typed_data(a.get("typed_data"))
 
     if name == "create_wallet":
         w = create_wallet(chain, private_key=a.get("private_key"), testnet=a.get("testnet", False))
