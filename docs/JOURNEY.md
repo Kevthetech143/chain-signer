@@ -280,3 +280,4 @@ Daily competition/threat scan: wedge still clear (no drop-in decode+flag lib riv
 ## 2026-06-03 — VERIFY: live E2E of published 0.5.0 = PASS. EIP-7702 guard fires HIGH+blocks; 3 tools regress clean; MCP 9 tools. (PyPI CDN served 0.4.3 first, verified via ==0.5.0 pin.)
 ## 2026-06-03 — DOCS: README preflight coverage updated to include EIP-7702 (accuracy after v0.5.0). No release (rides next). Signals flat.
 ## 2026-06-03 — HOLD: signals flat (badge 404, PR open, 0 stars). Suite complete/leading-edge/verified, docs accurate. No evidenced gap, no clean reach move. Watching.
+## 2026-06-03 — HOLD: no human signal (stars/forks 0/0/, badge 404). Watching.
