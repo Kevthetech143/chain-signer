@@ -272,3 +272,4 @@ README/PyPI told pip users to run examples/*.py, but wheel ships only chain_sign
 
 ## 2026-06-03 — VERIFY: live E2E of published 0.4.3 = PASS (binding rule)
 Sub-agent, fresh venv: 0.4.3 installs; README inline snippet works (unlimited_approval flagged); all 3 tools pass (NFT drain HIGH, Permit2 unlimited flagged, action-gate fails CLOSED on empty allowlist); MCP lists 9 tools. Note: first cold pip fetch transiently resolved 0.4.2 (PyPI CDN propagation lag), clean on retry x2 — not a packaging problem. Honest-docs fix verified live.
+## 2026-06-03 — HOLD: signals flat (badge 404, PR open, 0 stars/forks, 0 issues). Suite complete + live-verified (0.4.3), docs honest. No clean build/distribution step; not manufacturing busywork. Reach gated on Glama listing + organic discovery.
