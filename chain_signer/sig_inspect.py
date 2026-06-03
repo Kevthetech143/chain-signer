@@ -39,6 +39,25 @@ def _permit2_flags(message):
     return flags
 
 
+def _permit2_transfer_flags(message):
+    """Permit2 SignatureTransfer (PermitTransferFrom/Batch): flag ONLY an unlimited permitted amount
+    — legit apps authorize an exact amount, so we don't cry wolf on large-but-specific transfers."""
+    flags = []
+    spender = message.get("spender")
+    permitted = message.get("permitted")
+    items = permitted if isinstance(permitted, list) else [permitted]
+    for d in items:
+        if not isinstance(d, dict):
+            continue
+        amt = _to_int(d.get("amount"))
+        if amt is not None and amt >= _PERMIT2_UNLIMITED:
+            flags.append({"code": "unlimited_permit_signature", "severity": "HIGH",
+                          "detail": f"signing this Permit2 transfer authorizes {spender} to pull an effectively-"
+                                    f"unlimited amount of token {d.get('token')} — a signature-transfer drain. "
+                                    "Legit transfers use an exact amount; do not sign this."})
+    return flags
+
+
 def inspect_typed_data(td, *, max_value=None):
     """Inspect an EIP-712 typed-data object the agent is about to sign. Never raises."""
     if not isinstance(td, dict):
@@ -79,9 +98,13 @@ def inspect_typed_data(td, *, max_value=None):
                           "detail": f"signing this permit grants a very large token allowance to {spender}; "
                                     "confirm it's intended."})
 
-    # Permit2 (Uniswap): PermitSingle / PermitBatch — same drain, uint160 amounts.
+    # Permit2 (Uniswap): PermitSingle / PermitBatch — allowance permits, uint160 amounts.
     elif pnorm in ("permitsingle", "permitbatch"):
         flags.extend(_permit2_flags(message))
+
+    # Permit2 SignatureTransfer — authorizes a pull; flag only unlimited (legit uses exact amounts).
+    elif pnorm in ("permittransferfrom", "permitbatchtransferfrom"):
+        flags.extend(_permit2_transfer_flags(message))
 
     decoded = {"primaryType": primary, "verifyingContract": (td.get("domain") or {}).get("verifyingContract")}
     ok = not any(f["severity"] == "HIGH" for f in flags)

@@ -29,7 +29,7 @@ not a guarantee — pair it with your wallet + identity stack.
 | ERC-2612 `permit` signature (unlimited) | ✅ | HIGH; the classic signature-phishing drain |
 | Uniswap Permit2 `PermitSingle`/`PermitBatch` | ✅ | uint160-aware threshold |
 | DAI-style `permit` (`allowed: true`) | ✅ | HIGH |
-| Permit2 `PermitTransferFrom` (SignatureTransfer) | ❌ | overlaps legit swap flows; would flag only unlimited amounts — on demand |
+| Permit2 `PermitTransferFrom`/`PermitBatchTransferFrom` (SignatureTransfer) | ✅ | flags only UNLIMITED permitted amount (legit swaps use exact amounts → no false alarm) |
 | Seaport order signatures (NFT listing phishing) | ❌ | FP-prone vs legit listings; needs offer/consideration value compare — on demand |
 
 ## Agent actions — `check_action(action, policy)`
