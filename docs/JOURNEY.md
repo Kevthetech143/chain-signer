@@ -213,3 +213,5 @@ PulseMCP search shows "Chain Signer by Kevthetech143" — auto-ingested from the
 ## 2026-06-02 — WATCH (hourly): no change (Glama 404, PR open, 0 stars). Notify sent.
 
 ## 2026-06-02 — WATCH (hourly): no change. Blocker = Kelvin 2-min Glama GitHub sign-in. Notify sent.
+
+## 2026-06-02 — WATCH (hourly): no change. Awaiting Kelvin glama sign-in choice. Notify sent.
