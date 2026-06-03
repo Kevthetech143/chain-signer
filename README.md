@@ -104,6 +104,8 @@ r = check_action({"tool": "send", "args": {"to": addr, "value_wei": 5*10**18}}, 
 All three guards are exposed as MCP tools (`preflight`, `inspect_signature`, `check_action`) — any
 agent runtime (Claude, Cursor, …) can call them directly, read-only, no key.
 
+What's caught and what isn't — the honest threat-coverage map: [`docs/THREAT-COVERAGE.md`](docs/THREAT-COVERAGE.md).
+
 ## What you get
 - `preflight(tx)` / `assert_safe(tx)` — decode an unsigned tx and flag drain patterns before signing.
 - `inspect_typed_data(td)` — flag permit-phishing in an EIP-712 message before the agent signs it.
