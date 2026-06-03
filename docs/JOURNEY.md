@@ -242,3 +242,6 @@ Added Permit2 PermitSingle/PermitBatch detection with a uint160-specific unlimit
 
 ## 2026-06-03 — SUITE: sig-inspector covers DAI-style permit (v0.3.2)
 DAI permit (allowed:bool, no value field) was waved through by the value check — real gap, DAI is major. allowed=true -> HIGH, allowed=false -> safe. Inspector now covers ALL 3 major permit shapes: ERC-2612, Permit2 (single/batch), DAI. 181 tests, live. Tool #2 now comprehensive on permit drains.
+
+## 2026-06-03 — SUITE: safety tools now on the MCP surface (v0.3.3)
+MCP server advertised only wallet ops; the wedge (preflight + sig inspector) was import-only, not MCP-callable. Added "preflight" + "inspect_signature" as read-only no-key MCP tools -> any agent runtime can call the guard. 8 tools now (2 are the safety wedge). 185 tests. The registry-listed MCP server now leads with security.
