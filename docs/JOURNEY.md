@@ -311,3 +311,4 @@ Daily competition/threat scan: wedge still clear (no drop-in decode+flag lib riv
 ## 2026-06-03 — SHIP v0.5.3 (docs): recalibrated honest-limits + real-drainer validation note now on the live PyPI page (were GitHub-only). No code change. Live-verify next.
 ## 2026-06-03 — HOLD: glama pending, PR #7298 OPEN, stars 0. Self-critique A/B/C shipped+live (v0.5.3). No change.
 ## 2026-06-03 — HOLD: glama pending, PR #7298 OPEN, stars 0. No change.
+## 2026-06-03 — HOLD: glama pending, PR #7298 OPEN, stars 0. No change.
