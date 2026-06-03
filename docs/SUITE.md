@@ -32,3 +32,10 @@ every agent wallet + identity stack (AP2 / Skyfire / Coinbase / Okta). Complemen
 - 3 pillars tracked each cycle: Distribution (real stars/forks/installs, not download noise),
   Security (adversarially test — these are security tools, correctness is the product),
   Competition (stay non-overlapping; we are the complement to identity/wallet stacks).
+
+## LIVE-VERIFY RULE (Kelvin, 2026-06-03 — binding)
+After EVERY ship (tag pipeline green), spawn a SUB-AGENT to install the LIVE PyPI package in a fresh
+venv and exercise all tools end-to-end (preflight drain, permit/Permit2/DAI signatures, action-gate
+fail-closed, MCP introspection lists the tools). Unit tests passing is NOT enough — only call it
+shipped-verified when the published artifact works for a real installer. Tests prove the repo; this
+proves what users get.

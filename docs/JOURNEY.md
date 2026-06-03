@@ -260,3 +260,6 @@ Ran independent bypass hunt on sig_inspect + action_gate. Real fail-open found: 
 
 ## 2026-06-03 — WATCH/DISTRIBUTION probe: no clean new channel; holding
 Signals flat (Glama badge 404, PR open, 0 stars). Probed security-list channels: Anugrahsr/Awesome-web3-Security (1.6k stars but 3mo stale + audit/CTF-focused, marginal fit), MCP-security lists dont exist, wong2 PR-dead. No clean well-fit active PR-accepting list -> forcing one = spam for low yield (fails fit check). Seaport rule stays deferred (FP-prone; add on demand per doctrine). Suite feature-complete + hardened (v0.4.2, 197 tests). Correct move = hold; reach still gated on Glama listing + organic/warm discovery. No notify.
+
+## 2026-06-03 — VERIFY: live E2E of published 0.4.2 via sub-agent = PASS
+Fresh-venv install of live PyPI 0.4.2; sub-agent exercised all 3 tools + MCP introspection: preflight (unlimited approval + NFT drain HIGH), inspect_typed_data (ERC-2612/Permit2/DAI unlimited flagged), check_action (forbid denies, empty-allowlist fails CLOSED, over-limit denies), MCP lists all 9 tools incl. the 3 safety tools. All True, no errors. Adopted Kelvin standing rule: live-verify after every ship via a sub-agent (added to SUITE.md doctrine + cron).
