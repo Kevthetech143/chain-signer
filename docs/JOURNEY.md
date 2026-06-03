@@ -281,3 +281,4 @@ Daily competition/threat scan: wedge still clear (no drop-in decode+flag lib riv
 ## 2026-06-03 — DOCS: README preflight coverage updated to include EIP-7702 (accuracy after v0.5.0). No release (rides next). Signals flat.
 ## 2026-06-03 — HOLD: signals flat (badge 404, PR open, 0 stars). Suite complete/leading-edge/verified, docs accurate. No evidenced gap, no clean reach move. Watching.
 ## 2026-06-03 — HOLD: no human signal (stars/forks 0/0/, badge 404). Watching.
+## 2026-06-03 — DOCS/AUDIT: added docs/THREAT-COVERAGE.md (honest vector->coverage map). Self-audit confirms no clean gap missed; deferred items (Universal Router, Permit2 SignatureTransfer, Seaport) justified (FP-prone/on-demand). Trust + leader-positioning asset. Signals flat. No notify.
