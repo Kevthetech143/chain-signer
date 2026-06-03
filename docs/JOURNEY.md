@@ -290,3 +290,4 @@ Daily competition/threat scan: wedge still clear (no drop-in decode+flag lib riv
 ## 2026-06-03 — VERIFY: live E2E of 0.5.2 = PASS. EIP-7702 hardening live (single-dict/uppercase/snake/non-dict-no-crash all flag; no-auth silent); core+v0.5.x guards regress clean; MCP 9 tools. NOTE (future hygiene, non-urgent): pip backtracks on old web3 betas under py3.12 — consider raising the web3 lower bound in pyproject for cleaner installs. Not a defect (installs fine).
 ## 2026-06-03 — HYGIENE/HOLD: checked the web3-floor note — pyproject ALREADY pins web3>=7 (excludes old betas); install resolves clean, backtracking was transient. No change needed (verified before editing). Signals flat (badge 404, PR open, 0 stars). Hold.
 ## 2026-06-03 — HOLD: no signal (0/0/, badge 404, PR OPEN). Suite complete/hardened/verified; clean build wells dry; reach gated. Watching.
+## 2026-06-03 — HOLD: no signal (stars 0, badge 404, PR open). Watching.
