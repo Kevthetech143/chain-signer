@@ -64,11 +64,26 @@ What it flags today: unlimited/large approval, `increaseAllowance`, `setApproval
 ERC-20 `transferFrom` + ERC-721/1155 `safeTransferFrom` (token & NFT drains), on-chain `permit`,
 proxy `upgradeTo`/`upgradeToAndCall`, approvals hidden inside `multicall` (all router variants,
 nested), large native value, opaque calldata, malformed calls, and will-revert (with a sim hook).
-Honest limits: it can't read intent it can't decode, and off-chain permit-signature phishing flows
-through `sign_typed_data`, not a transaction — so that's out of scope. A guard, not a guarantee.
+Honest limits: it can't read intent it can't decode. A guard, not a guarantee.
+
+## Signed-message inspector (the off-chain half)
+A drain doesn't need a transaction. A dApp can ask the agent to **sign** an EIP-712 message —
+most dangerously a `permit` granting an unlimited token allowance, which `preflight` (a tx check)
+can't see. `inspect_typed_data()` catches it before the agent signs:
+```python
+from chain_signer import inspect_typed_data
+report = inspect_typed_data(typed_data)   # the EIP-712 object you're about to sign
+# ok=False, risk_flags=[{'code': 'unlimited_permit_signature', 'severity': 'HIGH', ...}]
+```
+Covers all three major permit shapes: **ERC-2612**, **Uniswap Permit2** (PermitSingle/PermitBatch),
+and **DAI-style** (`allowed: true`). Offline, never raises.
+
+Both guards are also exposed as MCP tools (`preflight`, `inspect_signature`) — any agent runtime
+(Claude, Cursor, …) can call them directly, read-only, no key.
 
 ## What you get
 - `preflight(tx)` / `assert_safe(tx)` — decode an unsigned tx and flag drain patterns before signing (the wedge).
+- `inspect_typed_data(td)` — flag permit-phishing in an EIP-712 message before the agent signs it.
 - `burner()` — a fresh wallet for a one-off task; discard it when done.
 - `restore(key)` — reload a wallet later from its exported private key (same key → same address).
 - `send_ether(w, to, amount)` — send in ETH (not wei); nonce, gas, and broadcast handled for you.
