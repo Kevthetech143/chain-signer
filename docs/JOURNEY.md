@@ -236,3 +236,6 @@ Logged into Glama settings/mcp/servers: lists only GitHub-auto-detected repos (H
 
 ## 2026-06-03 — SUITE: tool #2 shipped — signed-message/permit-phishing inspector (v0.3.0)
 First slice of inspect_typed_data(): catches the off-chain drain preflight cannot — an ERC-2612 permit SIGNATURE granting unlimited allowance (the classic signature-phishing attack). EIP-712 decode + unlimited(HIGH)/large(MED) flags, fail-safe, reuses preflight thresholds (no new deps). Exported + live on PyPI/registry. Suite now = 2 tools (preflight + sig-inspector). Next: Permit2 (PermitSingle/Batch), Seaport orders. 176 tests.
+
+## 2026-06-03 — SUITE: sig-inspector covers Permit2 (v0.3.1)
+Added Permit2 PermitSingle/PermitBatch detection with a uint160-specific unlimited threshold (the uint256 threshold would miss Permit2 max). Now catches both ERC-2612 and Uniswap Permit2 signature-phishing drains. 179 tests, live. Next: Seaport order signatures.
