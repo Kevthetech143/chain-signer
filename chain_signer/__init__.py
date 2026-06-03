@@ -8,7 +8,8 @@ from .api import (to_wei, send_ether, burner, restore, sign_message, sign_typed_
                   sign_x402_payment, export_encrypted, load_encrypted)
 from .preflight import preflight, assert_safe
 from .sig_inspect import inspect_typed_data
+from .action_gate import check_action
 
 __all__ = ["Wallet", "create_wallet", "to_wei", "send_ether", "burner", "restore",
            "sign_message", "sign_typed_data", "sign_x402_payment", "export_encrypted", "load_encrypted",
-           "preflight", "assert_safe", "inspect_typed_data"]
+           "preflight", "assert_safe", "inspect_typed_data", "check_action"]
