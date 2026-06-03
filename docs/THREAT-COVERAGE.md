@@ -46,5 +46,8 @@ not a guarantee — pair it with your wallet + identity stack.
 - We are a complement, not a replacement for: hardware-wallet confirmation, MPC custody, or an
   identity layer. The seatbelt, not the whole car.
 
+## Validated against real drainer techniques
+The suite is tested against the ACTUAL techniques used by the dominant 2024-2025 wallet drainers (Inferno / Angel / Pink / Ace; ~$494M stolen in 2024) — Permit/Permit2 signatures (the #1 vector, 56.7% of attacks per SlowMist 2024), setApprovalForAll NFT theft, unlimited approve + transferFrom, and EIP-7702 "wallet upgrade" delegation. See `tests/test_real_drainer_techniques.py` (each test cites its technique). Note: because this is STATIC decoding, it is immune to the "Red Pill"/TOCTOU simulation-evasion that fools simulation-based scanners — we read the calldata's literal intent.
+
 _Last updated 2026-06-03 (v0.5.0). Gaps are tracked honestly; we close the ones with real demand
 or a clean, low-false-positive rule — never ship a guard that cries wolf._
