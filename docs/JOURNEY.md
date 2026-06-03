@@ -251,3 +251,6 @@ README falsely still said permit-phishing was "out of scope" (stale since v0.3.0
 
 ## 2026-06-03 — SUITE: tool #3 shipped — action-policy gate (v0.4.0)
 check_action(action, policy): enforce forbid/allow tools, max_value_wei, allow_recipients on a proposed agent tool call BEFORE it runs. The "inspect what the agent DOES" half every identity vendor + NIST named. Fail-safe (denies on bad input). Exported + MCP tool. Suite now 3 tools (preflight, inspect_signature, check_action), all MCP-callable. 192 tests.
+
+## 2026-06-03 — DISTRIBUTION: README/PyPI hero now leads with the 3-guard suite (v0.4.1)
+Hero reframed from "wallet with a preflight check" to "security suite for AI agents" (preflight + inspect_typed_data + check_action). Dropped the now-FALSE hero claim "won't catch permit-signature phishing" (we cover it). Documented check_action + added to features. Landing page matches shipped reality. No notify (routine). Signals: badge 404, PR open, 0 stars.
