@@ -257,3 +257,6 @@ Hero reframed from "wallet with a preflight check" to "security suite for AI age
 
 ## 2026-06-03 — SECURITY: adversarial review of tools #2/#3 -> hardening (v0.4.2)
 Ran independent bypass hunt on sig_inspect + action_gate. Real fail-open found: action_gate allow_tools=[] allowed everything (now DENIES — fail closed). Defense-in-depth: case-insensitive tool matching + case/whitespace-normalized permit primaryType (note: a non-canonical permit type also breaks the EIP-712 hash so the real-world drain is narrower, but a guard must not be beaten by casing). Crash tests held. 197 tests, live. Honest log, no notify (self-found, 0 users).
+
+## 2026-06-03 — WATCH/DISTRIBUTION probe: no clean new channel; holding
+Signals flat (Glama badge 404, PR open, 0 stars). Probed security-list channels: Anugrahsr/Awesome-web3-Security (1.6k stars but 3mo stale + audit/CTF-focused, marginal fit), MCP-security lists dont exist, wong2 PR-dead. No clean well-fit active PR-accepting list -> forcing one = spam for low yield (fails fit check). Seaport rule stays deferred (FP-prone; add on demand per doctrine). Suite feature-complete + hardened (v0.4.2, 197 tests). Correct move = hold; reach still gated on Glama listing + organic/warm discovery. No notify.
