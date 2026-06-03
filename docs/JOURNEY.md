@@ -233,3 +233,6 @@ Logged into Glama settings/mcp/servers: lists only GitHub-auto-detected repos (H
 ## 2026-06-03 — WATCH (hourly): no change. Ruled out glama.json as detection trigger (auto-detected Hivemind repos lack it too) — it is Glama crawl/review timing, not a missing config. No speculative file added. Notify sent.
 
 ## 2026-06-03 — WATCH (hourly): no change. Notify sent.
+
+## 2026-06-03 — SUITE: tool #2 shipped — signed-message/permit-phishing inspector (v0.3.0)
+First slice of inspect_typed_data(): catches the off-chain drain preflight cannot — an ERC-2612 permit SIGNATURE granting unlimited allowance (the classic signature-phishing attack). EIP-712 decode + unlimited(HIGH)/large(MED) flags, fail-safe, reuses preflight thresholds (no new deps). Exported + live on PyPI/registry. Suite now = 2 tools (preflight + sig-inspector). Next: Permit2 (PermitSingle/Batch), Seaport orders. 176 tests.
