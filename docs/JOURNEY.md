@@ -263,3 +263,6 @@ Signals flat (Glama badge 404, PR open, 0 stars). Probed security-list channels:
 
 ## 2026-06-03 — VERIFY: live E2E of published 0.4.2 via sub-agent = PASS
 Fresh-venv install of live PyPI 0.4.2; sub-agent exercised all 3 tools + MCP introspection: preflight (unlimited approval + NFT drain HIGH), inspect_typed_data (ERC-2612/Permit2/DAI unlimited flagged), check_action (forbid denies, empty-allowlist fails CLOSED, over-limit denies), MCP lists all 9 tools incl. the 3 safety tools. All True, no errors. Adopted Kelvin standing rule: live-verify after every ship via a sub-agent (added to SUITE.md doctrine + cron).
+
+## 2026-06-03 — DISTRIBUTION: added examples/agent_safety_demo.py (conversion piece)
+Offline 2-second demo: all 3 guards block 3 real attacks (unlimited approval, permit-phishing signature, off-policy send). Verified runs clean. README points to it. One-time adoption asset (the "see it work instantly" piece), not a feature. No notify (routine). Signals flat: badge 404, PR open, 0 stars.
