@@ -302,3 +302,4 @@ Daily competition/threat scan: wedge still clear (no drop-in decode+flag lib riv
 ## 2026-06-03 — DISTRIBUTION: Glama listed chain-signer but quality SCORE still null/pending (API: quality/score/qualityScore all null). That's why PR #7298 isn't merged — bot wants a real score; Glama eval is queued (has our Dockerfile). Our side complete; awaiting Glama scoring. NOT adding badge to our README until a real score exists (won't showcase 'unrated'). Hold.
 ## 2026-06-03 — HOLD: PR #7298 OPEN merged=no, glama score=None, stars 0. Awaiting Glama score + merge. No change.
 ## 2026-06-03 — HOLD: PR #7298 OPEN merged=no, stars 0. Glama score still pending. No change.
+## 2026-06-03 — HOLD: PR #7298 OPEN merged=no, stars 0. No change.
