@@ -212,7 +212,13 @@ def preflight(tx, *, fetch=None, sim=None, max_value=None):
 
     # EIP-7702 account delegation (type-0x04 set-code): signing an authorization hands the delegate
     # contract control of the account — a current drainer vector disguised as a "wallet upgrade".
-    auth_list = tx.get("authorizationList") or tx.get("authorization_list")
+    auth_list = None
+    for k, v in tx.items():
+        if isinstance(k, str) and k.replace("_", "").lower() == "authorizationlist":
+            auth_list = v
+            break
+    if isinstance(auth_list, dict):          # tolerate a single authorization, not just a list
+        auth_list = [auth_list]
     if isinstance(auth_list, list) and auth_list:
         targets = [a.get("address") for a in auth_list if isinstance(a, dict)]
         flags.append({"code": "eip7702_delegation", "severity": "HIGH",
