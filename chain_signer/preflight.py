@@ -210,6 +210,16 @@ def preflight(tx, *, fetch=None, sim=None, max_value=None):
                           "detail": f"calldata calls an unknown function ({decoded.get('selector')}); "
                                     "can't tell what it does — review before signing."})
 
+    # EIP-7702 account delegation (type-0x04 set-code): signing an authorization hands the delegate
+    # contract control of the account — a current drainer vector disguised as a "wallet upgrade".
+    auth_list = tx.get("authorizationList") or tx.get("authorization_list")
+    if isinstance(auth_list, list) and auth_list:
+        targets = [a.get("address") for a in auth_list if isinstance(a, dict)]
+        flags.append({"code": "eip7702_delegation", "severity": "HIGH",
+                      "detail": f"this transaction delegates account control via EIP-7702 to {targets} — the "
+                                "delegate can then move your funds with no further approval. Only sign if you "
+                                "set this up and trust that address (drainers disguise it as a 'wallet upgrade')."})
+
     value = _to_int(tx.get("value"))
     if value is None:
         flags.append({"code": "unreadable_value", "severity": "MED",
