@@ -245,3 +245,6 @@ DAI permit (allowed:bool, no value field) was waved through by the value check �
 
 ## 2026-06-03 — SUITE: safety tools now on the MCP surface (v0.3.3)
 MCP server advertised only wallet ops; the wedge (preflight + sig inspector) was import-only, not MCP-callable. Added "preflight" + "inspect_signature" as read-only no-key MCP tools -> any agent runtime can call the guard. 8 tools now (2 are the safety wedge). 185 tests. The registry-listed MCP server now leads with security.
+
+## 2026-06-03 — DISTRIBUTION: README/PyPI now documents the signature inspector + MCP tools (v0.3.4)
+README falsely still said permit-phishing was "out of scope" (stale since v0.3.0). Added Signed-message inspector section (ERC-2612/Permit2/DAI), corrected limits line, noted both guards are MCP-callable, listed inspect_typed_data in features. Docs refresh so the live PyPI landing matches shipped reality. No notify (routine). Signals: badge 404, PR open, 0 stars.
