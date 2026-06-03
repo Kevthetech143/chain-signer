@@ -306,3 +306,4 @@ Daily competition/threat scan: wedge still clear (no drop-in decode+flag lib riv
 ## 2026-06-03 — HOLD: glama score None, PR #7298 OPEN, stars 0. No change.
 ## 2026-06-03 — HOLD: glama score None, PR #7298 OPEN, stars 0. No change.
 ## 2026-06-03 — HOLD: glama score None, PR #7298 OPEN, stars 0. No change.
+## 2026-06-03 — SELF-CRITIQUE (A+C): recalibrated README honest-limits — static-not-simulation, EVM-only safety, not field-proven, pair with sim+human review. Walked back the 'strong' overclaim to precise truth. GitHub now, rides next release. NEXT (B): build a test corpus from REAL documented drainer tx shapes + prove preflight flags them (close the synthetic-only gap). Glama score still pending, PR open, 0 stars.
