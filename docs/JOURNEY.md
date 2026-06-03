@@ -254,3 +254,6 @@ check_action(action, policy): enforce forbid/allow tools, max_value_wei, allow_r
 
 ## 2026-06-03 — DISTRIBUTION: README/PyPI hero now leads with the 3-guard suite (v0.4.1)
 Hero reframed from "wallet with a preflight check" to "security suite for AI agents" (preflight + inspect_typed_data + check_action). Dropped the now-FALSE hero claim "won't catch permit-signature phishing" (we cover it). Documented check_action + added to features. Landing page matches shipped reality. No notify (routine). Signals: badge 404, PR open, 0 stars.
+
+## 2026-06-03 — SECURITY: adversarial review of tools #2/#3 -> hardening (v0.4.2)
+Ran independent bypass hunt on sig_inspect + action_gate. Real fail-open found: action_gate allow_tools=[] allowed everything (now DENIES — fail closed). Defense-in-depth: case-insensitive tool matching + case/whitespace-normalized permit primaryType (note: a non-canonical permit type also breaks the EIP-712 hash so the real-world drain is narrower, but a guard must not be beaten by casing). Crash tests held. 197 tests, live. Honest log, no notify (self-found, 0 users).
