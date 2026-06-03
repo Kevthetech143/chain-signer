@@ -278,3 +278,4 @@ Sub-agent, fresh venv: 0.4.3 installs; README inline snippet works (unlimited_ap
 ## 2026-06-03 — SECURITY (leader): preflight covers EIP-7702 delegation drainers (v0.5.0)
 Daily competition/threat scan: wedge still clear (no drop-in decode+flag lib rivals — only API services/tutorials/sim engines). NEW evidenced threat = EIP-7702 account-delegation drainers (live 2026, bypass approve()-detection, disguised as wallet upgrade). Built it: preflight flags any tx with an authorizationList -> HIGH, names the delegate. 200 tests. Staying at the leading edge. Live-verify next (binding). Sources: threesigma.xyz, blockaid.io, cyfrin.io.
 ## 2026-06-03 — VERIFY: live E2E of published 0.5.0 = PASS. EIP-7702 guard fires HIGH+blocks; 3 tools regress clean; MCP 9 tools. (PyPI CDN served 0.4.3 first, verified via ==0.5.0 pin.)
+## 2026-06-03 — DOCS: README preflight coverage updated to include EIP-7702 (accuracy after v0.5.0). No release (rides next). Signals flat.
