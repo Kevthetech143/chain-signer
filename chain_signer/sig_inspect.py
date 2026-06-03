@@ -53,6 +53,16 @@ def inspect_typed_data(td, *, max_value=None):
     # ERC-2612 permit: signing this grants an allowance off-chain, just like approve() on-chain.
     if primary == "Permit":
         spender = message.get("spender")
+        # DAI-style permit(holder, spender, nonce, expiry, allowed): no `value`; allowed=true == unlimited.
+        if "allowed" in message and "value" not in message:
+            if message.get("allowed") is True:
+                flags.append({"code": "unlimited_permit_signature", "severity": "HIGH",
+                              "detail": f"signing this DAI-style permit (allowed=true) grants an UNLIMITED token "
+                                        f"allowance to {spender} — the classic signature-phishing drain. Do not "
+                                        "sign unless you trust the spender."})
+            decoded = {"primaryType": primary, "verifyingContract": (td.get("domain") or {}).get("verifyingContract")}
+            return {"decoded": decoded, "risk_flags": flags,
+                    "ok": not any(f["severity"] == "HIGH" for f in flags)}
         value = _to_int(message.get("value"))
         if value is None:
             flags.append({"code": "unreadable_permit_value", "severity": "MED",
