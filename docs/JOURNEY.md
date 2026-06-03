@@ -295,3 +295,4 @@ Daily competition/threat scan: wedge still clear (no drop-in decode+flag lib riv
 ## 2026-06-03 — HOLD: no signal (stars 0, badge 404, PR OPEN). Watching.
 ## 2026-06-03 — HOLD: no signal (stars 0, badge 404, PR OPEN). Watching.
 ## 2026-06-03 — DISTRIBUTION (real signal): Glama listed chain-signer + score badge LIVE (200). Added the badge to PR #7298 + replied to glama-check bot -> PR now meets all listing requirements, awaiting maintainer merge. Verified page+badge resolve 200 for anon visitors. Notified Kelvin (badge-live = his listed real signal). First external traction.
+## 2026-06-03 — DISTRIBUTION: PR #7298 — bot acknowledged badge (glama-badge-check), asks to confirm Glama quality-score eval. Badge live (200), server listed + builds (Dockerfile), MIT + green CI -> should score fine. All in-our-control requirements MET; awaiting Glama score-eval completion + maintainer merge (external). No new notify (badge-live already sent; merge = next notify). Stars 0.
