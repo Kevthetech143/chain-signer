@@ -47,11 +47,13 @@ def inspect_typed_data(td, *, max_value=None):
                 "ok": False}
 
     primary = td.get("primaryType")
+    # Normalize for matching — a security tool must not be defeated by casing/whitespace.
+    pnorm = primary.strip().lower() if isinstance(primary, str) else ""
     message = td.get("message") if isinstance(td.get("message"), dict) else {}
     flags = []
 
     # ERC-2612 permit: signing this grants an allowance off-chain, just like approve() on-chain.
-    if primary == "Permit":
+    if pnorm == "permit":
         spender = message.get("spender")
         # DAI-style permit(holder, spender, nonce, expiry, allowed): no `value`; allowed=true == unlimited.
         if "allowed" in message and "value" not in message:
@@ -78,7 +80,7 @@ def inspect_typed_data(td, *, max_value=None):
                                     "confirm it's intended."})
 
     # Permit2 (Uniswap): PermitSingle / PermitBatch — same drain, uint160 amounts.
-    elif primary in ("PermitSingle", "PermitBatch"):
+    elif pnorm in ("permitsingle", "permitbatch"):
         flags.extend(_permit2_flags(message))
 
     decoded = {"primaryType": primary, "verifyingContract": (td.get("domain") or {}).get("verifyingContract")}
