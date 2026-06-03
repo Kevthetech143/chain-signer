@@ -5,14 +5,19 @@
 ![PyPI](https://img.shields.io/pypi/v/chain-signer) ![Python](https://img.shields.io/pypi/pyversions/chain-signer) ![License](https://img.shields.io/pypi/l/chain-signer) ![Release](https://github.com/Kevthetech143/chain-signer/actions/workflows/release.yml/badge.svg)
 
 
-A non-custodial agent wallet with a preflight safety check. Give your AI agent its own
-wallet in one line, and a first-line guard that decodes a transaction and flags common drain
-patterns BEFORE it signs — unlimited approvals, approve-all, token & NFT transferFrom pulls,
-proxy upgrades, on-chain permit, approvals hidden inside multicall (including Uniswap-style router
-batches), and reverts. It's a guard, not a guarantee (it won't catch permit-signature phishing,
-which isn't a transaction), and it fails safe — it flags rather than waving through what it can't
-read. Make a burner wallet, check balance, send, swap; the agent holds its own key and signs
-locally. No MetaMask, no account, no custody.
+A security suite for AI agents — the seatbelt that catches the dangerous thing BEFORE it happens.
+Three guards, each callable on its own (and as MCP tools), pairing with any wallet or identity stack:
+
+- `preflight(tx)` — decode an unsigned transaction and flag drains before signing (unlimited/large
+  approval, approve-all, token & NFT transferFrom, proxy upgrade, on-chain permit, approvals hidden
+  in multicall incl. Uniswap router batches, will-revert).
+- `inspect_typed_data(td)` — catch permit-phishing in an EIP-712 message before the agent signs it
+  (ERC-2612, Uniswap Permit2, DAI-style permits).
+- `check_action(action, policy)` — enforce allow/forbid + value/recipient limits before the agent acts.
+
+All three fail safe and are guards, not guarantees. Also bundled: a non-custodial multi-chain wallet
+(burner, balance, send, swap) — the agent holds its own key and signs locally. No MetaMask, no
+account, no custody.
 
 ```python
 from chain_signer import assert_safe
@@ -78,12 +83,23 @@ report = inspect_typed_data(typed_data)   # the EIP-712 object you're about to s
 Covers all three major permit shapes: **ERC-2612**, **Uniswap Permit2** (PermitSingle/PermitBatch),
 and **DAI-style** (`allowed: true`). Offline, never raises.
 
-Both guards are also exposed as MCP tools (`preflight`, `inspect_signature`) — any agent runtime
-(Claude, Cursor, …) can call them directly, read-only, no key.
+## Action-policy gate (inspect what the agent DOES)
+Identity tells you *who* the agent is; it doesn't stop a bad *action*. `check_action()` enforces a
+policy on a proposed tool call before it runs — fail-safe (denies on unreadable input):
+```python
+from chain_signer import check_action
+policy = {"forbid_tools": ["bridge"], "max_value_wei": 10**18, "allow_recipients": [trusted_addr]}
+r = check_action({"tool": "send", "args": {"to": addr, "value_wei": 5*10**18}}, policy)
+# {'allowed': False, 'violations': [{'code': 'value_over_limit', ...}]}
+```
+
+All three guards are exposed as MCP tools (`preflight`, `inspect_signature`, `check_action`) — any
+agent runtime (Claude, Cursor, …) can call them directly, read-only, no key.
 
 ## What you get
-- `preflight(tx)` / `assert_safe(tx)` — decode an unsigned tx and flag drain patterns before signing (the wedge).
+- `preflight(tx)` / `assert_safe(tx)` — decode an unsigned tx and flag drain patterns before signing.
 - `inspect_typed_data(td)` — flag permit-phishing in an EIP-712 message before the agent signs it.
+- `check_action(action, policy)` — enforce allow/forbid + value/recipient limits before the agent acts.
 - `burner()` — a fresh wallet for a one-off task; discard it when done.
 - `restore(key)` — reload a wallet later from its exported private key (same key → same address).
 - `send_ether(w, to, amount)` — send in ETH (not wei); nonce, gas, and broadcast handled for you.
