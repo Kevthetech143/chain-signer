@@ -20,7 +20,14 @@ def check_action(action, policy=None):
     if not isinstance(action, dict):
         return {"allowed": False, "violations": [{"code": "unparseable",
                 "detail": "action is not a readable object — denying (a policy gate must fail closed)."}]}
-    policy = policy if isinstance(policy, dict) else {}
+    # policy=None is the documented "no policy" default (no constraints). But a non-None policy that
+    # isn't a dict is UNREADABLE — a misconfigured gate. Fail CLOSED rather than silently allowing
+    # everything (a policy gate that errors open is worse than useless). Matches the action-side rule.
+    if policy is None:
+        policy = {}
+    elif not isinstance(policy, dict):
+        return {"allowed": False, "violations": [{"code": "unparseable_policy",
+                "detail": "policy is not a readable object — denying (a policy gate must fail closed)."}]}
     tool = action.get("tool")
     # Normalize the candidate tool the SAME way on both lists — a guard must not be defeated by
     # trailing whitespace / casing. forbid_tools previously failed OPEN on "send\n" while allow_tools
