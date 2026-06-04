@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Kevthetech143/chain-signer",
-  "description": "Non-custodial agent wallet with a preflight safety check that flags drain txs before signing.",
+  "description": "Security suite for AI agents: flag drains, permit-phishing & risky actions before signing.",
   "version": "0.1.4",
   "repository": {
     "url": "https://github.com/Kevthetech143/chain-signer",
