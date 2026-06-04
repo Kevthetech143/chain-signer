@@ -14,7 +14,7 @@ not a guarantee — pair it with your wallet + identity stack.
 | ERC-721/1155 `safeTransferFrom` (NFT theft) | ✅ | HIGH |
 | On-chain `permit()` call | ✅ | HIGH on unlimited |
 | Proxy `upgradeTo` / `upgradeToAndCall` | ✅ | HIGH (logic swap) |
-| Approval hidden in `multicall` (all 4 variants, nested) | ✅ | recurses, depth-capped |
+| Approval hidden in `multicall` (all 4 variants, nested) | ✅ | recurses; nesting beyond the cap → HIGH hard-stop (abnormally deep = hostile obfuscation) |
 | EIP-7702 account delegation ("wallet upgrade" drainer) | ✅ | HIGH; flags the delegate target |
 | Large native value | ✅ | MED, against a caller `max_value` |
 | Will-revert (wasted gas / unexpected) | 🟡 | needs an injected `sim` hook |
@@ -28,7 +28,7 @@ not a guarantee — pair it with your wallet + identity stack.
 |---|---|---|
 | ERC-2612 `permit` signature (unlimited) | ✅ | HIGH; the classic signature-phishing drain |
 | Uniswap Permit2 `PermitSingle`/`PermitBatch` | ✅ | uint160-aware threshold |
-| DAI-style `permit` (`allowed: true`) | ✅ | HIGH |
+| DAI-style `permit` (`allowed: true`) | ✅ | HIGH (any true-encoding: `true`/`1`/`"1"`/`"0x1"`) |
 | Permit2 `PermitTransferFrom`/`PermitBatchTransferFrom` (SignatureTransfer) | ✅ | flags only UNLIMITED permitted amount (legit swaps use exact amounts → no false alarm) |
 | Seaport order signatures (NFT listing phishing) | ❌ | FP-prone vs legit listings; needs offer/consideration value compare — on demand |
 
