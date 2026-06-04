@@ -165,9 +165,13 @@ def _collect_flags(data, prefix="", depth=0):
     selector = "0x" + s[:8].lower()
     if selector in _MULTICALL_VARIANTS:
         if depth >= _MAX_MULTICALL_DEPTH:
-            return [{"code": "malformed_call", "severity": "MED",
+            # Abnormally-deep nesting is not a legitimate pattern (real multicalls nest 1-2 deep) — it
+            # is a strong obfuscation signal hiding calls we refuse to keep unwrapping. HIGH so the
+            # hard stop (assert_safe) fires rather than waving it through with a soft advisory.
+            return [{"code": "deeply_nested_multicall", "severity": "HIGH",
                      "detail": f"{prefix}multicall nested deeper than {_MAX_MULTICALL_DEPTH} levels — "
-                               "refusing to keep unwrapping; review before signing."}]
+                               "this is not a normal pattern and hides calls that can't be inspected; "
+                               "treat as hostile and do not sign without manual review."}]
         inner = _multicall_inner(data)
         if inner is None:
             return [{"code": "malformed_call", "severity": "MED",
