@@ -15,6 +15,24 @@ from .preflight import _to_int, _UNLIMITED_THRESHOLD, _LARGE_APPROVAL
 _PERMIT2_UNLIMITED = 1 << 159
 
 
+def _allowed_is_true(v):
+    """DAI permit `allowed` is a bool on-chain, but a hostile dApp controls the JSON it asks us to
+    sign and can encode "true" as 1 / "1" / "0x1" / "true" — all of which the on-chain verifier reads
+    as true and grant an UNLIMITED allowance. Treat every such encoding as true; only false/0/"" is safe."""
+    if v is True:
+        return True
+    if v is False or v is None:
+        return False
+    if isinstance(v, str):
+        s = v.strip().lower()
+        if s in ("true", "yes"):
+            return True
+        if s in ("false", "no", ""):
+            return False
+    i = _to_int(v)
+    return i is not None and i != 0
+
+
 def _permit2_flags(message):
     """Flags for a Permit2 PermitSingle/PermitBatch signature. details is a dict or a list of dicts."""
     flags = []
@@ -76,7 +94,7 @@ def inspect_typed_data(td, *, max_value=None):
         spender = message.get("spender")
         # DAI-style permit(holder, spender, nonce, expiry, allowed): no `value`; allowed=true == unlimited.
         if "allowed" in message and "value" not in message:
-            if message.get("allowed") is True:
+            if _allowed_is_true(message.get("allowed")):
                 flags.append({"code": "unlimited_permit_signature", "severity": "HIGH",
                               "detail": f"signing this DAI-style permit (allowed=true) grants an UNLIMITED token "
                                         f"allowance to {spender} — the classic signature-phishing drain. Do not "

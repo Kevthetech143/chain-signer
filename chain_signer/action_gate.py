@@ -22,19 +22,22 @@ def check_action(action, policy=None):
                 "detail": "action is not a readable object — denying (a policy gate must fail closed)."}]}
     policy = policy if isinstance(policy, dict) else {}
     tool = action.get("tool")
-    tool_l = tool.lower() if isinstance(tool, str) else tool
+    # Normalize the candidate tool the SAME way on both lists — a guard must not be defeated by
+    # trailing whitespace / casing. forbid_tools previously failed OPEN on "send\n" while allow_tools
+    # failed CLOSED; that asymmetry favored the attacker. Callers must dispatch on the normalized name.
+    tool_l = tool.strip().casefold() if isinstance(tool, str) else tool
     args = action.get("args") if isinstance(action.get("args"), dict) else {}
     v = []
 
     # allow_tools: an EXPLICIT empty list means "allow nothing" — must fail closed, not open.
-    # (use `is not None`, not truthiness). Tool matching is case-insensitive.
+    # (use `is not None`, not truthiness). Tool matching is case/whitespace-insensitive.
     allow_tools = policy.get("allow_tools")
     if allow_tools is not None:
-        allowed_set = {str(t).lower() for t in allow_tools}
+        allowed_set = {str(t).strip().casefold() for t in allow_tools}
         if tool_l not in allowed_set:
             v.append({"code": "tool_not_allowed",
                       "detail": f"tool '{tool}' is not in the allow-list {list(allow_tools)}."})
-    forbid_set = {str(t).lower() for t in (policy.get("forbid_tools") or [])}
+    forbid_set = {str(t).strip().casefold() for t in (policy.get("forbid_tools") or [])}
     if tool_l in forbid_set:
         v.append({"code": "forbidden_tool", "detail": f"tool '{tool}' is forbidden by policy."})
 
