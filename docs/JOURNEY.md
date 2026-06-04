@@ -310,11 +310,4 @@ Daily competition/threat scan: wedge still clear (no drop-in decode+flag lib riv
 ## 2026-06-03 — SELF-CRITIQUE (B done): added real-drainer-technique corpus (6 tests, all PASS) proving coverage of the dominant documented drainers (Permit2 56.7%, setApprovalForAll, approve+transferFrom, EIP-7702) w/ cited sources. Threat-coverage doc cites it + notes static decoding is immune to Red Pill/TOCTOU. 214 tests. Closes synthetic-only gap. Test+docs only (no release; rides next). A+B+C of self-critique now done.
 ## 2026-06-03 — SHIP v0.5.3 (docs): recalibrated honest-limits + real-drainer validation note now on the live PyPI page (were GitHub-only). No code change. Live-verify next.
 ## 2026-06-03 — HOLD: glama pending, PR #7298 OPEN, stars 0. Self-critique A/B/C shipped+live (v0.5.3). No change.
-## 2026-06-03 — HOLD: glama pending, PR #7298 OPEN, stars 0. No change.
-## 2026-06-03 — HOLD: glama pending, PR #7298 OPEN, stars 0. No change.
-## 2026-06-03 — HOLD: glama pending, PR #7298 OPEN, stars 0. No change.
-## 2026-06-03 — HOLD: glama pending, PR #7298 OPEN, stars 0. No change.
-## 2026-06-03 — HOLD: glama pending, PR #7298 OPEN, stars 0. No change.
-## 2026-06-03 — HOLD: glama pending, PR #7298 OPEN, stars 0. No change.
-## 2026-06-03 — HOLD: glama pending, PR #7298 OPEN, stars 0. No change.
-## 2026-06-03 — HOLD: glama pending, PR #7298 OPEN, stars 0. No change.
+## 2026-06-03 — HOLD x8: glama score pending (eval not yet posted), PR #7298 OPEN awaiting that score, 0 stars/forks. Product feature-complete + hardened + live-verified at v0.5.3. Distribution gated externally (Glama eval timeline + maintainer merge). No actionable build step; correct cycle is watch+log.
