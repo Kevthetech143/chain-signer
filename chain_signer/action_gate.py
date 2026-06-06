@@ -57,11 +57,29 @@ def check_action(action, policy=None):
             v.append({"code": "value_over_limit",
                       "detail": f"value {val} wei exceeds the policy limit {cap} wei."})
 
+    # A recipient allow-list means the operator cares WHERE funds go, so it must FAIL CLOSED — like
+    # allow_tools. The old `if allow_recipients and "to" in args` skipped the check when `to` was
+    # absent, ALLOWING a value-bearing action with no recipient (a fail-open that defeats the list);
+    # and `(args.get("to") or "").lower()` RAISED on a non-string `to` (breaks the never-raises
+    # contract). Now: check a readable `to` against the list; otherwise deny when `to` is present-but-
+    # unreadable OR the action moves native value (a transfer we can't verify). A pure non-value
+    # action with no `to` isn't a transfer, so it is not flagged (stay non-noisy).
     allow_recipients = policy.get("allow_recipients")
-    if allow_recipients and "to" in args:
-        to = (args.get("to") or "").lower()
-        if to not in {str(a).lower() for a in allow_recipients}:
-            v.append({"code": "recipient_not_allowed",
-                      "detail": f"recipient {args.get('to')} is not on the allow-list."})
+    if allow_recipients:
+        allowed_recips = {str(a).strip().lower() for a in allow_recipients}
+        to_raw = args.get("to")
+        to = to_raw.strip().lower() if isinstance(to_raw, str) else None
+        if to is not None:
+            if to not in allowed_recips:
+                v.append({"code": "recipient_not_allowed",
+                          "detail": f"recipient {args.get('to')} is not on the allow-list."})
+        else:
+            val = _to_int(args.get("value_wei"))
+            moves_value = val is not None and val > 0
+            if "to" in args or moves_value:
+                v.append({"code": "recipient_not_allowed",
+                          "detail": "action has no readable recipient to check against the allow-list "
+                                    "(missing or unreadable `to` on a value transfer) — denying "
+                                    "(a recipient allow-list must fail closed)."})
 
     return {"allowed": len(v) == 0, "violations": v}
