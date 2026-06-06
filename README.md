@@ -9,8 +9,9 @@ A security suite for AI agents — the seatbelt that catches the dangerous thing
 Three guards, each callable on its own (and as MCP tools), pairing with any wallet or identity stack:
 
 - `preflight(tx)` — decode an unsigned transaction and flag drains before signing (unlimited/large
-  approval, approve-all, token & NFT transferFrom, proxy upgrade, on-chain permit, approvals hidden
-  in multicall incl. Uniswap router batches, EIP-7702 account delegation, will-revert).
+  approval, approve-all, token & NFT transferFrom, proxy upgrade, on-chain permit, on-chain Permit2
+  approve/transferFrom, approvals hidden in multicall incl. Uniswap router batches, EIP-7702 account
+  delegation, will-revert).
 - `inspect_typed_data(td)` — catch permit-phishing in an EIP-712 message before the agent signs it
   (ERC-2612, Uniswap Permit2, DAI-style permits).
 - `check_action(action, policy)` — enforce allow/forbid + value/recipient limits before the agent acts.
@@ -74,9 +75,10 @@ assert_safe(tx, sim=my_simulator)   # optional: also flag will-revert via your s
 ```
 What it flags today: unlimited/large approval, `increaseAllowance`, `setApprovalForAll`,
 ERC-20 `transferFrom` + ERC-721/1155 `safeTransferFrom` (token & NFT drains), on-chain `permit`,
-proxy `upgradeTo`/`upgradeToAndCall`, approvals hidden inside `multicall` (all router variants,
-nested), EIP-7702 account delegation (the "wallet upgrade" drainer), large native value, opaque
-calldata, malformed calls, and will-revert (with a sim hook).
+on-chain Permit2 `approve`/`transferFrom` (the dominant approval router — unlimited uint160 allowance
++ drain pull), proxy `upgradeTo`/`upgradeToAndCall`, approvals hidden inside `multicall` (all router
+variants, nested), EIP-7702 account delegation (the "wallet upgrade" drainer), large native value,
+opaque calldata, malformed calls, and will-revert (with a sim hook).
 Honest limits (read these): this is STATIC analysis — it decodes calldata and matches known drain
 patterns. It is NOT a transaction simulator: it won't catch a novel/obfuscated drain it can't decode
 (those get a low-severity "unknown" flag, not a block), and simulation-based scanners go deeper there.
