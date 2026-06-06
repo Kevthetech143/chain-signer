@@ -76,6 +76,31 @@ def _permit2_transfer_flags(message):
     return flags
 
 
+def _seaport_flags(message):
+    """Flag a Seaport order that GIVES ASSETS AWAY for nothing: the `offer` is non-empty but the
+    `consideration` is empty or all-zero. A legitimate listing always pays the seller, so this stays
+    non-noisy — we do NOT flag normal-priced listings. This is the off-chain NFT-drain sibling of
+    setApprovalForAll (a signed marketplace order, not a transaction)."""
+    flags = []
+    offer = message.get("offer")
+    if not isinstance(offer, list) or not offer:
+        return flags                       # nothing offered -> nothing to give away
+    consideration = message.get("consideration")
+    items = consideration if isinstance(consideration, list) else []
+    total = 0
+    for c in items:
+        if isinstance(c, dict):
+            amt = _to_int(c.get("startAmount"))
+            if amt:
+                total += amt
+    if total == 0:                         # consideration empty OR every amount zero/unreadable
+        flags.append({"code": "seaport_zero_consideration", "severity": "HIGH",
+                      "detail": "signing this Seaport order gives away the offered asset(s) for ZERO "
+                                "consideration — the NFT/marketplace signature-phishing drain. A real "
+                                "listing always pays the seller; do not sign unless you intend a gift."})
+    return flags
+
+
 def inspect_typed_data(td, *, max_value=None):
     """Inspect an EIP-712 typed-data object the agent is about to sign. Never raises."""
     if not isinstance(td, dict):
@@ -123,6 +148,10 @@ def inspect_typed_data(td, *, max_value=None):
     # Permit2 SignatureTransfer — authorizes a pull; flag only unlimited (legit uses exact amounts).
     elif pnorm in ("permittransferfrom", "permitbatchtransferfrom"):
         flags.extend(_permit2_transfer_flags(message))
+
+    # Seaport order — a signed marketplace order that gives assets away for zero consideration.
+    elif pnorm == "ordercomponents":
+        flags.extend(_seaport_flags(message))
 
     decoded = {"primaryType": primary, "verifyingContract": (td.get("domain") or {}).get("verifyingContract")}
     ok = not any(f["severity"] == "HIGH" for f in flags)
