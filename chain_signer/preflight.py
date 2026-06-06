@@ -24,9 +24,16 @@ _KNOWN = {
     "0x4f1ef286": ("upgradeToAndCall", ["address"]),
     # ERC-2612 permit submitted on-chain — grants an allowance to `spender` like approve does.
     "0xd505accf": ("permit", ["address", "address", "uint256", "uint256", "uint8", "bytes32", "bytes32"]),
+    # Permit2 (Uniswap's universal approval router, used by most aggregators) — its ON-CHAIN calls flow
+    # through here as plain txs. approve grants an allowance; transferFrom is the drain-pull counterpart.
+    # NOTE arg ORDER differs from ERC-20: spender is the 2nd arg, amount the 3rd; amount is uint160.
+    "0x87517c45": ("permit2Approve", ["address", "address", "uint160", "uint48"]),
+    "0x36c78516": ("permit2TransferFrom", ["address", "address", "uint160", "address"]),
 }
 
 _UNLIMITED_THRESHOLD = 1 << 255       # effectively-infinite approval (catches uint-max + half-max)
+_UNLIMITED_U160 = 1 << 159            # Permit2 amount is uint160 — its "infinite" is type(uint160).max,
+                                      # far below the uint256 threshold; catch the top half of the range
 _LARGE_APPROVAL = 10 ** 24            # large-but-finite: warn, don't claim infinite
 _MULTICALL = "0xac9650d8"             # multicall(bytes[]) — batches inner calls; drains hide here
 # Every multicall variant we know maps selector -> ABI arg types; the bytes[] arg holds inner calls.
@@ -115,6 +122,16 @@ def _call_flags(decoded, prefix=""):
         elif amt >= _LARGE_APPROVAL:
             flags.append({"code": "large_approval", "severity": "MED",
                           "detail": f"{prefix}{fn}() grants a very large allowance to {spender}; confirm it's intended."})
+    elif fn == "permit2Approve" and len(args) >= 3:
+        spender, amt = args[1], args[2]          # NOTE: spender is arg[1], amount arg[2] for Permit2
+        if amt >= _UNLIMITED_U160:
+            flags.append({"code": "unlimited_approval", "severity": "HIGH",
+                          "detail": f"{prefix}Permit2 approve() grants an effectively-unlimited allowance to "
+                                    f"{spender} — a spender that turns malicious can drain that token."})
+        elif amt >= _LARGE_APPROVAL:
+            flags.append({"code": "large_approval", "severity": "MED",
+                          "detail": f"{prefix}Permit2 approve() grants a very large allowance to {spender}; "
+                                    "confirm it's intended."})
     elif fn == "permit" and len(args) >= 3:
         spender, value = args[1], args[2]
         if value >= _UNLIMITED_THRESHOLD:
@@ -128,8 +145,8 @@ def _call_flags(decoded, prefix=""):
         flags.append({"code": "approval_for_all", "severity": "HIGH",
                       "detail": f"{prefix}setApprovalForAll grants {args[0]} control of EVERY token in this "
                                 "collection — a common NFT-drain approval."})
-    elif fn in ("transferFrom", "safeTransferFrom", "safeBatchTransferFrom") and len(args) >= 2:
-        asset = "an NFT/token" if fn != "transferFrom" else "tokens"
+    elif fn in ("transferFrom", "safeTransferFrom", "safeBatchTransferFrom", "permit2TransferFrom") and len(args) >= 2:
+        asset = "tokens" if fn in ("transferFrom", "permit2TransferFrom") else "an NFT/token"
         flags.append({"code": "token_transfer_from", "severity": "HIGH",
                       "detail": f"{prefix}{fn} moves {asset} OUT of {args[0]} to {args[1]} — this is the call a "
                                 "malicious spender uses to drain an approved wallet/collection. Confirm you intend it."})
