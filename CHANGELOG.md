@@ -3,6 +3,14 @@
 All notable changes to chain-signer. Newest first. Security fixes are released as a new version —
 published versions are never overwritten. Dates are UTC.
 
+## 0.5.12 — 2026-06-06
+- Security (check_action): the `allow_recipients` whitelist failed OPEN and could crash. It only ran
+  when `to` was present (`if allow_recipients and "to" in args`), so a value-bearing action that
+  OMITTED `to` was ALLOWED — defeating the whole point of a recipient allow-list. And a non-string
+  `to` (int/list) raised AttributeError via `(args.get("to") or "").lower()`, breaking the never-raises
+  contract. Now fails CLOSED like `allow_tools`: a missing/unreadable `to` on a native-value transfer
+  DENYs (`recipient_not_allowed`); a pure non-value action with no `to` is not flagged (non-noisy).
+
 ## 0.5.11 — 2026-06-06
 - Security (inspect_typed_data): flag Seaport marketplace order signatures (primaryType
   `OrderComponents`) that give the offered asset away for ZERO/empty consideration — the NFT
