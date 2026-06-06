@@ -13,7 +13,7 @@ Three guards, each callable on its own (and as MCP tools), pairing with any wall
   approve/permit/transferFrom, approvals hidden in multicall incl. Uniswap router batches, EIP-7702 account
   delegation, will-revert).
 - `inspect_typed_data(td)` — catch permit-phishing in an EIP-712 message before the agent signs it
-  (ERC-2612, Uniswap Permit2, DAI-style permits).
+  (ERC-2612, Uniswap Permit2, DAI-style permits) and Seaport orders that give an NFT away for nothing.
 - `check_action(action, policy)` — enforce allow/forbid + value/recipient limits before the agent acts.
 
 All three fail safe and are guards, not guarantees. Also bundled: a non-custodial multi-chain wallet
@@ -96,7 +96,8 @@ report = inspect_typed_data(typed_data)   # the EIP-712 object you're about to s
 # ok=False, risk_flags=[{'code': 'unlimited_permit_signature', 'severity': 'HIGH', ...}]
 ```
 Covers all three major permit shapes: **ERC-2612**, **Uniswap Permit2** (PermitSingle/PermitBatch),
-and **DAI-style** (`allowed: true`). Offline, never raises.
+and **DAI-style** (`allowed: true`), plus **Seaport** marketplace orders that give an asset away for
+zero consideration (the NFT signature-phishing drain). Offline, never raises.
 
 ## Action-policy gate (inspect what the agent DOES)
 Identity tells you *who* the agent is; it doesn't stop a bad *action*. `check_action()` enforces a

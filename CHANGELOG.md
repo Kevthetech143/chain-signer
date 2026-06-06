@@ -3,6 +3,12 @@
 All notable changes to chain-signer. Newest first. Security fixes are released as a new version —
 published versions are never overwritten. Dates are UTC.
 
+## 0.5.11 — 2026-06-06
+- Security (inspect_typed_data): flag Seaport marketplace order signatures (primaryType
+  `OrderComponents`) that give the offered asset away for ZERO/empty consideration — the NFT
+  signature-phishing drain (off-chain sibling of setApprovalForAll). Conservative by design: normal-
+  priced listings and buy orders are not flagged, only unambiguous zero-consideration giveaways.
+
 ## 0.5.10 — 2026-06-06
 - Security (preflight): flag the on-chain Permit2 `permit()` entrypoint (single + batch). 0.5.9 caught
   Permit2 `approve()` but not `permit()`, which writes the identical (spender → unlimited uint160
