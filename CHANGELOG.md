@@ -3,6 +3,24 @@
 All notable changes to chain-signer. Newest first. Security fixes are released as a new version —
 published versions are never overwritten. Dates are UTC.
 
+## 0.5.10 — 2026-06-06
+- Security (preflight): flag the on-chain Permit2 `permit()` entrypoint (single + batch). 0.5.9 caught
+  Permit2 `approve()` but not `permit()`, which writes the identical (spender → unlimited uint160
+  allowance) state — so an attacker could swap `approve` for `permit` and bypass the guard. The amount
+  sits inside a tuple/tuple-array, so this uses real ABI decoding; batch flags if ANY entry is unlimited.
+
+## 0.5.9 — 2026-06-06
+- Security (preflight): detect the on-chain Permit2 surface — `approve()` (0x87517c45) and the
+  `transferFrom()` drain-pull (0x36c78516). These flow through preflight as plain txs but were unknown
+  selectors, so an unlimited Permit2 allowance was waved through. Permit2 uses uint160 amounts, so
+  "infinite" is below the ERC-20 threshold — added a uint160-scaled unlimited check.
+
+## 0.5.8 — 2026-06-04
+- Security (check_action dispatch): a valid action with a malformed (non-dict, non-None) policy was
+  coerced to an empty policy and ALLOWED — a fail-OPEN. A non-None non-dict policy now DENYs
+  (`unparseable_policy`), matching the module's fail-closed contract. policy=None remains the
+  documented no-policy default.
+
 ## 0.5.7 — 2026-06-03
 - Docs/positioning: the MCP registry listing now leads with the security suite and names all three
   guards (was wallet-led, naming only the preflight check). No code change.
