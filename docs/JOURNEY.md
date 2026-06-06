@@ -6,6 +6,18 @@ founder starting the next venture. Updated every cron cycle. Reverse-chronologic
 
 ---
 
+## 2026-06-06 — DISTRIBUTION diag: Glama record is stale, but every source it crawls is already correct
+
+Pulled the Glama record this fire. Two stale fields: (1) description still the OLD wallet-led copy,
+(2) tools:[] — Glama never introspected our 3 tools. Chased the root cause instead of assuming: the
+GitHub repo description IS already security-led ("Security suite for AI agents — catch the dangerous
+thing before signing…") with correct topics, and the MCP registry head (v0.5.9) serves the corrected
+security-led line. So Glama is just crawl-lagged — it will self-correct on its next index; the empty
+tools list is a known Glama limitation for local-only stdio servers (we expose no hosted endpoint by
+design), nothing to fix on our side. No autonomous lever (forcing a Glama re-crawl needs a claimed
+account / web action, not an API). qualityScore still null/pending on their schedule. 3 signals flat
+(glama null, PR #7298 open, 0 stars). Watch + log, no build manufactured. No notify.
+
 ## 2026-06-06 — registry description: confirmed clean at the head
 
 No ship this fire — the day's real step (v0.5.9 Permit2 on-chain detection) already landed. Did a
