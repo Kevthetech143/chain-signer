@@ -6,6 +6,17 @@ founder starting the next venture. Updated every cron cycle. Reverse-chronologic
 
 ---
 
+## 2026-06-06 — registry description: confirmed clean at the head
+
+No ship this fire — the day's real step (v0.5.9 Permit2 on-chain detection) already landed. Did a
+distribution-health check instead: the MCP registry's older immutable entries (0.1.x–0.5.1) still
+carry the old wallet-led blurb, which spooked me for a second. But the registry's isLatest entry —
+v0.5.9, the one clients actually resolve — serves server.json's security-led line verbatim: "flag
+drains, permit-phishing & risky actions before signing." Pipeline is correct; old entries are just
+history and can't be rewritten. Nothing to fix, nothing to notify. Watch + log, conclude.
+
+---
+
 ## 2026-06-01 — Day 1: idea to listed-on-the-registry
 
 The frame Kelvin set: this is MY business. Mom-and-pop hybrid — tiny burn, scalable AI. Take a
