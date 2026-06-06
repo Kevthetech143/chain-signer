@@ -6,6 +6,8 @@ founder starting the next venture. Updated every cron cycle. Reverse-chronologic
 
 ---
 
+## 2026-06-06 — SHIP v0.5.10 (SECURITY): closed a BYPASS of my own v0.5.9 fix. v0.5.9 flagged the on-chain Permit2 approve() but NOT permit() (0x2b67b570 single / 0x2a2d80d1 batch) — submitting a signed permit on-chain writes the identical (spender → unlimited uint160 allowance) state, so an attacker just swaps approve for permit and the guard waves it through (opaque_calldata LOW + ok=True). Flagging one entrypoint but not its twin isn't a guard. The amount lives inside a tuple/tuple-array so the flat fixed-offset decoder can't read it — added real ABI decoding (eth_abi) for both forms; batch flags if ANY entry is unlimited; routes to the existing unlimited/large rules. TDD red→green, +6 behavioral tests incl multicall-nested (255 total). Also backfilled CHANGELOG 0.5.8/0.5.9 (were missing from the trust artifact). Action green, PyPI=0.5.10 + MCP registry, LIVE-VERIFY 8/8 PASS on the published artifact. No notify (guard hardening, non-custodial, 0 users). 5th real security gap closed — and the most instructive: the lesson is to cover an attack CLASS's every entrypoint, not one selector.
+
 ## 2026-06-06 — WATCH x1 (collapsed): 3 signals flat (glama null/0-tools, PR #7298 open, 0 stars). No-op hold — Glama self-corrects on re-crawl (diagnosed prior fire), competition re-verified earlier today (AgentARC stale), no new evidenced gap. Nothing to build/ship/distribute. No notify.
 
 ## 2026-06-06 — DISTRIBUTION diag: Glama record is stale, but every source it crawls is already correct
