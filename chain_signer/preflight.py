@@ -31,6 +31,17 @@ _KNOWN = {
     "0x36c78516": ("permit2TransferFrom", ["address", "address", "uint160", "address"]),
 }
 
+# Permit2 permit() — submitting a signed permit ON-CHAIN writes the SAME (spender -> uint160 allowance)
+# state that permit2Approve writes, so flagging approve but not permit leaves a trivial bypass. The
+# amount lives inside a tuple (single) / tuple-array (batch), so these need real ABI decoding, not the
+# flat fixed-offset path. permit(owner, PermitSingle/PermitBatch, signature).
+_PERMIT2_PERMIT_SINGLE = "0x2b67b570"
+_PERMIT2_PERMIT_BATCH = "0x2a2d80d1"
+_PERMIT2_PERMIT_TYPES = {
+    _PERMIT2_PERMIT_SINGLE: ["address", "((address,uint160,uint48,uint48),address,uint256)", "bytes"],
+    _PERMIT2_PERMIT_BATCH: ["address", "((address,uint160,uint48,uint48)[],address,uint256)", "bytes"],
+}
+
 _UNLIMITED_THRESHOLD = 1 << 255       # effectively-infinite approval (catches uint-max + half-max)
 _UNLIMITED_U160 = 1 << 159            # Permit2 amount is uint160 — its "infinite" is type(uint160).max,
                                       # far below the uint256 threshold; catch the top half of the range
@@ -72,12 +83,35 @@ def _to_int(v):
     return None
 
 
+def _decode_permit2_permit(selector, body_hex):
+    """Decode Permit2 permit (single/batch) via real ABI decode -> (spender, worst_amount) or None."""
+    try:
+        raw = bytes.fromhex(body_hex)
+        from eth_abi import decode as _abidecode
+        owner, permit, sig = _abidecode(_PERMIT2_PERMIT_TYPES[selector], raw)
+        if selector == _PERMIT2_PERMIT_SINGLE:
+            details, spender, _deadline = permit          # details = (token, amount, exp, nonce)
+            amount = details[1]
+        else:
+            details_arr, spender, _deadline = permit       # details_arr = [(token, amount, exp, nonce), ...]
+            amount = max((d[1] for d in details_arr), default=0)
+        return spender, amount
+    except Exception:                                       # malformed / not real Permit2 calldata
+        return None
+
+
 def _decode(data):
     """Decode calldata -> {function, selector, args, malformed}. Never raises."""
     s = _norm_hex(data)
     if not s:
         return None
     selector = "0x" + s[:8].lower()
+    if selector in _PERMIT2_PERMIT_TYPES:
+        res = _decode_permit2_permit(selector, s[8:])
+        if res is None:
+            return {"function": "permit2Permit", "selector": selector, "args": [], "malformed": True}
+        spender, amount = res
+        return {"function": "permit2Permit", "selector": selector, "args": [spender, amount], "malformed": False}
     spec = _KNOWN.get(selector)
     if not spec:
         return {"function": None, "selector": selector, "args": [], "malformed": False}
@@ -131,6 +165,16 @@ def _call_flags(decoded, prefix=""):
         elif amt >= _LARGE_APPROVAL:
             flags.append({"code": "large_approval", "severity": "MED",
                           "detail": f"{prefix}Permit2 approve() grants a very large allowance to {spender}; "
+                                    "confirm it's intended."})
+    elif fn == "permit2Permit" and len(args) >= 2:
+        spender, amt = args[0], args[1]          # decoded form: [spender, worst-case amount]
+        if amt >= _UNLIMITED_U160:
+            flags.append({"code": "unlimited_approval", "severity": "HIGH",
+                          "detail": f"{prefix}Permit2 permit() grants an effectively-unlimited allowance to "
+                                    f"{spender} via a signed permit — a spender that turns malicious can drain that token."})
+        elif amt >= _LARGE_APPROVAL:
+            flags.append({"code": "large_approval", "severity": "MED",
+                          "detail": f"{prefix}Permit2 permit() grants a very large allowance to {spender}; "
                                     "confirm it's intended."})
     elif fn == "permit" and len(args) >= 3:
         spender, value = args[1], args[2]
