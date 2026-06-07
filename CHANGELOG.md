@@ -3,6 +3,16 @@
 All notable changes to chain-signer. Newest first. Security fixes are released as a new version —
 published versions are never overwritten. Dates are UTC.
 
+## 0.5.13 — 2026-06-07
+- Distribution (MCP surface): the `tools/list` introspection led with the WALLET tools
+  (create_wallet/get_balance/send/...) and put the three security guards LAST — so a directory
+  (Glama) or agent runtime reading the tool order saw a wallet-first server, contradicting the
+  security wedge every other surface (README/PyPI/registry) leads with. Reordered `TOOL_SPECS` so
+  preflight/inspect_signature/check_action come FIRST; wallet/exec tools follow. Presentation-only
+  (dispatch is by name; zero behavior change) + a regression test locking the wedge to the front of
+  the surface (265). Found by exercising the published-style artifact exactly as Glama does
+  (initialize + tools/list over the stdio server).
+
 ## 0.5.12 — 2026-06-06
 - Security (check_action): the `allow_recipients` whitelist failed OPEN and could crash. It only ran
   when `to` was present (`if allow_recipients and "to" in args`), so a value-bearing action that

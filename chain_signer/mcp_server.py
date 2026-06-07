@@ -36,6 +36,26 @@ def _schema(properties, required=()):
 
 
 TOOL_SPECS = (
+    # --- Safety wedge: inspect BEFORE signing. Read-only, no key, never sends. The brand leads
+    # with these on EVERY surface (README/PyPI/registry) — so the MCP tool list must too, since a
+    # directory (Glama) and any agent runtime read this order. Wallet/exec tools follow. ---
+    {"name": "preflight",
+     "description": "SAFETY: decode an UNSIGNED EVM transaction and flag drain patterns (unlimited/large approval, approve-all, token & NFT transferFrom, proxy upgrade, on-chain permit, approvals hidden in multicall, opaque calldata) BEFORE signing. Returns {decoded, risk_flags, ok}. Read-only; takes no key.",
+     "inputSchema": _schema({
+         "tx": {"type": "object", "description": "Unsigned tx: {to, data (hex calldata), value}."},
+         "max_value": {"type": "integer", "description": "Optional: flag native value above this (wei)."},
+     }, required=["tx"])},
+    {"name": "inspect_signature",
+     "description": "SAFETY: inspect an EIP-712 typed-data message the agent is about to SIGN and flag permit-phishing (ERC-2612, Uniswap Permit2, DAI-style permits granting an unlimited/large allowance). Catches the off-chain drain a transaction check can't see. Returns {decoded, risk_flags, ok}. Read-only; takes no key.",
+     "inputSchema": _schema({
+         "typed_data": {"type": "object", "description": "EIP-712 typed data: {types, domain, primaryType, message}."},
+     }, required=["typed_data"])},
+    {"name": "check_action",
+     "description": "SAFETY: enforce a policy on a proposed agent action (tool call) BEFORE it runs. policy supports forbid_tools/allow_tools, max_value_wei, allow_recipients. Returns {allowed, violations}. Fail-safe: denies on unreadable input. The 'inspect what the agent DOES' gate, not just who it is.",
+     "inputSchema": _schema({
+         "action": {"type": "object", "description": "Proposed action: {tool, args}."},
+         "policy": {"type": "object", "description": "Rules: forbid_tools[], allow_tools[], max_value_wei, allow_recipients[]."},
+     }, required=["action"])},
     {"name": "create_wallet",
      "description": "Create or restore a non-custodial wallet; returns the address and the private key (caller keeps the key).",
      "inputSchema": _schema({
@@ -97,24 +117,6 @@ TOOL_SPECS = (
          "integrator": {"type": "string", "default": "chain-signer"},
          **_EVM_TX,
      }, required=["private_key", "from_chain", "to_chain", "from_token", "to_token", "amount"] + _EVM_TX_REQUIRED[1:])},
-    # --- Safety wedge: inspect BEFORE signing. Read-only, no key, never sends. ---
-    {"name": "preflight",
-     "description": "SAFETY: decode an UNSIGNED EVM transaction and flag drain patterns (unlimited/large approval, approve-all, token & NFT transferFrom, proxy upgrade, on-chain permit, approvals hidden in multicall, opaque calldata) BEFORE signing. Returns {decoded, risk_flags, ok}. Read-only; takes no key.",
-     "inputSchema": _schema({
-         "tx": {"type": "object", "description": "Unsigned tx: {to, data (hex calldata), value}."},
-         "max_value": {"type": "integer", "description": "Optional: flag native value above this (wei)."},
-     }, required=["tx"])},
-    {"name": "inspect_signature",
-     "description": "SAFETY: inspect an EIP-712 typed-data message the agent is about to SIGN and flag permit-phishing (ERC-2612, Uniswap Permit2, DAI-style permits granting an unlimited/large allowance). Catches the off-chain drain a transaction check can't see. Returns {decoded, risk_flags, ok}. Read-only; takes no key.",
-     "inputSchema": _schema({
-         "typed_data": {"type": "object", "description": "EIP-712 typed data: {types, domain, primaryType, message}."},
-     }, required=["typed_data"])},
-    {"name": "check_action",
-     "description": "SAFETY: enforce a policy on a proposed agent action (tool call) BEFORE it runs. policy supports forbid_tools/allow_tools, max_value_wei, allow_recipients. Returns {allowed, violations}. Fail-safe: denies on unreadable input. The 'inspect what the agent DOES' gate, not just who it is.",
-     "inputSchema": _schema({
-         "action": {"type": "object", "description": "Proposed action: {tool, args}."},
-         "policy": {"type": "object", "description": "Rules: forbid_tools[], allow_tools[], max_value_wei, allow_recipients[]."},
-     }, required=["action"])},
 )
 TOOL_NAMES = tuple(t["name"] for t in TOOL_SPECS)
 
