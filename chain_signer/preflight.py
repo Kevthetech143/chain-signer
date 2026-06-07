@@ -42,7 +42,11 @@ _PERMIT2_PERMIT_TYPES = {
     _PERMIT2_PERMIT_BATCH: ["address", "((address,uint160,uint48,uint48)[],address,uint256)", "bytes"],
 }
 
-_UNLIMITED_THRESHOLD = 1 << 255       # effectively-infinite approval (catches uint-max + half-max)
+_UNLIMITED_THRESHOLD = 10 ** 40       # effectively-infinite approval. A drainer needn't use uint256-max:
+                                      # any amount beyond every real ERC-20's total supply (largest are
+                                      # ~1e33 base units) is a full drain. 1e40 sits ~7 orders above that
+                                      # — no legit approval reaches it — yet well below sub-max evasions
+                                      # (2**160/200/240) that previously slipped to MED and dodged the hard-stop.
 _UNLIMITED_U160 = 1 << 159            # Permit2 amount is uint160 — its "infinite" is type(uint160).max,
                                       # far below the uint256 threshold; catch the top half of the range
 _LARGE_APPROVAL = 10 ** 24            # large-but-finite: warn, don't claim infinite

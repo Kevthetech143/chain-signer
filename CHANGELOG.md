@@ -3,6 +3,17 @@
 All notable changes to chain-signer. Newest first. Security fixes are released as a new version —
 published versions are never overwritten. Dates are UTC.
 
+## 0.5.15 — 2026-06-07
+- Security (preflight + inspect_typed_data): the HIGH "unlimited approval" net was 2**255, so an
+  effectively-infinite approval BELOW that — e.g. 2**200 (~1.6e60), astronomically beyond any real
+  ERC-20's total supply (largest are ~1e33 base units) — only WARNED (MED `large_approval`) with
+  ok=True, escaping the `assert_safe` hard-stop. A drainer could pick a sub-2**255 value to dodge the
+  block while still draining the token. Tightened `_UNLIMITED_THRESHOLD` to 1e40 — ~7 orders of
+  magnitude above any real token supply (no false positive: 1e33 SHIB-scale stays MED) and well below
+  every sub-max evasion. Same evasion CLASS as the v0.5.9 Permit2 uint160 "infinite below the ERC-20
+  threshold" fix; applies to ERC-20 approve, on-chain permit, and the ERC-2612 permit signature path
+  (shared constant). Red test (2**200 → HIGH) + full suite green (267).
+
 ## 0.5.14 — 2026-06-07
 - Security (inspect_typed_data): a DAI-style `permit` (allowed=true) carrying a DECOY `value` key
   slipped past the guard. DAI detection only ran when `value` was ABSENT (`"allowed" in message and

@@ -41,6 +41,17 @@ def test_finite_approval_not_flagged_unlimited():
     assert r["ok"] is True
 
 
+def test_effectively_unlimited_subkmax_approval_is_high_and_blocks():
+    """Evasion: a drainer needn't use uint256-max. 2**200 (~1.6e60) is astronomically beyond ANY
+    real ERC-20 total supply (largest real supplies ~1e33 base units), so it's a full drain — yet it
+    was below the old 2**255 HIGH net and only WARNED (MED), escaping the assert_safe hard-stop. An
+    effectively-infinite approval must be HIGH regardless of the exact magnitude."""
+    r = preflight(_approve(1 << 200))
+    assert "unlimited_approval" in _codes(r)
+    assert next(f for f in r["risk_flags"] if f["code"] == "unlimited_approval")["severity"] == "HIGH"
+    assert r["ok"] is False
+
+
 # --- unit 2: setApprovalForAll(true) ---
 def _set_approval_for_all(approved):
     word = "1" if approved else "0"
