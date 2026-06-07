@@ -3,6 +3,19 @@
 All notable changes to chain-signer. Newest first. Security fixes are released as a new version —
 published versions are never overwritten. Dates are UTC.
 
+## 0.5.16 — 2026-06-07
+- Security (inspect_typed_data): the Permit2 SignatureTransfer guard matched only the names
+  `PermitTransferFrom` / `PermitBatchTransferFrom`, so the WITNESS variants
+  (`PermitWitnessTransferFrom` / `PermitBatchWitnessTransferFrom` — the intent-order mode used by
+  protocols like UniswapX) fell through with ok=True (fail-OPEN). Those variants carry the IDENTICAL
+  `permitted{token,amount}` shape, so an attacker could swap the plain name for a witness name to
+  dodge the guard while signing the same effectively-unlimited signature-transfer drain. Match is now
+  structural (any `permit…transferfrom` primaryType) instead of a fixed name list — closing the whole
+  variant class, including future ones. Non-noisy: `permitted` is what's read, so a type with no
+  permitted field can't false-positive, and exact-amount witness transfers stay clean. Same evasion
+  CLASS as the v0.5.9/0.5.10 Permit2 approve->permit swap. Red tests (witness single + batch → HIGH)
+  + full suite green (270).
+
 ## 0.5.15 — 2026-06-07
 - Security (preflight + inspect_typed_data): the HIGH "unlimited approval" net was 2**255, so an
   effectively-infinite approval BELOW that — e.g. 2**200 (~1.6e60), astronomically beyond any real
