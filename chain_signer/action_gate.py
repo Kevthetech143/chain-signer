@@ -53,7 +53,14 @@ def check_action(action, policy=None):
         cap = _to_int(policy.get("max_value_wei"))
         if val is None:
             v.append({"code": "unreadable_value", "detail": "action value_wei can't be read — denying."})
-        elif cap is not None and val > cap:
+        elif cap is None:
+            # The operator SET a value cap (max_value_wei is not None) but it can't be read — e.g.
+            # typo'd as "1 ETH". Skipping the check would silently disable the limit and allow any
+            # value (fail-OPEN). A cap that can't be read must DENY, like every other unreadable input.
+            v.append({"code": "unreadable_value_limit",
+                      "detail": "policy max_value_wei is set but unreadable — denying (a value cap that "
+                                "can't be read must fail closed)."})
+        elif val > cap:
             v.append({"code": "value_over_limit",
                       "detail": f"value {val} wei exceeds the policy limit {cap} wei."})
 

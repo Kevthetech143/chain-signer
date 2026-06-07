@@ -3,6 +3,16 @@
 All notable changes to chain-signer. Newest first. Security fixes are released as a new version —
 published versions are never overwritten. Dates are UTC.
 
+## 0.5.17 — 2026-06-07
+- Security (check_action): the `max_value_wei` value cap failed OPEN when the cap itself was
+  unreadable. If an operator set the limit but typo'd it as a non-numeric value (e.g. "1 ETH"),
+  `_to_int` returned None and the comparison was SKIPPED — silently disabling the limit and ALLOWING
+  any value, including a large transfer the operator meant to block. A value cap that can't be read
+  now DENYs (`unreadable_value_limit`), matching this gate's contract that every unreadable input
+  fails closed (same class as the v0.5.8 malformed-policy and v0.5.12 recipient fail-opens). Non-
+  noisy: the deny only fires when a cap is set AND the action carries `value_wei`; a readable
+  in-bounds value still passes. Red test + full suite green (272).
+
 ## 0.5.16 — 2026-06-07
 - Security (inspect_typed_data): the Permit2 SignatureTransfer guard matched only the names
   `PermitTransferFrom` / `PermitBatchTransferFrom`, so the WITNESS variants

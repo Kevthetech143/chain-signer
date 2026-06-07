@@ -32,6 +32,23 @@ def test_value_over_limit_is_denied():
     assert r["allowed"] is False and "value_over_limit" in _codes(r)
 
 
+def test_unreadable_value_cap_fails_closed():
+    """Fail-open: the operator sets a value cap but typos it as a non-numeric string. The cap can't be
+    read (cap is None), so the old code SKIPPED the comparison and ALLOWED a large transfer — silently
+    disabling the limit the operator asked for. A value cap that can't be read must DENY, like every
+    other unreadable input in this gate (same class as the v0.5.8 malformed-policy fail-open)."""
+    action = {"tool": "send", "args": {"to": RECIP, "value_wei": 10**18}}
+    r = check_action(action, {"max_value_wei": "1 ETH"})
+    assert r["allowed"] is False and "unreadable_value_limit" in _codes(r)
+
+
+def test_readable_cap_under_limit_still_passes():
+    # the fix must not over-deny: a readable cap with an in-bounds value stays allowed
+    action = {"tool": "send", "args": {"to": RECIP, "value_wei": 10**16}}
+    r = check_action(action, {"max_value_wei": 10**17})
+    assert r["allowed"] is True
+
+
 def test_recipient_not_on_allowlist_is_denied():
     action = {"tool": "send", "args": {"to": OTHER, "value_wei": 1}}
     r = check_action(action, {"allow_recipients": [RECIP]})
