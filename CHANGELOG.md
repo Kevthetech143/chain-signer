@@ -3,6 +3,15 @@
 All notable changes to chain-signer. Newest first. Security fixes are released as a new version —
 published versions are never overwritten. Dates are UTC.
 
+## 0.5.14 — 2026-06-07
+- Security (inspect_typed_data): a DAI-style `permit` (allowed=true) carrying a DECOY `value` key
+  slipped past the guard. DAI detection only ran when `value` was ABSENT (`"allowed" in message and
+  "value" not in message`), so a hostile dApp could add `value: 0` to dodge it — EIP-712 hashes only
+  the fields declared in `types` (the DAI 5-field type, no `value`), so the wallet ignores the decoy
+  key and still signs allowed=true (unlimited on-chain) while the guard waved it through (fail-OPEN).
+  DAI detection now keys off the PRESENCE of `allowed` and the ERC-2612 value check runs independently
+  — neither path can be evaded by adding/omitting the other's field. Same evasion class as 0.5.4.
+
 ## 0.5.13 — 2026-06-07
 - Distribution (MCP surface): the `tools/list` introspection led with the WALLET tools
   (create_wallet/get_balance/send/...) and put the three security guards LAST — so a directory
