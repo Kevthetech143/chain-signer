@@ -35,3 +35,14 @@ def test_dai_permit_allowed_false_not_flagged():
     # allowed:false REVOKES — that's safe, must not cry wolf
     r = inspect_typed_data(_dai_permit(False))
     assert "unlimited_permit_signature" not in _codes(r) and r["ok"] is True
+
+
+def test_dai_permit_with_decoy_value_still_flagged():
+    """Evasion: a hostile dApp adds a decoy `value` key to a DAI permit. EIP-712 hashes only the
+    fields declared in `types` (the DAI 5-field type, no `value`), so the wallet signs allowed=true
+    (unlimited on-chain) while the extra message key is ignored. The guard must NOT key its DAI
+    detection off the ABSENCE of `value` — `allowed:true` is unlimited regardless of any decoy key."""
+    td = _dai_permit(True)
+    td["message"]["value"] = "0"          # decoy: not in `types`, ignored by the on-chain verifier
+    r = inspect_typed_data(td)
+    assert "unlimited_permit_signature" in _codes(r) and r["ok"] is False

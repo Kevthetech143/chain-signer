@@ -117,29 +117,33 @@ def inspect_typed_data(td, *, max_value=None):
     # ERC-2612 permit: signing this grants an allowance off-chain, just like approve() on-chain.
     if pnorm == "permit":
         spender = message.get("spender")
-        # DAI-style permit(holder, spender, nonce, expiry, allowed): no `value`; allowed=true == unlimited.
-        if "allowed" in message and "value" not in message:
-            if _allowed_is_true(message.get("allowed")):
-                flags.append({"code": "unlimited_permit_signature", "severity": "HIGH",
-                              "detail": f"signing this DAI-style permit (allowed=true) grants an UNLIMITED token "
-                                        f"allowance to {spender} — the classic signature-phishing drain. Do not "
-                                        "sign unless you trust the spender."})
-            decoded = {"primaryType": primary, "verifyingContract": (td.get("domain") or {}).get("verifyingContract")}
-            return {"decoded": decoded, "risk_flags": flags,
-                    "ok": not any(f["severity"] == "HIGH" for f in flags)}
-        value = _to_int(message.get("value"))
-        if value is None:
-            flags.append({"code": "unreadable_permit_value", "severity": "MED",
-                          "detail": "permit signature whose allowance amount can't be read — review before signing."})
-        elif value >= _UNLIMITED_THRESHOLD:
+        # DAI-style permit(holder, spender, nonce, expiry, allowed): allowed=true == unlimited.
+        # Detect off the PRESENCE of `allowed`, never off the ABSENCE of `value` — EIP-712 hashes only
+        # the fields declared in `types`, so a hostile dApp can add a decoy `value` key the on-chain
+        # verifier ignores while still signing allowed=true. allowed:true is unlimited regardless.
+        dai_allowed = "allowed" in message
+        if dai_allowed and _allowed_is_true(message.get("allowed")):
             flags.append({"code": "unlimited_permit_signature", "severity": "HIGH",
-                          "detail": f"signing this permit grants an effectively-unlimited token allowance to "
-                                    f"{spender} — a spender that turns malicious can then drain that token. This is "
-                                    "the classic signature-phishing drain. Do not sign unless you trust the spender."})
-        elif value >= _LARGE_APPROVAL:
-            flags.append({"code": "large_permit_signature", "severity": "MED",
-                          "detail": f"signing this permit grants a very large token allowance to {spender}; "
-                                    "confirm it's intended."})
+                          "detail": f"signing this DAI-style permit (allowed=true) grants an UNLIMITED token "
+                                    f"allowance to {spender} — the classic signature-phishing drain. Do not "
+                                    "sign unless you trust the spender."})
+        # ERC-2612 value path — runs when a `value` is present (a real ERC-2612 permit, or a decoy
+        # alongside a DAI permit). A bare DAI permit (allowed only, no value) skips this; missing
+        # value would read as 0 and is not a drain.
+        if "value" in message:
+            value = _to_int(message.get("value"))
+            if value is None:
+                flags.append({"code": "unreadable_permit_value", "severity": "MED",
+                              "detail": "permit signature whose allowance amount can't be read — review before signing."})
+            elif value >= _UNLIMITED_THRESHOLD:
+                flags.append({"code": "unlimited_permit_signature", "severity": "HIGH",
+                              "detail": f"signing this permit grants an effectively-unlimited token allowance to "
+                                        f"{spender} — a spender that turns malicious can then drain that token. This is "
+                                        "the classic signature-phishing drain. Do not sign unless you trust the spender."})
+            elif value >= _LARGE_APPROVAL:
+                flags.append({"code": "large_permit_signature", "severity": "MED",
+                              "detail": f"signing this permit grants a very large token allowance to {spender}; "
+                                        "confirm it's intended."})
 
     # Permit2 (Uniswap): PermitSingle / PermitBatch — allowance permits, uint160 amounts.
     elif pnorm in ("permitsingle", "permitbatch"):
