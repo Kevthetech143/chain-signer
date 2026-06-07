@@ -83,3 +83,58 @@ def test_seaport_malformed_does_not_crash():
     bad = {"primaryType": "OrderComponents", "message": {"offer": "not-a-list", "consideration": None}}
     r = inspect_typed_data(bad)            # must not raise
     assert isinstance(r, dict) and "risk_flags" in r
+
+
+# --- Adversarial (2026-06-07): the zero-consideration net only SUMS amounts — it never checks WHO is
+# paid. A drainer dodges it by making consideration NON-zero but routing every penny to THEMSELVES, so
+# the victim (offerer) still nets nothing. Same evasion CLASS as the Permit2 approve->permit / witness
+# swaps: a covered guard sidestepped by a variant that achieves the identical harm. ---
+
+ATTACKER = "0x" + "ee" * 20
+
+
+def test_seaport_consideration_all_to_third_party_is_high():
+    """Victim offers an NFT; consideration is non-zero (dodges the all-zero net) but the ONLY recipient
+    is the attacker — the offerer receives nothing. A real listing/bid always pays the offerer, so the
+    offerer getting ZERO while assets leave is the giveaway drain in disguise. Must be HIGH."""
+    consideration = [{"itemType": 0, "token": "0x" + "00" * 20, "identifierOrCriteria": 0,
+                      "startAmount": 10 ** 18, "endAmount": 10 ** 18, "recipient": ATTACKER}]
+    r = inspect_typed_data(_order([_OFFER_NFT], consideration))
+    assert "seaport_consideration_not_to_offerer" in _codes(r)
+    assert _sev(r, "seaport_consideration_not_to_offerer") == "HIGH"
+    assert r["ok"] is False
+
+
+def test_seaport_listing_with_fees_still_pays_offerer_not_flagged():
+    """Legit listing with a marketplace fee + creator royalty: the SELLER is still paid a positive
+    amount, the rest are fees to other recipients. Must NOT be flagged (no over-deny on normal splits)."""
+    consideration = [
+        {"itemType": 0, "token": "0x" + "00" * 20, "startAmount": 95 * 10 ** 16, "endAmount": 95 * 10 ** 16, "recipient": SELLER},
+        {"itemType": 0, "token": "0x" + "00" * 20, "startAmount": 5 * 10 ** 16, "endAmount": 5 * 10 ** 16, "recipient": ATTACKER},
+    ]
+    r = inspect_typed_data(_order([_OFFER_NFT], consideration))
+    assert "seaport_consideration_not_to_offerer" not in _codes(r)
+    assert r["ok"] is True
+
+
+def test_seaport_offerer_paid_zero_while_third_party_paid_is_high():
+    """A subtle split: a token item to the offerer with amount 0 (looks like they're a recipient) but
+    the real money goes to the attacker. The offerer's TAKE is zero, so this is still the drain."""
+    consideration = [
+        {"itemType": 0, "token": "0x" + "00" * 20, "startAmount": 0, "endAmount": 0, "recipient": SELLER},
+        {"itemType": 0, "token": "0x" + "00" * 20, "startAmount": 10 ** 18, "endAmount": 10 ** 18, "recipient": ATTACKER},
+    ]
+    r = inspect_typed_data(_order([_OFFER_NFT], consideration))
+    assert "seaport_consideration_not_to_offerer" in _codes(r)
+    assert r["ok"] is False
+
+
+def test_seaport_unreadable_offerer_does_not_falsely_flag_routing():
+    """Conservative: if the offerer field is missing/unreadable we cannot claim 'the victim receives
+    nothing', so the routing check must NOT fire (avoid crying wolf). A non-zero paid order with an
+    unknown offerer is left to the zero-consideration net only."""
+    consideration = [{"itemType": 0, "token": "0x" + "00" * 20, "startAmount": 10 ** 18, "endAmount": 10 ** 18, "recipient": ATTACKER}]
+    td = _order([_OFFER_NFT], consideration)
+    td["message"].pop("offerer")
+    r = inspect_typed_data(td)
+    assert "seaport_consideration_not_to_offerer" not in _codes(r)

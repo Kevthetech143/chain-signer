@@ -88,16 +88,33 @@ def _seaport_flags(message):
     consideration = message.get("consideration")
     items = consideration if isinstance(consideration, list) else []
     total = 0
+    offerer_take = 0
+    offerer = message.get("offerer")
+    offerer_l = offerer.strip().lower() if isinstance(offerer, str) else None
     for c in items:
         if isinstance(c, dict):
             amt = _to_int(c.get("startAmount"))
             if amt:
                 total += amt
+                recip = c.get("recipient")
+                if offerer_l is not None and isinstance(recip, str) and recip.strip().lower() == offerer_l:
+                    offerer_take += amt
     if total == 0:                         # consideration empty OR every amount zero/unreadable
         flags.append({"code": "seaport_zero_consideration", "severity": "HIGH",
                       "detail": "signing this Seaport order gives away the offered asset(s) for ZERO "
                                 "consideration — the NFT/marketplace signature-phishing drain. A real "
                                 "listing always pays the seller; do not sign unless you intend a gift."})
+    # Summing amounts isn't enough — a drainer dodges the zero-consideration net by making the
+    # consideration NON-zero but routing every penny to a THIRD party, so the offerer (the signer/
+    # victim) still nets nothing. A real listing/bid always pays the offerer a positive amount; the
+    # offerer's take being ZERO while assets leave is the same giveaway drain in disguise. Only checked
+    # when the offerer is readable (otherwise we can't claim "victim receives nothing" — stay non-noisy).
+    elif offerer_l is not None and offerer_take == 0:
+        flags.append({"code": "seaport_consideration_not_to_offerer", "severity": "HIGH",
+                      "detail": "signing this Seaport order pays the offerer (you) NOTHING — the entire "
+                                "consideration is routed to other recipient(s) while your offered asset(s) "
+                                "leave. This is the marketplace signature-phishing drain dressed up with a "
+                                "non-zero price. Do not sign unless you intend the proceeds to go elsewhere."})
     return flags
 
 

@@ -3,6 +3,19 @@
 All notable changes to chain-signer. Newest first. Security fixes are released as a new version —
 published versions are never overwritten. Dates are UTC.
 
+## 0.5.18 — 2026-06-07
+- Security (inspect_typed_data / Seaport): the zero-consideration guard only SUMMED consideration
+  amounts — it never checked WHO is paid. A drainer dodged it by making the consideration NON-zero but
+  routing every penny to a third-party (attacker) recipient, so the offerer (the signer/victim) still
+  netted NOTHING while their offered asset(s) left — ok=True, zero flags (empirically confirmed fail-
+  OPEN). A real listing/bid always pays the offerer a positive amount, so an order where the offerer's
+  take is ZERO while assets leave now DENYs (`seaport_consideration_not_to_offerer`, HIGH). Same
+  evasion CLASS as the v0.5.10/0.5.16 Permit2 approve->permit / witness swaps — a covered guard dodged
+  by a variant that achieves the identical harm. Non-noisy: only fires when the offerer is readable and
+  receives nothing; normal listings, fee/royalty splits, and bids (offerer receives the asset) stay
+  clean. Red tests (all-to-third-party + zero-to-offerer → HIGH; fee-split + unreadable-offerer not
+  flagged) + full suite green (276).
+
 ## 0.5.17 — 2026-06-07
 - Security (check_action): the `max_value_wei` value cap failed OPEN when the cap itself was
   unreadable. If an operator set the limit but typo'd it as a non-numeric value (e.g. "1 ETH"),
