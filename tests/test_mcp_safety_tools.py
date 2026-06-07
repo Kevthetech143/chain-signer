@@ -34,3 +34,19 @@ def test_safety_tools_have_schemas():
     specs = {t["name"]: t for t in list_tools()}
     assert "inputSchema" in specs["preflight"]
     assert "inputSchema" in specs["inspect_signature"]
+
+
+def test_security_wedge_leads_the_surface():
+    """The brand wedge is 'inspect BEFORE signing' — DEPTH in security, pairing with wallets, never
+    leading with them. A directory (Glama) and any agent runtime read the tool list in order, so the
+    THREE guards must come FIRST, before any wallet/exec tool. Previously TOOL_SPECS led with
+    create_wallet/get_balance/send, presenting a wallet-first surface that contradicted the
+    positioning every other surface (README/PyPI/registry) leads with."""
+    names = [t["name"] for t in list_tools()]
+    guards = ["preflight", "inspect_signature", "check_action"]
+    assert names[:3] == guards, f"security guards must lead the surface, got {names[:3]}"
+    # And every guard precedes every wallet/exec tool.
+    wallet_exec = ["create_wallet", "get_balance", "send", "call_contract", "swap", "bridge"]
+    last_guard = max(names.index(g) for g in guards)
+    first_wallet = min(names.index(w) for w in wallet_exec if w in names)
+    assert last_guard < first_wallet
