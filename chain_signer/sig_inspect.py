@@ -150,7 +150,12 @@ def inspect_typed_data(td, *, max_value=None):
         flags.extend(_permit2_flags(message))
 
     # Permit2 SignatureTransfer — authorizes a pull; flag only unlimited (legit uses exact amounts).
-    elif pnorm in ("permittransferfrom", "permitbatchtransferfrom"):
+    # Match structurally (any Permit2 transfer variant), not by a fixed name list: the WITNESS variants
+    # (PermitWitnessTransferFrom / PermitBatchWitnessTransferFrom — used by intent protocols like
+    # UniswapX) carry the identical `permitted{token,amount}` shape, so an attacker could swap the
+    # plain name for a witness name to dodge a name-list while signing the same drain. `permitted`
+    # is read below, so non-transfer types that happen to match won't false-positive (no permitted).
+    elif pnorm.startswith("permit") and "transferfrom" in pnorm:
         flags.extend(_permit2_transfer_flags(message))
 
     # Seaport order — a signed marketplace order that gives assets away for zero consideration.
