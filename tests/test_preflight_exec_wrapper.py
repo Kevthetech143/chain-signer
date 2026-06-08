@@ -116,3 +116,37 @@ def test_execute_malformed_inner_does_not_crash():
     bad = "0xb61d27f6" + "00" * 4    # truncated wrapper args
     r = preflight({"to": SAFE, "data": bad, "value": 0})
     assert isinstance(r, dict) and "risk_flags" in r
+
+
+# --- Cross-wrapper nesting (depth-2): a smart account routes execute() whose inner calldata is
+# itself a multicall bundling the drain (and the inverse). The single-depth tests above don't cover
+# this realistic ERC-4337 batch shape; lock that the recursion is symmetric across wrapper kinds. ---
+
+def _multicall(calls):
+    """multicall(bytes[]) = 0xac9650d8 wrapping a list of inner-call byte strings."""
+    return bytes.fromhex("ac9650d8" + encode(["bytes[]"], [calls]).hex())
+
+
+def test_execute_wrapping_multicall_wrapping_drain_is_high():
+    inner = "0x" + _multicall([_approve(MAX)]).hex()
+    data = "0xb61d27f6" + encode(["address", "uint256", "bytes"],
+                                  [TOKEN, 0, bytes.fromhex(inner[2:])]).hex()
+    r = preflight({"to": SAFE, "data": data, "value": 0})
+    assert "unlimited_approval" in _codes(r) and r["ok"] is False
+
+
+def test_multicall_wrapping_execute_wrapping_drain_is_high():
+    execute = bytes.fromhex("b61d27f6" + encode(["address", "uint256", "bytes"],
+                                                [TOKEN, 0, _approve(MAX)]).hex())
+    data = "0x" + _multicall([execute]).hex()
+    r = preflight({"to": SAFE, "data": data, "value": 0})
+    assert "unlimited_approval" in _codes(r) and r["ok"] is False
+
+
+def test_execute_batch_2arg_flags_every_call_in_batch():
+    tf = bytes.fromhex("23b872dd" + ("0x" + "12" * 20)[2:].rjust(64, "0")
+                       + ATTACKER[2:].rjust(64, "0") + format(1, "064x"))
+    data = "0x18dfb3c7" + encode(["address[]", "bytes[]"],
+                                 [[TOKEN, TOKEN], [_approve(MAX), tf]]).hex()
+    r = preflight({"to": SAFE, "data": data, "value": 0})
+    assert {"unlimited_approval", "token_transfer_from"} <= _codes(r) and r["ok"] is False
