@@ -142,12 +142,40 @@ def _decode_permit2_permit(selector, body_hex):
         return None
 
 
+# Permit2 BATCH transferFrom submitted ON-CHAIN: transferFrom(AllowanceTransferDetails[]) pulls approved
+# tokens OUT of one or more victims in ONE call — the same drain as the single transferFrom (0x36c78516),
+# but its (from,to) live inside a dynamic tuple-array, so it needs real ABI decoding, not the flat path.
+_PERMIT2_TRANSFER_FROM_BATCH = "0x0d58b1db"   # transferFrom((address,address,uint160,address)[])
+
+
+def _decode_permit2_transfer_batch(body_hex):
+    """Decode Permit2 batch transferFrom -> (from, to) of the first transfer, () if empty, or None."""
+    try:
+        raw = bytes.fromhex(body_hex)
+        from eth_abi import decode as _abidecode
+        (details,) = _abidecode(["(address,address,uint160,address)[]"], raw)
+        if not details:
+            return ()
+        frm, to, _amount, _token = details[0]
+        return frm, to
+    except Exception:                                       # malformed / not real Permit2 calldata
+        return None
+
+
 def _decode(data):
     """Decode calldata -> {function, selector, args, malformed}. Never raises."""
     s = _norm_hex(data)
     if not s:
         return None
     selector = "0x" + s[:8].lower()
+    if selector == _PERMIT2_TRANSFER_FROM_BATCH:
+        res = _decode_permit2_transfer_batch(s[8:])
+        if res is None:
+            return {"function": "permit2TransferFrom", "selector": selector, "args": [], "malformed": True}
+        if not res:                                         # empty batch -> moves nothing, stays clean
+            return {"function": "permit2TransferFrom", "selector": selector, "args": [], "malformed": False}
+        frm, to = res
+        return {"function": "permit2TransferFrom", "selector": selector, "args": [frm, to], "malformed": False}
     if selector in _PERMIT2_PERMIT_TYPES:
         res = _decode_permit2_permit(selector, s[8:])
         if res is None:
