@@ -3,6 +3,21 @@
 All notable changes to chain-signer. Newest first. Security fixes are released as a new version —
 published versions are never overwritten. Dates are UTC.
 
+## 0.5.20 — 2026-06-08
+- Security (inspect_typed_data / Seaport): the Seaport guard dispatched only on primaryType
+  `OrderComponents`, but Seaport (1.2+) also supports BULK ORDER signatures — one EIP-712 signature
+  over a merkle TREE of orders (primaryType `BulkOrder`, a `tree` of OrderComponents; used by OpenSea
+  for bulk listings). So a drainer could hide the SAME zero-consideration / routed-consideration
+  giveaway the plain-order guard catches inside a "bulk listing" tree and it slipped through with
+  ok=True, zero flags (empirically confirmed fail-OPEN). Now a BulkOrder is flattened and EVERY
+  order-shaped node in the tree runs through the same `_seaport_flags`, so a giveaway hidden in the
+  tree DENYs exactly like a plain order. Same evasion CLASS as the v0.5.16 Permit2 witness variants
+  and v0.5.18 Seaport routed-consideration — a covered giveaway hidden behind an uncovered wrapper.
+  Non-noisy by reuse: empty-offer padding leaves (bulk trees pad to a power of two) and normal
+  listings (offerer paid) stay clean; tree walk is depth/size-bounded against a hostile tree. Red
+  tests (zero + routed + nested-tree → HIGH; all-legit, padding, malformed not flagged) + full suite
+  green (293).
+
 ## 0.5.19 — 2026-06-07
 - Security (preflight): the inner-call recursion covered multicall variants but NOT the ERC-4337 /
   smart-account execute wrappers. An agent's smart wallet (ERC-4337 account, Gnosis Safe) never calls

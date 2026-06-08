@@ -118,6 +118,29 @@ def _seaport_flags(message):
     return flags
 
 
+def _bulk_order_flags(message):
+    """Seaport BULK ORDER: one signature over a merkle TREE of orders (primaryType BulkOrder, used by
+    OpenSea for bulk listings). The same giveaway the plain-order guard catches can hide in the tree,
+    so flatten it and run the SAME _seaport_flags on every order-shaped node. Non-noisy by reuse:
+    empty-offer padding leaves and normal listings stay clean exactly as a plain order does."""
+    flags = []
+    seen = 0
+
+    def _walk(node, depth=0):
+        nonlocal seen
+        if depth > 12 or seen > 4096:        # bound work against a hostile deeply-nested/huge tree
+            return
+        if isinstance(node, list):
+            for child in node:
+                _walk(child, depth + 1)
+        elif isinstance(node, dict) and "offer" in node:
+            seen += 1
+            flags.extend(_seaport_flags(node))
+
+    _walk(message.get("tree"))
+    return flags
+
+
 def inspect_typed_data(td, *, max_value=None):
     """Inspect an EIP-712 typed-data object the agent is about to sign. Never raises."""
     if not isinstance(td, dict):
@@ -178,6 +201,10 @@ def inspect_typed_data(td, *, max_value=None):
     # Seaport order — a signed marketplace order that gives assets away for zero consideration.
     elif pnorm == "ordercomponents":
         flags.extend(_seaport_flags(message))
+
+    # Seaport BULK ORDER — one signature over a tree of orders; the giveaway can hide in the tree.
+    elif pnorm == "bulkorder":
+        flags.extend(_bulk_order_flags(message))
 
     decoded = {"primaryType": primary, "verifyingContract": (td.get("domain") or {}).get("verifyingContract")}
     ok = not any(f["severity"] == "HIGH" for f in flags)

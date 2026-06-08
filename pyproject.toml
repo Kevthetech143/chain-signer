@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "chain-signer"
-version = "0.5.19"
+version = "0.5.20"
 description = "Security suite for AI agents — catch the dangerous thing before it's signed. Preflight an unsigned EVM transaction for drains, inspect EIP-712 signatures for permit-phishing, and gate agent actions by policy. Pairs with any wallet or MCP stack; ships a non-custodial wallet too."
 readme = "README.md"
 requires-python = ">=3.10"
