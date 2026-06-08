@@ -3,6 +3,23 @@
 All notable changes to chain-signer. Newest first. Security fixes are released as a new version —
 published versions are never overwritten. Dates are UTC.
 
+## 0.5.19 — 2026-06-07
+- Security (preflight): the inner-call recursion covered multicall variants but NOT the ERC-4337 /
+  smart-account execute wrappers. An agent's smart wallet (ERC-4337 account, Gnosis Safe) never calls
+  approve()/transferFrom() directly — it routes EVERY action through `execute(address,uint256,bytes)`
+  (0xb61d27f6), `executeBatch(address[],uint256[],bytes[])` (0x47e1da2a) /
+  `executeBatch(address[],bytes[])` (0x18dfb3c7), or Safe `multiSend(bytes)` (0x8d80ff0a). So a drain
+  wrapped one layer down — `execute(token, 0, approve(attacker, MAX))` — flowed through as a single
+  opaque LOW call: ok=True, assert_safe PASSED (empirically confirmed fail-OPEN). This is the dominant
+  calldata shape in our exact niche (AI agents signing for their own smart accounts). preflight now
+  decodes the wrappers and recurses into their inner call(s) via the existing depth-capped path, so a
+  drain hidden behind a wrapper — even nested — is caught and hard-stops. Same evasion CLASS as the
+  v0.5.5 multicall recursion gap (a covered drain hidden behind an uncovered wrapper selector).
+  Non-noisy by construction: we flag only on what the INNER call is, so a benign execute (clean swap,
+  exact approval, bare ETH transfer with empty inner data) stays clean. Red tests (execute /
+  executeBatch x2 / multiSend wrapping unlimited approve + transferFrom → HIGH + hard-stop; benign
+  execute, empty-data ETH transfer, malformed wrapper not flagged) + full suite green (286).
+
 ## 0.5.18 — 2026-06-07
 - Security (inspect_typed_data / Seaport): the zero-consideration guard only SUMMED consideration
   amounts — it never checked WHO is paid. A drainer dodged it by making the consideration NON-zero but

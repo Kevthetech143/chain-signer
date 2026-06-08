@@ -61,6 +61,23 @@ _MULTICALL_VARIANTS = {
 }
 _MAX_MULTICALL_DEPTH = 5              # guard against a malicious deeply-nested multicall bomb
 
+# ERC-4337 / smart-account execute wrappers. An agent's smart wallet (ERC-4337 account, Gnosis Safe)
+# does NOT call approve()/transferFrom() directly — it routes every action through one of these. A
+# drain wrapped one layer down (execute(token, 0, approve(attacker, MAX))) is invisible unless we
+# unwrap it, exactly like a drain hidden in a multicall. execute() carries ONE inner call; the
+# executeBatch / multiSend forms carry many. We recurse into the inner call(s) and flag only on what
+# they are — a benign execute (clean swap, exact approval, bare ETH transfer) stays clean.
+_EXEC_SINGLE = {
+    "0xb61d27f6": ["address", "uint256", "bytes"],          # execute(address,uint256,bytes)
+}
+_EXEC_BATCH = {
+    "0x47e1da2a": ["address[]", "uint256[]", "bytes[]"],    # executeBatch(address[],uint256[],bytes[])
+    "0x18dfb3c7": ["address[]", "bytes[]"],                 # executeBatch(address[],bytes[])
+}
+_MULTISEND = "0x8d80ff0a"                                   # Gnosis Safe multiSend(bytes) — packed encoding
+# Every selector that wraps inner calldata we must unwrap before judging.
+_WRAPPER_SELECTORS = set(_MULTICALL_VARIANTS) | set(_EXEC_SINGLE) | set(_EXEC_BATCH) | {_MULTISEND}
+
 
 def _norm_hex(data):
     if isinstance(data, (bytes, bytearray)):
@@ -223,28 +240,78 @@ def _multicall_inner(data):
         return None
 
 
-def _collect_flags(data, prefix="", depth=0):
-    """Risk flags for one call. If it's a multicall (any variant), recurse into its inner calls
-    so a drain hidden inside — even nested — is caught. Depth-capped against nesting bombs."""
+def _exec_inner(data):
+    """Inner calldata of an ERC-4337 execute/executeBatch wrapper, or None if not one / undecodable.
+    execute(to,value,data) -> one inner call; executeBatch(...) -> many (the bytes[] is last)."""
     s = _norm_hex(data) or ""
     selector = "0x" + s[:8].lower()
+    try:
+        from eth_abi import decode as _abidecode
+        if selector in _EXEC_SINGLE:
+            _to, _value, inner = _abidecode(_EXEC_SINGLE[selector], bytes.fromhex(s[8:]))
+            return ["0x" + inner.hex()]
+        if selector in _EXEC_BATCH:
+            decoded = _abidecode(_EXEC_BATCH[selector], bytes.fromhex(s[8:]))
+            return ["0x" + c.hex() for c in decoded[-1]]    # bytes[] is always last
+    except Exception:
+        return None
+    return None
+
+
+def _multisend_inner(data):
+    """Inner calldata of a Gnosis Safe multiSend(bytes). The bytes arg is a PACKED list of
+    (operation:1, to:20, value:32, dataLength:32, data:dataLength) records — not standard ABI."""
+    s = _norm_hex(data) or ""
+    if "0x" + s[:8].lower() != _MULTISEND:
+        return None
+    try:
+        from eth_abi import decode as _abidecode
+        (packed,) = _abidecode(["bytes"], bytes.fromhex(s[8:]))
+    except Exception:
+        return None
+    calls, i, n = [], 0, len(packed)
+    while i + 85 <= n:                                       # need at least the fixed header
+        dlen = int.from_bytes(packed[i + 53:i + 85], "big")
+        start, end = i + 85, i + 85 + dlen
+        if end > n:                                          # truncated record — stop, don't guess
+            break
+        calls.append("0x" + packed[start:end].hex())
+        i = end
+    return calls
+
+
+def _wrapper_inner(data, selector):
+    """Inner calls for any wrapper selector, dispatched by family. Returns (inner_or_None, label)."""
     if selector in _MULTICALL_VARIANTS:
+        return _multicall_inner(data), "(inside multicall) "
+    if selector in _EXEC_SINGLE or selector in _EXEC_BATCH:
+        return _exec_inner(data), "(inside execute) "
+    return _multisend_inner(data), "(inside multiSend) "
+
+
+def _collect_flags(data, prefix="", depth=0):
+    """Risk flags for one call. If it WRAPS inner calls (multicall, ERC-4337 execute/executeBatch,
+    Safe multiSend), recurse into them so a drain hidden inside — even nested — is caught.
+    Depth-capped against nesting bombs."""
+    s = _norm_hex(data) or ""
+    selector = "0x" + s[:8].lower()
+    if selector in _WRAPPER_SELECTORS:
         if depth >= _MAX_MULTICALL_DEPTH:
-            # Abnormally-deep nesting is not a legitimate pattern (real multicalls nest 1-2 deep) — it
+            # Abnormally-deep nesting is not a legitimate pattern (real wrappers nest 1-2 deep) — it
             # is a strong obfuscation signal hiding calls we refuse to keep unwrapping. HIGH so the
             # hard stop (assert_safe) fires rather than waving it through with a soft advisory.
             return [{"code": "deeply_nested_multicall", "severity": "HIGH",
-                     "detail": f"{prefix}multicall nested deeper than {_MAX_MULTICALL_DEPTH} levels — "
+                     "detail": f"{prefix}call wrappers nested deeper than {_MAX_MULTICALL_DEPTH} levels — "
                                "this is not a normal pattern and hides calls that can't be inspected; "
                                "treat as hostile and do not sign without manual review."}]
-        inner = _multicall_inner(data)
+        inner, label = _wrapper_inner(data, selector)
         if inner is None:
             return [{"code": "malformed_call", "severity": "MED",
-                     "detail": f"{prefix}multicall calldata couldn't be decoded — its inner calls can't be "
+                     "detail": f"{prefix}wrapped calldata couldn't be decoded — its inner calls can't be "
                                "checked; review before signing."}]
         flags = []
         for c in inner:
-            flags.extend(_collect_flags(c, prefix="(inside multicall) ", depth=depth + 1))
+            flags.extend(_collect_flags(c, prefix=label, depth=depth + 1))
         return flags
     decoded = _decode(data)
     flags = _call_flags(decoded, prefix)
@@ -269,9 +336,11 @@ def preflight(tx, *, fetch=None, sim=None, max_value=None):
     decoded = _decode(data)
     flags = []
 
-    if selector in _MULTICALL_VARIANTS:
+    if selector in _WRAPPER_SELECTORS:
         flags.extend(_collect_flags(data))
-        decoded = {"function": "multicall", "selector": selector, "args": [], "malformed": False}
+        name = ("multicall" if selector in _MULTICALL_VARIANTS
+                else "multiSend" if selector == _MULTISEND else "execute")
+        decoded = {"function": name, "selector": selector, "args": [], "malformed": False}
     else:
         flags.extend(_call_flags(decoded))
         if decoded is not None and decoded.get("function") is None and data not in ("0x", ""):
