@@ -24,6 +24,10 @@ _KNOWN = {
     "0x4f1ef286": ("upgradeToAndCall", ["address"]),
     # ERC-2612 permit submitted on-chain — grants an allowance to `spender` like approve does.
     "0xd505accf": ("permit", ["address", "address", "uint256", "uint256", "uint8", "bytes32", "bytes32"]),
+    # DAI-style permit submitted on-chain — different shape (no amount; a bool `allowed`). allowed=true
+    # grants an effectively-unlimited allowance to `spender`; allowed=false REVOKES. Only first 5 args
+    # are needed (trailing v,r,s ignored). permit(holder, spender, nonce, expiry, allowed, v, r, s).
+    "0x8fcbaf0c": ("daiPermit", ["address", "address", "uint256", "uint256", "bool"]),
     # Permit2 (Uniswap's universal approval router, used by most aggregators) — its ON-CHAIN calls flow
     # through here as plain txs. approve grants an allowance; transferFrom is the drain-pull counterpart.
     # NOTE arg ORDER differs from ERC-20: spender is the 2nd arg, amount the 3rd; amount is uint160.
@@ -223,6 +227,11 @@ def _call_flags(decoded, prefix=""):
         elif value >= _LARGE_APPROVAL:
             flags.append({"code": "large_approval", "severity": "MED",
                           "detail": f"{prefix}permit() grants a very large allowance to {spender}; confirm it's intended."})
+    elif fn == "daiPermit" and len(args) >= 5 and args[4] is True:
+        spender = args[1]
+        flags.append({"code": "unlimited_approval", "severity": "HIGH",
+                      "detail": f"{prefix}DAI permit() with allowed=true grants {spender} an effectively-unlimited "
+                                "allowance via a signed permit — a spender that turns malicious can drain that token."})
     elif fn == "setApprovalForAll" and len(args) >= 2 and args[1] is True:
         flags.append({"code": "approval_for_all", "severity": "HIGH",
                       "detail": f"{prefix}setApprovalForAll grants {args[0]} control of EVERY token in this "
