@@ -10,10 +10,13 @@ Three guards, each callable on its own (and as MCP tools), pairing with any wall
 
 - `preflight(tx)` — decode an unsigned transaction and flag drains before signing (unlimited/large
   approval, approve-all, token & NFT transferFrom, proxy upgrade, on-chain permit, on-chain Permit2
-  approve/permit/transferFrom, approvals hidden in multicall incl. Uniswap router batches, EIP-7702 account
+  approve/permit/transferFrom, approvals hidden in multicall incl. Uniswap router batches, approvals
+  wrapped in ERC-4337/smart-account execute/executeBatch and Gnosis Safe multiSend, EIP-7702 account
   delegation, will-revert).
 - `inspect_typed_data(td)` — catch permit-phishing in an EIP-712 message before the agent signs it
-  (ERC-2612, Uniswap Permit2, DAI-style permits) and Seaport orders that give an NFT away for nothing.
+  (ERC-2612, Uniswap Permit2 incl. SignatureTransfer + witness variants, DAI-style permits) and Seaport
+  orders that give assets away — zero consideration, proceeds routed to a third party, or hidden in a
+  BulkOrder tree.
 - `check_action(action, policy)` — enforce allow/forbid + value/recipient limits before the agent acts.
 
 All three fail safe and are guards, not guarantees. Also bundled: a non-custodial multi-chain wallet
@@ -77,7 +80,8 @@ What it flags today: unlimited/large approval, `increaseAllowance`, `setApproval
 ERC-20 `transferFrom` + ERC-721/1155 `safeTransferFrom` (token & NFT drains), on-chain `permit`,
 on-chain Permit2 `approve`/`permit`/`transferFrom` (the dominant approval router — unlimited uint160 allowance
 + drain pull), proxy `upgradeTo`/`upgradeToAndCall`, approvals hidden inside `multicall` (all router
-variants, nested), EIP-7702 account delegation (the "wallet upgrade" drainer), large native value,
+variants, nested), approvals wrapped in ERC-4337/smart-account `execute`/`executeBatch` or Gnosis Safe
+`multiSend` (decoded and recursed), EIP-7702 account delegation (the "wallet upgrade" drainer), large native value,
 opaque calldata, malformed calls, and will-revert (with a sim hook).
 Honest limits (read these): this is STATIC analysis — it decodes calldata and matches known drain
 patterns. It is NOT a transaction simulator: it won't catch a novel/obfuscated drain it can't decode
@@ -95,9 +99,11 @@ from chain_signer import inspect_typed_data
 report = inspect_typed_data(typed_data)   # the EIP-712 object you're about to sign
 # ok=False, risk_flags=[{'code': 'unlimited_permit_signature', 'severity': 'HIGH', ...}]
 ```
-Covers all three major permit shapes: **ERC-2612**, **Uniswap Permit2** (PermitSingle/PermitBatch),
-and **DAI-style** (`allowed: true`), plus **Seaport** marketplace orders that give an asset away for
-zero consideration (the NFT signature-phishing drain). Offline, never raises.
+Covers all three major permit shapes: **ERC-2612**, **Uniswap Permit2** (PermitSingle/PermitBatch, plus
+SignatureTransfer and the witness variants intent protocols use), and **DAI-style** (`allowed: true`),
+plus **Seaport** marketplace orders that hand assets over for nothing — zero consideration, proceeds
+routed to a third party while your asset leaves, or the same giveaway buried in a BulkOrder merkle tree.
+Offline, never raises.
 
 ## Action-policy gate (inspect what the agent DOES)
 Identity tells you *who* the agent is; it doesn't stop a bad *action*. `check_action()` enforces a
