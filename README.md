@@ -79,8 +79,8 @@ assert_safe(tx, sim=my_simulator)   # optional: also flag will-revert via your s
 ```
 What it flags today: unlimited/large approval, `increaseAllowance`, `setApprovalForAll`,
 ERC-20 `transferFrom` + ERC-721/1155 `safeTransferFrom` (token & NFT drains), on-chain ERC-2612 and DAI-style `permit`,
-on-chain Permit2 `approve`/`permit`/`transferFrom` (the dominant approval router — unlimited uint160 allowance
-+ drain pull), proxy `upgradeTo`/`upgradeToAndCall`, approvals hidden inside `multicall` (all router
+on-chain Permit2 `approve`/`permit`/`transferFrom` (single **and** batch — the dominant approval router:
+unlimited uint160 allowance + drain pull), proxy `upgradeTo`/`upgradeToAndCall`, approvals hidden inside `multicall` (all router
 variants, nested), approvals wrapped in ERC-4337/smart-account `execute`/`executeBatch` or Gnosis Safe
 `multiSend` (decoded and recursed), drains routed through the Uniswap **Universal Router**
 (`execute(commands,inputs)` — Permit2 `permit`/`transferFrom` commands, batch and `EXECUTE_SUB_PLAN`),
