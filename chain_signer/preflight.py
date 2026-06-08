@@ -78,6 +78,23 @@ _MULTISEND = "0x8d80ff0a"                                   # Gnosis Safe multiS
 # Every selector that wraps inner calldata we must unwrap before judging.
 _WRAPPER_SELECTORS = set(_MULTICALL_VARIANTS) | set(_EXEC_SINGLE) | set(_EXEC_BATCH) | {_MULTISEND}
 
+# Uniswap UNIVERSAL ROUTER — the dominant swap/approval entrypoint in the EVM agent niche. Unlike every
+# wrapper above, its inner calls are NOT selector-prefixed calldata: execute(bytes commands, bytes[]
+# inputs[, uint256 deadline]) carries ONE byte per command (low 7 bits = command type, high bit 0x80 =
+# allow-revert) and inputs[i] is a RAW ABI tuple. So the selector-based recursion can't reach a drain
+# routed through it — we decode the command bytes and the dangerous Permit2 inputs directly.
+_UR_EXEC = {
+    "0x3593564c": ["bytes", "bytes[]", "uint256"],   # execute(commands, inputs, deadline)
+    "0x24856bc3": ["bytes", "bytes[]"],              # execute(commands, inputs)
+}
+_UR_COMMAND_TYPE_MASK = 0x7f                          # low 7 bits = command type; 0x80 = allow-revert flag
+# command type bytes (verified against Uniswap's live Commands.sol)
+_UR_PERMIT2_TRANSFER_FROM = 0x02
+_UR_PERMIT2_PERMIT_BATCH = 0x03
+_UR_PERMIT2_PERMIT = 0x0a
+_UR_PERMIT2_TRANSFER_FROM_BATCH = 0x0d
+_UR_EXECUTE_SUB_PLAN = 0x21                           # carries a nested (commands, inputs) — recurse
+
 
 def _norm_hex(data):
     if isinstance(data, (bytes, bytearray)):
@@ -289,12 +306,96 @@ def _wrapper_inner(data, selector):
     return _multisend_inner(data), "(inside multiSend) "
 
 
+def _ur_command_flags(cmd, inp, prefix, depth):
+    """Flags for ONE Universal Router command + its raw ABI-tuple input. Only the Permit2 approval /
+    transfer-from commands (and the recursive sub-plan) are dangerous; swaps/wrap/unwrap carry no such
+    command and produce nothing — keeping benign swaps clean."""
+    from eth_abi import decode as _abidecode
+    label = prefix + "(inside Universal Router) "
+    try:
+        if cmd == _UR_PERMIT2_TRANSFER_FROM:
+            _token, recipient, _amount = _abidecode(["address", "address", "uint160"], inp)
+            return [{"code": "token_transfer_from", "severity": "HIGH",
+                     "detail": f"{label}Permit2 transferFrom moves tokens OUT to {recipient} — the call a "
+                               "malicious router script uses to drain an approved wallet. Confirm you intend it."}]
+        if cmd == _UR_PERMIT2_TRANSFER_FROM_BATCH:
+            (batch,) = _abidecode(["(address,address,uint160,address)[]"], inp)
+            flags = []
+            for _from, to, _amt, _tok in batch:
+                flags.append({"code": "token_transfer_from", "severity": "HIGH",
+                              "detail": f"{label}Permit2 transferFrom (batch) moves tokens OUT to {to} — the call a "
+                                        "malicious router script uses to drain an approved wallet. Confirm you intend it."})
+            return flags
+        if cmd == _UR_PERMIT2_PERMIT:
+            permit, _data = _abidecode(["((address,uint160,uint48,uint48),address,uint256)", "bytes"], inp)
+            details, spender, _sig = permit            # details = (token, amount, expiration, nonce)
+            return _ur_permit_flags(details[1], spender, label)
+        if cmd == _UR_PERMIT2_PERMIT_BATCH:
+            permit, _data = _abidecode(["((address,uint160,uint48,uint48)[],address,uint256)", "bytes"], inp)
+            details_arr, spender, _sig = permit
+            amount = max((d[1] for d in details_arr), default=0)
+            return _ur_permit_flags(amount, spender, label)
+        if cmd == _UR_EXECUTE_SUB_PLAN:
+            if depth >= _MAX_MULTICALL_DEPTH:
+                return [{"code": "deeply_nested_multicall", "severity": "HIGH",
+                         "detail": f"{label}sub-plans nested deeper than {_MAX_MULTICALL_DEPTH} levels — "
+                                   "abnormal obfuscation; treat as hostile and review before signing."}]
+            sub_commands, sub_inputs = _abidecode(["bytes", "bytes[]"], inp)
+            return _ur_process(sub_commands, sub_inputs, prefix, depth + 1)
+    except Exception:
+        return [{"code": "malformed_call", "severity": "MED",
+                 "detail": f"{label}a Universal Router command's input couldn't be decoded — its real effect "
+                           "can't be trusted; review before signing."}]
+    return []
+
+
+def _ur_permit_flags(amount, spender, label):
+    if amount >= _UNLIMITED_U160:
+        return [{"code": "unlimited_approval", "severity": "HIGH",
+                 "detail": f"{label}Permit2 permit() grants an effectively-unlimited allowance to {spender} "
+                           "via a signed permit — a spender that turns malicious can drain that token."}]
+    if amount >= _LARGE_APPROVAL:
+        return [{"code": "large_approval", "severity": "MED",
+                 "detail": f"{label}Permit2 permit() grants a very large allowance to {spender}; confirm it's intended."}]
+    return []
+
+
+def _ur_process(commands, inputs, prefix, depth):
+    """Walk a Universal Router command list, judging each command by its type byte + paired input."""
+    flags = []
+    for i, cmd_byte in enumerate(commands):
+        cmd = cmd_byte & _UR_COMMAND_TYPE_MASK
+        inp = inputs[i] if i < len(inputs) else b""
+        flags.extend(_ur_command_flags(cmd, inp, prefix, depth))
+    return flags
+
+
+def _universal_router_flags(data, prefix="", depth=0):
+    """Flags for a Universal Router execute() — decode (commands, inputs[, deadline]) and judge each
+    command. Returns None if not a UR call (so callers fall through to normal decoding)."""
+    s = _norm_hex(data) or ""
+    types = _UR_EXEC.get("0x" + s[:8].lower())
+    if not types:
+        return None
+    try:
+        from eth_abi import decode as _abidecode
+        decoded = _abidecode(types, bytes.fromhex(s[8:]))
+    except Exception:
+        return [{"code": "malformed_call", "severity": "MED",
+                 "detail": f"{prefix}Universal Router calldata couldn't be decoded — its commands can't be "
+                           "checked; review before signing."}]
+    commands, inputs = decoded[0], decoded[1]
+    return _ur_process(commands, inputs, prefix, depth)
+
+
 def _collect_flags(data, prefix="", depth=0):
     """Risk flags for one call. If it WRAPS inner calls (multicall, ERC-4337 execute/executeBatch,
-    Safe multiSend), recurse into them so a drain hidden inside — even nested — is caught.
-    Depth-capped against nesting bombs."""
+    Safe multiSend, Uniswap Universal Router), recurse into them so a drain hidden inside — even
+    nested — is caught. Depth-capped against nesting bombs."""
     s = _norm_hex(data) or ""
     selector = "0x" + s[:8].lower()
+    if selector in _UR_EXEC:
+        return _universal_router_flags(data, prefix, depth)
     if selector in _WRAPPER_SELECTORS:
         if depth >= _MAX_MULTICALL_DEPTH:
             # Abnormally-deep nesting is not a legitimate pattern (real wrappers nest 1-2 deep) — it
@@ -336,10 +437,11 @@ def preflight(tx, *, fetch=None, sim=None, max_value=None):
     decoded = _decode(data)
     flags = []
 
-    if selector in _WRAPPER_SELECTORS:
+    if selector in _WRAPPER_SELECTORS or selector in _UR_EXEC:
         flags.extend(_collect_flags(data))
         name = ("multicall" if selector in _MULTICALL_VARIANTS
-                else "multiSend" if selector == _MULTISEND else "execute")
+                else "multiSend" if selector == _MULTISEND
+                else "universalRouterExecute" if selector in _UR_EXEC else "execute")
         decoded = {"function": name, "selector": selector, "args": [], "malformed": False}
     else:
         flags.extend(_call_flags(decoded))
