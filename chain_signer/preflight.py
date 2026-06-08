@@ -162,12 +162,53 @@ def _decode_permit2_transfer_batch(body_hex):
         return None
 
 
+# Permit2 SignatureTransfer submitted ON-CHAIN: permit(Witness)TransferFrom pulls tokens OUT of the
+# signing owner TO transferDetails.to using a ONE-SHOT signed permit (no pre-existing allowance) — a
+# drain when `to` is the attacker. The witness variants are what intent/filler protocols use. In every
+# overload the recipient(s) live in SignatureTransferDetails at ABI arg index 1, and the owner at index 2.
+_PERMIT2_SIGTRANSFER_TYPES = {
+    "0x30f28b7a": ["((address,uint256),uint256,uint256)", "(address,uint256)", "address", "bytes"],
+    "0xedd9444b": ["((address,uint256)[],uint256,uint256)", "(address,uint256)[]", "address", "bytes"],
+    "0x137c29fe": ["((address,uint256),uint256,uint256)", "(address,uint256)", "address",
+                   "bytes32", "string", "bytes"],
+    "0xfe8ec1a7": ["((address,uint256)[],uint256,uint256)", "(address,uint256)[]", "address",
+                   "bytes32", "string", "bytes"],
+}
+_PERMIT2_SIGTRANSFER_BATCH = {"0xedd9444b", "0xfe8ec1a7"}
+
+
+def _decode_permit2_sig_transfer(selector, body_hex):
+    """Decode Permit2 SignatureTransfer -> (owner, recipient) of the first transfer, () if empty, or None."""
+    try:
+        raw = bytes.fromhex(body_hex)
+        from eth_abi import decode as _abidecode
+        decoded = _abidecode(_PERMIT2_SIGTRANSFER_TYPES[selector], raw)
+        details, owner = decoded[1], decoded[2]
+        if selector in _PERMIT2_SIGTRANSFER_BATCH:
+            if not details:
+                return ()
+            to = details[0][0]
+        else:
+            to = details[0]
+        return owner, to
+    except Exception:                                       # malformed / not real Permit2 calldata
+        return None
+
+
 def _decode(data):
     """Decode calldata -> {function, selector, args, malformed}. Never raises."""
     s = _norm_hex(data)
     if not s:
         return None
     selector = "0x" + s[:8].lower()
+    if selector in _PERMIT2_SIGTRANSFER_TYPES:
+        res = _decode_permit2_sig_transfer(selector, s[8:])
+        if res is None:
+            return {"function": "permit2TransferFrom", "selector": selector, "args": [], "malformed": True}
+        if not res:                                         # empty batch -> moves nothing, stays clean
+            return {"function": "permit2TransferFrom", "selector": selector, "args": [], "malformed": False}
+        owner, to = res
+        return {"function": "permit2TransferFrom", "selector": selector, "args": [owner, to], "malformed": False}
     if selector == _PERMIT2_TRANSFER_FROM_BATCH:
         res = _decode_permit2_transfer_batch(s[8:])
         if res is None:
