@@ -97,3 +97,31 @@ def test_recipient_allowlist_nonstring_to_does_not_crash():
     action = {"tool": "send", "args": {"to": 12345, "value_wei": 5 * 10**17}}
     r = check_action(action, {"allow_recipients": [RECIP]})   # must not raise
     assert r["allowed"] is False and "recipient_not_allowed" in _codes(r)
+
+
+# --- Normalization (lock the deliberate casing/whitespace fix in action_gate.py): the attacker
+# controls the action's `tool`/`to` strings, so the gate casefolds+strips tool names and lowercases
+# recipients on BOTH sides. Without these, "BRIDGE" / " bridge\n" dodges a forbid-list and a
+# checksummed recipient false-denies. Currently unlocked by any test — guard it against a refactor. ---
+
+def test_forbidden_tool_casing_whitespace_still_denied():
+    r = check_action({"tool": "  BRIDGE \n", "args": {}}, {"forbid_tools": ["bridge"]})
+    assert r["allowed"] is False and "forbidden_tool" in _codes(r)
+
+
+def test_allow_tools_case_insensitive_accepts():
+    r = check_action({"tool": "SEND", "args": {}}, {"allow_tools": ["send"]})
+    assert r["allowed"] is True and "tool_not_allowed" not in _codes(r)
+
+
+def test_recipient_allowlist_matches_checksummed_case_no_false_deny():
+    # the SAME address in upper/checksummed form must still be allowed — don't reject a legit recipient
+    r = check_action({"tool": "send", "args": {"to": RECIP.upper(), "value_wei": 1}},
+                     {"allow_recipients": [RECIP]})
+    assert r["allowed"] is True and "recipient_not_allowed" not in _codes(r)
+
+
+def test_recipient_allowlist_different_addr_mixedcase_denied():
+    r = check_action({"tool": "send", "args": {"to": OTHER.upper(), "value_wei": 1}},
+                     {"allow_recipients": [RECIP]})
+    assert r["allowed"] is False and "recipient_not_allowed" in _codes(r)
