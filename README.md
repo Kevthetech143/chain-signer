@@ -11,7 +11,8 @@ Three guards, each callable on its own (and as MCP tools), pairing with any wall
 - `preflight(tx)` — decode an unsigned transaction and flag drains before signing (unlimited/large
   approval, approve-all, token & NFT transferFrom, proxy upgrade, on-chain permit, on-chain Permit2
   approve/permit/transferFrom, approvals hidden in multicall incl. Uniswap router batches, approvals
-  wrapped in ERC-4337/smart-account execute/executeBatch and Gnosis Safe multiSend/execTransaction, drains routed
+  wrapped in ERC-4337/smart-account execute/executeBatch, Gnosis Safe multiSend/execTransaction and DSProxy
+  execute, drains routed
   through the Uniswap Universal Router (Permit2 permit/transferFrom commands incl. sub-plans), EIP-7702
   account delegation, will-revert).
 - `inspect_typed_data(td)` — catch permit-phishing in an EIP-712 message before the agent signs it
@@ -83,8 +84,9 @@ ERC-20 `transferFrom` + ERC-721/1155 `safeTransferFrom` (token & NFT drains), ER
 on-chain Permit2 `approve`/`permit`/`transferFrom` (single **and** batch — the dominant approval router:
 unlimited uint160 allowance + drain pull) plus Permit2 SignatureTransfer `permit(Witness)TransferFrom`
 (the one-shot signed-permit pull intent/filler protocols use), proxy `upgradeTo`/`upgradeToAndCall`, approvals hidden inside `multicall` (all router
-variants, nested), approvals wrapped in ERC-4337/smart-account `execute`/`executeBatch` or Gnosis Safe
-`multiSend`/`execTransaction` (decoded and recursed), drains routed through the Uniswap **Universal Router**
+variants, nested), approvals wrapped in ERC-4337/smart-account `execute`/`executeBatch`, Gnosis Safe
+`multiSend`/`execTransaction`, or DSProxy `execute(target,data)`/`execute(code,data)` (decoded and recursed),
+drains routed through the Uniswap **Universal Router**
 (`execute(commands,inputs)` — Permit2 `permit`/`transferFrom` commands, batch and `EXECUTE_SUB_PLAN`),
 EIP-7702 account delegation (the "wallet upgrade" drainer), large native value,
 opaque calldata, malformed calls, and will-revert (with a sim hook).
