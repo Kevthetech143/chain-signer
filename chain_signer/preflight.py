@@ -86,6 +86,15 @@ _EXEC_BATCH = {
     "0x18dfb3c7": ["address[]", "bytes[]"],                 # executeBatch(address[],bytes[])
 }
 _MULTISEND = "0x8d80ff0a"                                   # Gnosis Safe multiSend(bytes) — packed encoding
+# DSProxy (MakerDAO / Oasis / InstaDapp) — the delegatecall proxy nearly every Maker-ecosystem user
+# action routes through. The proxy HOLDS the user's token approvals and delegatecalls whatever `data`
+# it's handed: execute(target, data) delegatecalls `data` at `target`; execute(code, data) deploys
+# `code` then delegatecalls `data`. In BOTH overloads the real inner call is the trailing `bytes data`
+# arg — a drain wrapped one layer down is invisible unless we recurse into it, exactly like execute().
+_DSPROXY = {
+    "0x1cff79cd": ["address", "bytes"],                     # execute(address target, bytes data)
+    "0x1f6a1eb9": ["bytes", "bytes"],                       # execute(bytes code, bytes data)
+}
 # Gnosis Safe's PRIMARY entrypoint: every Safe tx is submitted through execTransaction. The real inner
 # call the multisig runs is the `data` arg (index 2); `to` (index 0) is its target. A drain wrapped one
 # layer down is invisible unless we recurse into `data` — exactly like execute()/multiSend. (This also
@@ -95,7 +104,8 @@ _SAFE_EXEC = {
                    "uint256", "uint256", "address", "address", "bytes"],
 }
 # Every selector that wraps inner calldata we must unwrap before judging.
-_WRAPPER_SELECTORS = set(_MULTICALL_VARIANTS) | set(_EXEC_SINGLE) | set(_EXEC_BATCH) | set(_SAFE_EXEC) | {_MULTISEND}
+_WRAPPER_SELECTORS = (set(_MULTICALL_VARIANTS) | set(_EXEC_SINGLE) | set(_EXEC_BATCH)
+                      | set(_SAFE_EXEC) | set(_DSPROXY) | {_MULTISEND})
 
 # Uniswap UNIVERSAL ROUTER — the dominant swap/approval entrypoint in the EVM agent niche. Unlike every
 # wrapper above, its inner calls are NOT selector-prefixed calldata: execute(bytes commands, bytes[]
@@ -370,6 +380,9 @@ def _exec_inner(data):
         if selector in _SAFE_EXEC:
             decoded = _abidecode(_SAFE_EXEC[selector], bytes.fromhex(s[8:]))
             return ["0x" + decoded[2].hex()]                # execTransaction `data` arg (index 2)
+        if selector in _DSPROXY:
+            decoded = _abidecode(_DSPROXY[selector], bytes.fromhex(s[8:]))
+            return ["0x" + decoded[-1].hex()]               # DSProxy delegatecalled `data` arg (last)
     except Exception:
         return None
     return None
@@ -405,6 +418,8 @@ def _wrapper_inner(data, selector):
         return _exec_inner(data), "(inside execute) "
     if selector in _SAFE_EXEC:
         return _exec_inner(data), "(inside Safe execTransaction) "
+    if selector in _DSPROXY:
+        return _exec_inner(data), "(inside DSProxy execute) "
     return _multisend_inner(data), "(inside multiSend) "
 
 
