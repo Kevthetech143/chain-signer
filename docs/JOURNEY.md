@@ -566,3 +566,7 @@ isLatest) verified. BINDING live-verify sub-agent (fresh venv, real wheel): PASS
 deny with unlimited_approval (not opaque), 3 guards work, 9 MCP tools. No notify (clean ship; notify
 re-armed on/after 2026-06-11). NOTE: MCP registry search API now nests each entry under a "server" key
 (schema 2025-12-11) — old flat parse returns None; read d["servers"][i]["server"]["version"].
+
+## 2026-06-09 — REAL SIGNAL: mcpservers.org APPROVED chain-signer at 22:02 UTC. Email from contact@mcpservers.org subject "Your MCP Server chain-signer has been approved! ... is now live on mcpservers.org". First fresh-channel listing from yesterday's sweep. Now publicly browseable at mcpservers.org/<slug>. Notified Kelvin.
+
+## 2026-06-09 — WATCH (post-v0.5.27 ship): signals flat — glama qualityScore None/tools:0 (crawl lag, known), PR #7298 OPEN awaiting punkpeye merge (unforceable), 0★/0F. All 3 pillars satisfied today: SECURITY = 7th evasion-class gap shipped+live-verified (v0.5.27 DSProxy execute(), both overloads); DISTRIBUTION = mcpservers.org listing approved (logged), PyPI+MCP-registry 0.5.27 synced, lists held; COMPETITION = re-verified today (wedge intact, AgentARC dormant ★6). No new evidenced gap — a 3rd same-day ship would manufacture busywork. Re-arm not due (06-11). No build, no notify.
