@@ -545,3 +545,24 @@ Probed a concrete untested entrypoint instead of holding: execTransaction (0x6a7
 2026-06-09 — WATCH (post-ship tail): confirmed v0.5.26 fully propagated to MCP registry (isLatest:True) + PyPI — today's ERC-777 ship now shipped-verified across all surfaces. Signals flat (0★/0F; PR #7298 OPEN+MERGEABLE, unforceable; glama tools:0/score None crawl-lag). No new evidenced gap after 2 ships today (v0.5.25, v0.5.26) — declined to manufacture a 7th. Re-arm due 06-11 (not yet). No build, no notify.
 
 2026-06-09 — DISTRIBUTION/HONESTY fix (no ship): probed the stuck Glama listing — confirmed it's crawl-lag, NOT a metadata gap (glama.json + server.json present; list_tools() verifiably returns all 9 tools incl. the 3 security guards, so the MCP surface is fully reachable). BUT found a real undersell: README MCP section + distribution-plan.md both claimed the server exposes only "6 tools" (wallet-only) — hiding the flagship preflight/inspect_signature/check_action wedge from MCP users. Corrected both to list 9, guards first. Docs-only, pushed to main. Signals flat (0★/0F; PR #7298 OPEN+MERGEABLE unforceable; glama tools:0). No notify.
+
+## 2026-06-09 — WATCH cycle: no movement. 0★. PR #7298 OPEN (>24h since my nudge, last comment still mine). No replies on the 3 submissions. Stand-down holds. No notify.
+
+2026-06-09 — WATCH (collapsed hold). Signals flat (0★/0F; PR #7298 OPEN, last comment still mine, unforceable; glama tools:0/score None — crawl-lag, metadata already correct). Already advanced 4 real steps today: v0.5.25 + v0.5.26 ships (both live-verified), THREAT-COVERAGE correction, README/distribution-plan tool-count honesty fix. No new evidenced gap; not manufacturing a 7th. Re-arm due 06-11 (not yet). No build, no notify.
+
+2026-06-09 — WATCH (collapsed, +1 cycle ~19:xx). No change: signals flat (0★/0F; PR #7298 OPEN unforceable; glama tools:0 crawl-lag). All 3 pillars already current today. No new evidenced gap. No build, no notify.
+
+## 2026-06-09 — WATCH cycle: no movement. Stand-down holds. No notify.
+
+2026-06-09 — WATCH (collapsed, +1 cycle ~20:xx). Signals flat (0★/0F; PR #7298 OPEN unforceable; glama tools:0 crawl-lag). All 3 pillars current today, no new evidenced gap. OPS LESSON banked (evidenced this session): right after a tag push, PyPI's index lags a few seconds — a fresh `pip install chain-signer==X` can false-fail with "no matching distribution"; the live-verify sub-agent should poll the JSON API for the version (already does) and use `pip install --no-cache-dir` + one short retry before calling a release broken. Not a real failure. No build, no notify.
+
+2026-06-09 — SHIP v0.5.27: closed DSProxy execute() fail-open (7th evasion-class gap). DSProxy
+(MakerDAO/Oasis/InstaDapp delegatecall proxy that HOLDS user approvals) wrapped an unlimited approve /
+transferFrom one layer down in execute(target,data) + execute(code,data) -> flowed through as a single
+opaque LOW (ok=True). Confirmed fail-open empirically, then TDD red (6 drain cases) -> added _DSPROXY
+family recursing into the trailing delegatecalled `data` arg (same pattern as execute()/execTransaction)
+-> green 10/10, full suite 358. Release Action SUCCESS. PyPI 0.5.27 + MCP registry 0.5.27 (active,
+isLatest) verified. BINDING live-verify sub-agent (fresh venv, real wheel): PASS — both DSProxy overloads
+deny with unlimited_approval (not opaque), 3 guards work, 9 MCP tools. No notify (clean ship; notify
+re-armed on/after 2026-06-11). NOTE: MCP registry search API now nests each entry under a "server" key
+(schema 2025-12-11) — old flat parse returns None; read d["servers"][i]["server"]["version"].
