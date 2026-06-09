@@ -79,8 +79,16 @@ _EXEC_BATCH = {
     "0x18dfb3c7": ["address[]", "bytes[]"],                 # executeBatch(address[],bytes[])
 }
 _MULTISEND = "0x8d80ff0a"                                   # Gnosis Safe multiSend(bytes) — packed encoding
+# Gnosis Safe's PRIMARY entrypoint: every Safe tx is submitted through execTransaction. The real inner
+# call the multisig runs is the `data` arg (index 2); `to` (index 0) is its target. A drain wrapped one
+# layer down is invisible unless we recurse into `data` — exactly like execute()/multiSend. (This also
+# reaches the common Safe -> multiSend -> drain path, since Safe runs multiSend via execTransaction.)
+_SAFE_EXEC = {
+    "0x6a761202": ["address", "uint256", "bytes", "uint8", "uint256",
+                   "uint256", "uint256", "address", "address", "bytes"],
+}
 # Every selector that wraps inner calldata we must unwrap before judging.
-_WRAPPER_SELECTORS = set(_MULTICALL_VARIANTS) | set(_EXEC_SINGLE) | set(_EXEC_BATCH) | {_MULTISEND}
+_WRAPPER_SELECTORS = set(_MULTICALL_VARIANTS) | set(_EXEC_SINGLE) | set(_EXEC_BATCH) | set(_SAFE_EXEC) | {_MULTISEND}
 
 # Uniswap UNIVERSAL ROUTER — the dominant swap/approval entrypoint in the EVM agent niche. Unlike every
 # wrapper above, its inner calls are NOT selector-prefixed calldata: execute(bytes commands, bytes[]
@@ -348,6 +356,9 @@ def _exec_inner(data):
         if selector in _EXEC_BATCH:
             decoded = _abidecode(_EXEC_BATCH[selector], bytes.fromhex(s[8:]))
             return ["0x" + c.hex() for c in decoded[-1]]    # bytes[] is always last
+        if selector in _SAFE_EXEC:
+            decoded = _abidecode(_SAFE_EXEC[selector], bytes.fromhex(s[8:]))
+            return ["0x" + decoded[2].hex()]                # execTransaction `data` arg (index 2)
     except Exception:
         return None
     return None
@@ -381,6 +392,8 @@ def _wrapper_inner(data, selector):
         return _multicall_inner(data), "(inside multicall) "
     if selector in _EXEC_SINGLE or selector in _EXEC_BATCH:
         return _exec_inner(data), "(inside execute) "
+    if selector in _SAFE_EXEC:
+        return _exec_inner(data), "(inside Safe execTransaction) "
     return _multisend_inner(data), "(inside multiSend) "
 
 
