@@ -78,7 +78,8 @@ assert_safe(tx)          # raises ValueError on a HIGH flag; pass force=True to 
 assert_safe(tx, sim=my_simulator)   # optional: also flag will-revert via your simulation hook
 ```
 What it flags today: unlimited/large approval, `increaseAllowance`, `setApprovalForAll`,
-ERC-20 `transferFrom` + ERC-721/1155 `safeTransferFrom` (token & NFT drains), on-chain ERC-2612 and DAI-style `permit`,
+ERC-20 `transferFrom` + ERC-721/1155 `safeTransferFrom` (token & NFT drains), ERC-777 `authorizeOperator`/`operatorSend`
+(operator-grant + operator-pull drains), on-chain ERC-2612 and DAI-style `permit`,
 on-chain Permit2 `approve`/`permit`/`transferFrom` (single **and** batch — the dominant approval router:
 unlimited uint160 allowance + drain pull) plus Permit2 SignatureTransfer `permit(Witness)TransferFrom`
 (the one-shot signed-permit pull intent/filler protocols use), proxy `upgradeTo`/`upgradeToAndCall`, approvals hidden inside `multicall` (all router

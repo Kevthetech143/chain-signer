@@ -12,6 +12,8 @@ not a guarantee — pair it with your wallet + identity stack.
 | `setApprovalForAll(true)` (NFT operator) | ✅ | HIGH |
 | ERC-20 `transferFrom` | ✅ | HIGH (drain-execution call) |
 | ERC-721/1155 `safeTransferFrom` (NFT theft) | ✅ | HIGH |
+| ERC-777 `authorizeOperator` (operator-grant drain) | ✅ | HIGH; the setApprovalForAll-equivalent on ERC-777 tokens |
+| ERC-777 `operatorSend` (operator pull-to-attacker) | ✅ | HIGH; the transferFrom-equivalent drain-execution call |
 | On-chain ERC-2612 `permit()` + DAI-style `permit()` call | ✅ | HIGH on unlimited (both encodings) |
 | On-chain Permit2 `approve` / `permit` / `transferFrom` (single **and** batch) | ✅ | HIGH; the dominant approval router — unlimited uint160 allowance + the drain pull |
 | On-chain Permit2 SignatureTransfer `permit(Witness)TransferFrom` | ✅ | HIGH on a non-empty transfer (the one-shot signed-permit pull intent/filler protocols use) |
@@ -53,5 +55,5 @@ not a guarantee — pair it with your wallet + identity stack.
 ## Validated against real drainer techniques
 The suite is tested against the ACTUAL techniques used by the dominant 2024-2025 wallet drainers (Inferno / Angel / Pink / Ace; ~$494M stolen in 2024) — Permit/Permit2 signatures (the #1 vector, 56.7% of attacks per SlowMist 2024), setApprovalForAll NFT theft, unlimited approve + transferFrom, and EIP-7702 "wallet upgrade" delegation. See `tests/test_real_drainer_techniques.py` (each test cites its technique). Note: because this is STATIC decoding, it is immune to the "Red Pill"/TOCTOU simulation-evasion that fools simulation-based scanners — we read the calldata's literal intent.
 
-_Last updated 2026-06-09 (v0.5.25). Gaps are tracked honestly; we close the ones with real demand
+_Last updated 2026-06-09 (v0.5.26). Gaps are tracked honestly; we close the ones with real demand
 or a clean, low-false-positive rule — never ship a guard that cries wolf._

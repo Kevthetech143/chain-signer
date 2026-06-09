@@ -33,6 +33,13 @@ _KNOWN = {
     # NOTE arg ORDER differs from ERC-20: spender is the 2nd arg, amount the 3rd; amount is uint160.
     "0x87517c45": ("permit2Approve", ["address", "address", "uint160", "uint48"]),
     "0x36c78516": ("permit2TransferFrom", ["address", "address", "uint160", "address"]),
+    # ERC-777 operator model — the approve-all / transferFrom drain family on a different token standard
+    # (real ERC-777 tokens: imBTC, pNetwork pTokens). authorizeOperator gives `operator` control of EVERY
+    # ERC-777 token the caller holds (setApprovalForAll-equivalent); operatorSend is the operator's
+    # pull-to-attacker (transferFrom-equivalent). operatorSend's trailing bytes args are ignored — only
+    # the first two words (from, to) are needed for the drain check.
+    "0x959b8c3f": ("authorizeOperator", ["address"]),
+    "0x62ad1b83": ("operatorSend", ["address", "address"]),
 }
 
 # Permit2 permit() — submitting a signed permit ON-CHAIN writes the SAME (spender -> uint160 allowance)
@@ -313,8 +320,12 @@ def _call_flags(decoded, prefix=""):
         flags.append({"code": "approval_for_all", "severity": "HIGH",
                       "detail": f"{prefix}setApprovalForAll grants {args[0]} control of EVERY token in this "
                                 "collection — a common NFT-drain approval."})
-    elif fn in ("transferFrom", "safeTransferFrom", "safeBatchTransferFrom", "permit2TransferFrom") and len(args) >= 2:
-        asset = "tokens" if fn in ("transferFrom", "permit2TransferFrom") else "an NFT/token"
+    elif fn == "authorizeOperator" and len(args) >= 1:
+        flags.append({"code": "approval_for_all", "severity": "HIGH",
+                      "detail": f"{prefix}authorizeOperator grants {args[0]} control of EVERY ERC-777 token this "
+                                "wallet holds for this contract — an operator that turns malicious can drain it."})
+    elif fn in ("transferFrom", "safeTransferFrom", "safeBatchTransferFrom", "permit2TransferFrom", "operatorSend") and len(args) >= 2:
+        asset = "tokens" if fn in ("transferFrom", "permit2TransferFrom", "operatorSend") else "an NFT/token"
         flags.append({"code": "token_transfer_from", "severity": "HIGH",
                       "detail": f"{prefix}{fn} moves {asset} OUT of {args[0]} to {args[1]} — this is the call a "
                                 "malicious spender uses to drain an approved wallet/collection. Confirm you intend it."})
