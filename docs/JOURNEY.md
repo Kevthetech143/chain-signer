@@ -485,3 +485,40 @@ Daily competition/threat scan: wedge still clear (no drop-in decode+flag lib riv
 ## 2026-06-08 — WATCH (2h cron tick, 16th in window): no Glama reply (9h since PR nudge). stars/forks/watchers/issues all 0. Discord login mid-flight (hCaptcha pending Kelvin's hand). Stand-down holds. No notify.
 
 ## 2026-06-08 — WATCH (founder tick, no build): signals unchanged — glama q:null/tools:0, PR #7298 OPEN (no new activity), 0★/forks/watchers; PyPI latest = 0.5.24 (my latest ship live + correct). The one real bottleneck (Glama eval wall) was escalated to Kelvin LAST fire with the exact ask (sign into glama.ai, register the Dockerfile so the server gets scored -> unblocks the PR merge); re-notifying this fire would be spam — holding for his action. No build: shipped 4 real fail-open closes today (v0.5.21 Universal Router, v0.5.22 DAI on-chain permit, v0.5.23 Permit2 AllowanceTransfer batch transferFrom, v0.5.24 Permit2 SignatureTransfer permit(Witness)TransferFrom), each empirically confirmed + live-verified; the periodic new-angle security probe is well-satisfied and a 5th same-day build would be grinding. Product solid, distribution correctly blocked on Kelvin's one Glama action. Stand-down holds. No notify.
+
+## 2026-06-08 — DISTRIBUTION (real step, no build): PR #7298 had flipped CONFLICTING (upstream added zw008/VMware-Harden + gautam-u/sieve-mcp to the Security section since our submit, shifting our anchor). Re-cut the fork branch add-chain-signer onto current upstream/main, re-inserted our EXACT one-line entry as the last Security bullet, force-with-lease pushed. Verified: 1 file / 1 insertion only, no collateral. PR now reads MERGEABLE again (was CONFLICTING). Still gated on the Glama quality score — the wall already escalated to Kelvin; NOT re-notifying (spam). Kept the PR merge-ready so the moment Glama lands, the maintainer can merge with no friction. Signals: glama tools:[] (still unevaluated), PR #7298 OPEN+MERGEABLE, 0★. No notify.
+
+## 2026-06-08 — Discord login: polled 4min after Kelvin said "in front of computer", still on /login. Captcha unsolved or page reset. Holding the Chrome window open; will resume when Kelvin signals he's through.
+
+## 2026-06-08 — REAL SIGNAL: PR #7298 'has-glama' label added + check-submission=SUCCESS at 23:27Z. Glama quality-score blocker cleared. PR labels now: has-emoji + valid-name + has-glama (all green). Awaiting punkpeye's manual merge. Notified Kelvin. Stand-down still binding (no traction yet — just removed a gate).
+
+## 2026-06-08 — WATCH+log (distribution converged, no build): the two distribution threads I worked today have both landed clean — (1) my earlier conflict-fix force-push held: PR #7298 MERGEABLE; (2) the Glama wall cleared this evening: has-glama label + check-submission=SUCCESS, so all three awesome-mcp checks are green. PR #7298 is now OPEN + MERGEABLE + fully-checked, purely awaiting punkpeye's manual merge — nothing I can force (re-pinging = spam; other-list submits stay HELD until it merges or a real star). glama public API still reads tools:0 (CDN/crawl lag — the awesome-mcp has-glama gate already passed, so the score landed on Glama's side regardless). Signals: 0★/0 forks/0 watchers. No build (product solid, 4 fail-opens closed today, competition re-verified today — no evidenced gap; a 5th same-day build would be grinding). No notify (glama clearance already notified by the sibling tick; nothing critical). Stand-down holds.
+
+## 2026-06-08 — HOLD (collapsed no-op, +1h): signals unchanged from prior tick — PR #7298 OPEN+MERGEABLE+all-checks-green awaiting punkpeye's manual merge; glama tools:0 (crawl lag); 0★. Nothing forceable, no evidenced gap, pillars satisfied today. No build, no notify.
+
+## 2026-06-09 — WATCH cycle: PR still OPEN, has-glama label held. stars/forks/watchers/issues all 0. Awaiting punkpeye manual merge. Stand-down holds. No notify.
+
+## 2026-06-09 — COMPETITION (daily pillar, new day due): re-verified — wedge INTACT, no new rival. AgentARC still DORMANT ★6 last-push 2026-03-09; GH niche searches + PyPI niche names show no same-niche entrant (we're sole occupant). Signals flat: PR #7298 OPEN+MERGEABLE awaiting merge, glama tools:0 (crawl lag), 0★. Not yet re-arm date (06-11). No build (no evidenced gap), no notify.
+
+## 2026-06-09 — DISTRIBUTION SWEEP (Kelvin go): 4 new channels worked.
+  • mcpservers.org/submit — submitted with name, desc, link (Kevthetech143/chain-signer), category=Other, contact alltechkev@gmail.com. Confirmation page "Submission Successful! Review within 12 hours."
+  • AgDex.ai — sent submission email to agdex.ai@gmail.com from alltechkev@gmail.com via gws (thread 19eaa4b3f0e42f2d). Full pitch including security/guardrails category framing.
+  • AppSec Santa (contact form) — Topic=Submit a Tool, full pitch incl. competitive positioning vs Onyx/Noma/Cerbos/Cisco DefenseClaw. Confirmation: "Message received, reply <48h".
+  • mcp-awesome.com — RULED OUT as separate action: site aggregates from punkpeye/awesome-mcp-servers, so PR #7298 covers it on merge.
+  • appcypher/awesome-mcp-servers — RULED OUT. CONTRIBUTING.md invites PRs but cross-fork PRs are GH-disabled (same FORBIDDEN createPullRequest error as wong2 had). Owner-curated. Will reconsider only if appcypher opens PRs.
+
+## 2026-06-09 — HOLD (collapsed no-op, +1h): signals flat — PR #7298 OPEN+MERGEABLE awaiting punkpeye merge; glama tools:0/score None (crawl lag); 0★. Pillars satisfied today (competition re-verified, list candidates triaged/ruled-out). No evidenced gap (4 fail-opens already shipped today). Re-arm not due (06-11). No build, no notify.
+
+## 2026-06-09 — WATCH cycle: no Glama reply (~15h since PR nudge). No replies yet from mcpservers.org / AgDex / AppSec Santa (within their stated review windows). stars/forks/watchers/issues all 0. PR #7298 still OPEN, label set unchanged. Stand-down holds. No notify.
+
+## 2026-06-09 — SECURITY (new-angle adversarial probe, RULED OUT — no build): empirically tested two NEW angles distinct from today's Permit2/permit class. (1) Plain ERC-20 transfer(attacker,amount) 0xa9059cbb -> ok=True/no-flag = CORRECT by design (the agent moving its OWN tokens is normal wallet behavior; flagging every outbound send = noise, not a drain pattern). NOT a fail-open. (2) On-chain Seaport fulfillBasicOrder 0xfb0f3ee1 -> ok=True/['opaque_calldata'] = surfaced as a review-worthy LOW, not silent. The evidenced Seaport drain is the OFF-CHAIN order-signing path (already covered by inspect_typed_data incl. zero-consideration/third-party-recipient/BulkOrder); an agent CALLING fulfill on-chain is structurally the buyer side and large native value is already flagged separately — low-evidence, not a high-severity gap. Verdict: no evidenced gap -> no build (evidenced-pains-only). Signals flat: PR #7298 OPEN+MERGEABLE awaiting merge, glama tools:0/score None, 0★. Re-arm not due (06-11). No notify.
+
+## 2026-06-09 — HOLD (collapsed no-op, +1h): signals flat (PR #7298 OPEN+MERGEABLE awaiting merge; glama tools:0/score None; 0★). Pillars satisfied today (competition re-verified, new-angle security probe ruled out last fire). No evidenced gap, distribution unforceable, re-arm not due (06-11). No build, no notify.
+
+## 2026-06-09 — WATCH cycle: still no Glama reply, no replies from mcpservers.org/AgDex/AppSec Santa (all within their windows). 0 stars/forks/watchers/issues. PR #7298 OPEN unchanged. Stand-down holds. No notify.
+
+## 2026-06-09 — HOLD (collapsed no-op, +4h): signals flat (PR #7298 OPEN+MERGEABLE awaiting merge; glama tools:0/score None; 0★). Daily pillars done, no evidenced gap, distribution unforceable, re-arm not due (06-11). No build, no notify.
+
+## 2026-06-09 — WATCH cycle: still no inbound replies on the 3 submissions. 0 stars/forks/watchers/issues. PR #7298 OPEN unchanged. Stand-down holds. No notify.
+
+## 2026-06-09 — WATCH cycle: still no replies/signals. 0★/0F/0W/0I. PR #7298 unchanged. Stand-down holds. No notify.
