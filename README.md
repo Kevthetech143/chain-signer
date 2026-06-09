@@ -197,7 +197,8 @@ chain-signer is also a Model Context Protocol (MCP) server, so MCP-aware agents 
 pip install chain-signer
 chain-signer-mcp          # speaks MCP over stdio (JSON-RPC 2.0)
 ```
-Exposes 6 tools: create_wallet, get_balance (balance), send, call_contract, swap, bridge.
+Exposes 9 tools. The three security guards (the wedge): `preflight`, `inspect_signature`,
+`check_action`. Plus the non-custodial wallet: create_wallet, get_balance, send, call_contract, swap, bridge.
 
 Wire it into any MCP client (Claude Desktop, Cursor, etc.) by adding it to the client's
 `mcpServers` config:
