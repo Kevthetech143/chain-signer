@@ -4,7 +4,7 @@ LIVE: PyPI https://pypi.org/project/chain-signer/ (0.1.1, README renders clean) 
 Win = real recurring installs (tools/adoption.py) + stars/forks from strangers. Kill = crickets after a fair, honest push.
 
 ## KEY INSIGHT (live research): the buyer discovers agent tools via MCP REGISTRIES, not homepages.
-We already ship an MCP server (chain_signer.mcp_server, 6 tools verified: create_wallet, get_balance, send, call_contract, swap, bridge). That makes MCP registries our highest-leverage, on-topic, non-spam channel.
+We already ship an MCP server (chain_signer.mcp_server, 9 tools verified: the 3 security guards preflight/inspect_signature/check_action — the wedge — plus the wallet tools create_wallet, get_balance, send, call_contract, swap, bridge). That makes MCP registries our highest-leverage, on-topic, non-spam channel.
 
 ## HONESTY GATE (our own /business-think rule, and maintainers enforce it):
 Maintainers down-rank/flag submissions that are brand-new, 0-2 stars, single-maintainer, or mass-submitted to 15+ lists in parallel with inflated metrics. RIGHT NOW we fit that profile (repo hours old, 0 stars). So:
