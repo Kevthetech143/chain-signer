@@ -12,14 +12,18 @@ not a guarantee — pair it with your wallet + identity stack.
 | `setApprovalForAll(true)` (NFT operator) | ✅ | HIGH |
 | ERC-20 `transferFrom` | ✅ | HIGH (drain-execution call) |
 | ERC-721/1155 `safeTransferFrom` (NFT theft) | ✅ | HIGH |
-| On-chain `permit()` call | ✅ | HIGH on unlimited |
+| On-chain ERC-2612 `permit()` + DAI-style `permit()` call | ✅ | HIGH on unlimited (both encodings) |
+| On-chain Permit2 `approve` / `permit` / `transferFrom` (single **and** batch) | ✅ | HIGH; the dominant approval router — unlimited uint160 allowance + the drain pull |
+| On-chain Permit2 SignatureTransfer `permit(Witness)TransferFrom` | ✅ | HIGH on a non-empty transfer (the one-shot signed-permit pull intent/filler protocols use) |
 | Proxy `upgradeTo` / `upgradeToAndCall` | ✅ | HIGH (logic swap) |
 | Approval hidden in `multicall` (all 4 variants, nested) | ✅ | recurses; nesting beyond the cap → HIGH hard-stop (abnormally deep = hostile obfuscation) |
+| Drain wrapped in ERC-4337/smart-account `execute`/`executeBatch` | ✅ | recurses into the inner call(s) — flags on what they are; benign execute stays clean |
+| Drain wrapped in Gnosis Safe `multiSend` / `execTransaction` | ✅ | the Safe's primary entrypoints; recurses into the inner `data` (also reaches Safe→multiSend→drain) |
 | EIP-7702 account delegation ("wallet upgrade" drainer) | ✅ | HIGH; flags the delegate target |
 | Large native value | ✅ | MED, against a caller `max_value` |
 | Will-revert (wasted gas / unexpected) | 🟡 | needs an injected `sim` hook |
 | Opaque / unknown calldata | ✅ | LOW (can't read intent) |
-| Uniswap Universal Router `execute()` | ❌ | commands/inputs encoding; FP-prone — on real demand |
+| Uniswap Universal Router `execute(commands,inputs)` | ✅ | decodes Permit2 `permit`/`transferFrom` commands (single + batch) incl. `EXECUTE_SUB_PLAN` recursion |
 | Multicall3 `aggregate3`/`tryAggregate` | ❌ | executes in the contract's context, not the user's — not a direct user drain |
 | Real balance-diff via on-chain simulation | 🟡 | hook is injectable; no built-in sim engine (avoids a heavy dep) |
 
@@ -49,5 +53,5 @@ not a guarantee — pair it with your wallet + identity stack.
 ## Validated against real drainer techniques
 The suite is tested against the ACTUAL techniques used by the dominant 2024-2025 wallet drainers (Inferno / Angel / Pink / Ace; ~$494M stolen in 2024) — Permit/Permit2 signatures (the #1 vector, 56.7% of attacks per SlowMist 2024), setApprovalForAll NFT theft, unlimited approve + transferFrom, and EIP-7702 "wallet upgrade" delegation. See `tests/test_real_drainer_techniques.py` (each test cites its technique). Note: because this is STATIC decoding, it is immune to the "Red Pill"/TOCTOU simulation-evasion that fools simulation-based scanners — we read the calldata's literal intent.
 
-_Last updated 2026-06-03 (v0.5.0). Gaps are tracked honestly; we close the ones with real demand
+_Last updated 2026-06-09 (v0.5.25). Gaps are tracked honestly; we close the ones with real demand
 or a clean, low-false-positive rule — never ship a guard that cries wolf._
