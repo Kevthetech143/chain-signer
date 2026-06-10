@@ -107,6 +107,115 @@ _SAFE_EXEC = {
 _WRAPPER_SELECTORS = (set(_MULTICALL_VARIANTS) | set(_EXEC_SINGLE) | set(_EXEC_BATCH)
                       | set(_SAFE_EXEC) | set(_DSPROXY) | {_MULTISEND})
 
+# DEX Aggregator swap entrypoints — decoded on the swap's OWN parameters (NOT a wrapper/recursion pattern).
+# A malicious swap calldata can steal output by:
+#   (a) setting dstReceiver to an attacker address (output redirected to third party)
+#   (b) setting minReturnAmount / minOutputAmount to 0 (slippage rail removed — attacker can extract
+#       all value via sandwich or direct manipulation)
+# Both vectors are confirmed real attacks: SwapNet/Aperture (~$17M via redirected dstReceiver),
+# 1inch Fusion v1 (~$5M via forced minReturnAmount=0 calldata corruption).
+#
+# 1inch AggregationRouter v5: swap(address executor, SwapDescription desc, bytes permit, bytes data)
+#   SwapDescription = (srcToken, dstToken, srcReceiver, dstReceiver, amount, minReturnAmount, flags)
+#   selector verified via 4byte.directory: 0x12aa3caf
+#
+# 0x ExchangeProxy: transformERC20(address inputToken, address outputToken, uint256 inputTokenAmount,
+#   uint256 minOutputTokenAmount, (uint32,bytes)[] transformations)
+#   No explicit recipient (output always to msg.sender) — flag only on minOutputTokenAmount == 0.
+#   selector verified via 4byte.directory: 0x415565b0
+_AGGREGATOR_SWAP_1INCH = "0x12aa3caf"   # 1inch AggregationRouter v5 swap()
+_AGGREGATOR_SWAP_0X = "0x415565b0"      # 0x ExchangeProxy transformERC20()
+_AGGREGATOR_SWAP_SELECTORS = {_AGGREGATOR_SWAP_1INCH, _AGGREGATOR_SWAP_0X}
+
+
+def _decode_1inch_swap(body_hex: str):
+    """Decode 1inch swap body -> (dst_receiver, min_return_amount) or None on failure."""
+    try:
+        raw = bytes.fromhex(body_hex)
+        from eth_abi import decode as _abidecode
+        executor, desc, permit, data = _abidecode(
+            ["address", "(address,address,address,address,uint256,uint256,uint256)", "bytes", "bytes"],
+            raw,
+        )
+        # SwapDescription tuple: (srcToken, dstToken, srcReceiver, dstReceiver, amount, minReturnAmount, flags)
+        dst_receiver = desc[3]
+        min_return = desc[5]
+        return dst_receiver, min_return
+    except Exception:
+        return None
+
+
+def _decode_0x_transform(body_hex: str):
+    """Decode 0x transformERC20 body -> min_output_amount or None on failure."""
+    try:
+        raw = bytes.fromhex(body_hex)
+        from eth_abi import decode as _abidecode
+        input_token, output_token, input_amount, min_output, transformations = _abidecode(
+            ["address", "address", "uint256", "uint256", "(uint32,bytes)[]"],
+            raw,
+        )
+        return min_output
+    except Exception:
+        return None
+
+
+def _aggregator_swap_flags(data, prefix: str = "", tx_from: str | None = None) -> list:
+    """Risk flags for a recognised DEX-aggregator swap call. Returns [] for unknown selectors.
+
+    tx_from (optional): the tx.from address (case-insensitive). When provided, the 1inch
+    dstReceiver redirect flag is suppressed if dstReceiver == tx_from (benign self-swap).
+    When absent (e.g. called from within a wrapper), the conservative rule applies: any
+    non-zero dstReceiver is flagged HIGH (the signer can confirm it's their own address).
+    """
+    s = _norm_hex(data) or ""
+    if len(s) < 8:
+        return []
+    selector = "0x" + s[:8].lower()
+    body = s[8:]
+    flags = []
+    if selector == _AGGREGATOR_SWAP_1INCH:
+        result = _decode_1inch_swap(body)
+        if result is None:
+            return [{"code": "malformed_call", "severity": "MED",
+                     "detail": f"{prefix}1inch swap() calldata couldn't be decoded — its parameters can't be "
+                               "verified; review before signing."}]
+        dst_receiver, min_return = result
+        # Redirect check: flag if dstReceiver is a non-zero address that differs from tx.from.
+        # When tx.from is known we can suppress the flag for legitimate self-swaps; when unknown
+        # (nested call context) we flag any non-zero receiver conservatively.
+        zero_addr = "0x" + "00" * 20
+        dst_lower = (dst_receiver or "").lower()
+        from_lower = (tx_from or "").lower()
+        is_redirect = (
+            dst_lower
+            and dst_lower != zero_addr
+            and (not from_lower or dst_lower != from_lower)
+        )
+        if is_redirect:
+            flags.append({"code": "swap_output_redirected", "severity": "HIGH",
+                          "detail": f"{prefix}1inch swap() sends output to {dst_receiver} — if this address "
+                                    "is not your own wallet, your swap output is being stolen. Verify "
+                                    "dstReceiver matches your address before signing."})
+        if min_return == 0:
+            flags.append({"code": "swap_zero_slippage", "severity": "HIGH",
+                          "detail": f"{prefix}1inch swap() has minReturnAmount = 0 — the slippage protection "
+                                    "rail is removed, allowing a sandwich attack or full-output extraction. "
+                                    "Refuse or demand a non-zero minReturnAmount."})
+    elif selector == _AGGREGATOR_SWAP_0X:
+        result = _decode_0x_transform(body)
+        if result is None:
+            return [{"code": "malformed_call", "severity": "MED",
+                     "detail": f"{prefix}0x transformERC20() calldata couldn't be decoded — its parameters "
+                               "can't be verified; review before signing."}]
+        min_output = result
+        if min_output == 0:
+            flags.append({"code": "swap_zero_slippage", "severity": "HIGH",
+                          "detail": f"{prefix}0x transformERC20() has minOutputTokenAmount = 0 — the slippage "
+                                    "protection rail is removed, allowing a sandwich attack or full-output "
+                                    "extraction. Refuse or demand a non-zero minOutputTokenAmount."})
+    return flags
+
+
 # Uniswap UNIVERSAL ROUTER — the dominant swap/approval entrypoint in the EVM agent niche. Unlike every
 # wrapper above, its inner calls are NOT selector-prefixed calldata: execute(bytes commands, bytes[]
 # inputs[, uint256 deadline]) carries ONE byte per command (low 7 bits = command type, high bit 0x80 =
@@ -554,7 +663,14 @@ def preflight(tx, *, fetch=None, sim=None, max_value=None):
     decoded = _decode(data)
     flags = []
 
-    if selector in _WRAPPER_SELECTORS or selector in _UR_EXEC:
+    if selector in _AGGREGATOR_SWAP_SELECTORS:
+        # DEX-aggregator swap: flag on the swap's OWN parameters (dstReceiver redirect /
+        # zero-slippage), not via recursion. Pass tx.from so benign self-swaps stay clean.
+        tx_from = tx.get("from") or tx.get("From") or None
+        flags.extend(_aggregator_swap_flags(data, tx_from=tx_from))
+        name = ("1inchSwap" if selector == _AGGREGATOR_SWAP_1INCH else "0xTransformERC20")
+        decoded = {"function": name, "selector": selector, "args": [], "malformed": False}
+    elif selector in _WRAPPER_SELECTORS or selector in _UR_EXEC:
         flags.extend(_collect_flags(data))
         name = ("multicall" if selector in _MULTICALL_VARIANTS
                 else "multiSend" if selector == _MULTISEND
