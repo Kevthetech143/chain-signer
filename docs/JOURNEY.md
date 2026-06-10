@@ -578,3 +578,15 @@ re-armed on/after 2026-06-11). NOTE: MCP registry search API now nests each entr
 ## 2026-06-09 — WATCH (collapse, hold) + seeded next security lead. Signals flat (glama tools:0/score None crawl-lag, PR #7298 OPEN, 0★/0F); already shipped v0.5.27 + ran adversarial hunt today, so no 2nd same-day ship. NEXT-HUNT CANDIDATE (verified uncovered): preflight decodes Uniswap Universal Router but NOT the 1inch/0x DEX-aggregator swap() entrypoints. Malicious-swap drain shape = dstReceiver≠sender OR minReturnAmount≈0 — a NEW flag TYPE (the swap's own params), distinct from the wrapper-recursion class (execute/multicall/Safe/DSProxy/UR). Before building: confirm the pain is real (do agents actually sign raw aggregator swap() calldata vs always routing via UR?). If yes → TDD red + new flag on a future fire. No build, no notify this fire.
 
 ## 2026-06-09 — VALIDATED the seeded lead → CONFIRMED evidenced gap (build next fire). Signals flat (glama tools:0/score None, PR #7298 OPEN, 0★/0F). Researched the 1inch/0x aggregator-swap angle: PAIN IS REAL + agent-specific. Evidence: SwapNet/Aperture ~$17M drained via malicious swap calldata w/ attacker-controlled output recipient; 1inch Fusion v1 ~$5M calldata corruption. AI agents specifically exposed — frameworks fetch ready-to-exec aggregator calldata + sign blindly, no human in loop; keyless endpoints push full 0-to-1 slippage to autonomous agents. Named defenses = decode tx + assert dstReceiver==sender AND minReturnAmount not ≈0 → EXACTLY preflight's job + perfect wedge fit. SCOPE for next fire: new flag TYPE (swap's own params, not wrapper recursion) — decode 1inch AggregationRouter swap(executor,SwapDescription,permit,data) {srcToken,dstToken,srcReceiver,dstReceiver,amount,minReturnAmount,flags} + 0x equivalents; HIGH if dstReceiver≠tx.from (output redirected) ; MED/HIGH if minReturnAmount==0 (slippage rail removed). DECISION: did NOT rush a 2nd same-day ship on a security-critical artifact — build it properly next fire w/ full TDD red→green + live-verify. No build, no notify this fire.
+
+## 2026-06-09 — SHIP v0.5.28: DEX-aggregator malicious-swap coverage (8th evasion-class gap).
+Closed the confirmed lead: 1inch AggregationRouter v5 swap() (0x12aa3caf) and 0x ExchangeProxy
+transformERC20() (0x415565b0) were both opaque LOW (ok=True) — AI frameworks that fetch and sign
+aggregator calldata blind had zero guard. NEW flag type (swap's own params, not wrapper recursion):
+swap_output_redirected HIGH (1inch dstReceiver≠tx.from — output stolen; real attack ~$17M) and
+swap_zero_slippage HIGH (minReturnAmount/minOutputAmount=0 — rail removed; real attack ~$5M).
+Selectors verified via 4byte.directory. Benign self-swaps stay clean. Branch harden/aggregator-swap
+merged --no-ff, tag v0.5.28 → Release Action SUCCESS → PyPI 0.5.28 live.
+TDD red (7) → green (11), full suite 369 (+11, zero regressions from 358).
+LIVE-VERIFY (fresh venv, PyPI 0.5.28): 8/8 PASS — redirect drain flags HIGH, zero-slippage flags HIGH,
+benign self-swap stays clean, unlimited approve still HIGH, 9 MCP tools incl 3 guards. No notify (clean ship; re-arm 06-11).
