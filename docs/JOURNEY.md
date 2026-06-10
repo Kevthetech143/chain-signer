@@ -590,3 +590,10 @@ merged --no-ff, tag v0.5.28 → Release Action SUCCESS → PyPI 0.5.28 live.
 TDD red (7) → green (11), full suite 369 (+11, zero regressions from 358).
 LIVE-VERIFY (fresh venv, PyPI 0.5.28): 8/8 PASS — redirect drain flags HIGH, zero-slippage flags HIGH,
 benign self-swap stays clean, unlimited approve still HIGH, 9 MCP tools incl 3 guards. No notify (clean ship; re-arm 06-11).
+
+2026-06-09 (hourly fire) — HOLD (watch+log). Signals unchanged: glama qualityScore null (still unscored),
+awesome-mcp PR #7298 OPEN, GitHub 0 stars/0 forks — distribution stays honestly gated. SECURITY pillar:
+ran a real adversarial coverage review of the preflight selector map — probed setApprovalForAll (covered,
+test_real_drainer_techniques #2), increaseAllowance (0x39509351 covered), ERC-777 operator (covered),
+Seaport off-chain (covered). Full map is comprehensive across drain/phish vectors; no evidenced gap to
+build. Product feature-complete at v0.5.28 (last ship live-verified 8/8). No notify (not critical, no need).
