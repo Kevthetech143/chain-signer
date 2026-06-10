@@ -27,6 +27,9 @@ not a guarantee — pair it with your wallet + identity stack.
 | Will-revert (wasted gas / unexpected) | 🟡 | needs an injected `sim` hook |
 | Opaque / unknown calldata | ✅ | LOW (can't read intent) |
 | Uniswap Universal Router `execute(commands,inputs)` | ✅ | decodes Permit2 `permit`/`transferFrom` commands (single + batch) incl. `EXECUTE_SUB_PLAN` recursion |
+| 1inch AggregationRouter v5 `swap()` — redirected output (`dstReceiver != tx.from`) | ✅ | HIGH `swap_output_redirected`; confirmed real attack vector (~$17M SwapNet/Aperture) |
+| 1inch AggregationRouter v5 `swap()` — zero slippage rail (`minReturnAmount == 0`) | ✅ | HIGH `swap_zero_slippage`; confirmed real attack vector (~$5M 1inch Fusion v1) |
+| 0x ExchangeProxy `transformERC20()` — zero slippage rail (`minOutputTokenAmount == 0`) | ✅ | HIGH `swap_zero_slippage`; output always goes to caller so no redirect check needed |
 | Multicall3 `aggregate3`/`tryAggregate` | ❌ | executes in the contract's context, not the user's — not a direct user drain |
 | Real balance-diff via on-chain simulation | 🟡 | hook is injectable; no built-in sim engine (avoids a heavy dep) |
 
@@ -56,5 +59,5 @@ not a guarantee — pair it with your wallet + identity stack.
 ## Validated against real drainer techniques
 The suite is tested against the ACTUAL techniques used by the dominant 2024-2025 wallet drainers (Inferno / Angel / Pink / Ace; ~$494M stolen in 2024) — Permit/Permit2 signatures (the #1 vector, 56.7% of attacks per SlowMist 2024), setApprovalForAll NFT theft, unlimited approve + transferFrom, and EIP-7702 "wallet upgrade" delegation. See `tests/test_real_drainer_techniques.py` (each test cites its technique). Note: because this is STATIC decoding, it is immune to the "Red Pill"/TOCTOU simulation-evasion that fools simulation-based scanners — we read the calldata's literal intent.
 
-_Last updated 2026-06-09 (v0.5.27). Gaps are tracked honestly; we close the ones with real demand
+_Last updated 2026-06-09 (v0.5.28). Gaps are tracked honestly; we close the ones with real demand
 or a clean, low-false-positive rule — never ship a guard that cries wolf._

@@ -3,6 +3,19 @@
 All notable changes to chain-signer. Newest first. Security fixes are released as a new version —
 published versions are never overwritten. Dates are UTC.
 
+## 0.5.28 — 2026-06-09
+- Security (preflight): closed DEX-aggregator malicious-swap coverage. The 1inch AggregationRouter v5
+  `swap()` (0x12aa3caf) and 0x ExchangeProxy `transformERC20()` (0x415565b0) were decoded as opaque
+  calldata (LOW / ok=True) — AI-agent frameworks that fetch ready-to-exec aggregator calldata and sign
+  it blind had no guard against attacker-controlled output parameters. Two attack flags added:
+  `swap_output_redirected` (HIGH — 1inch `dstReceiver != tx.from`; output stolen by third party,
+  confirmed real attack: SwapNet/Aperture ~$17M) and `swap_zero_slippage` (HIGH — `minReturnAmount == 0`
+  or `minOutputTokenAmount == 0`; slippage rail removed enabling sandwich / full-output extraction,
+  confirmed real: 1inch Fusion v1 ~$5M). Selectors empirically verified via 4byte.directory. Benign
+  self-swaps (dstReceiver == tx.from, non-zero min) stay clean. Flag type is NEW — the swap's own
+  parameters, not a wrapper/recursion pattern. TDD red (7) -> green (11), full suite 369 passed (+11,
+  zero regressions vs 358).
+
 ## 0.5.20 — 2026-06-08
 - Security (inspect_typed_data / Seaport): the Seaport guard dispatched only on primaryType
   `OrderComponents`, but Seaport (1.2+) also supports BULK ORDER signatures — one EIP-712 signature

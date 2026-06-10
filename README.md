@@ -12,9 +12,9 @@ Three guards, each callable on its own (and as MCP tools), pairing with any wall
   approval, approve-all, token & NFT transferFrom, proxy upgrade, on-chain permit, on-chain Permit2
   approve/permit/transferFrom, approvals hidden in multicall incl. Uniswap router batches, approvals
   wrapped in ERC-4337/smart-account execute/executeBatch, Gnosis Safe multiSend/execTransaction and DSProxy
-  execute, drains routed
-  through the Uniswap Universal Router (Permit2 permit/transferFrom commands incl. sub-plans), EIP-7702
-  account delegation, will-revert).
+  execute, drains routed through the Uniswap Universal Router (Permit2 permit/transferFrom commands
+  incl. sub-plans), 1inch AggregationRouter v5 swap() with redirected output or zero slippage,
+  0x ExchangeProxy transformERC20() with zero slippage, EIP-7702 account delegation, will-revert).
 - `inspect_typed_data(td)` — catch permit-phishing in an EIP-712 message before the agent signs it
   (ERC-2612, Uniswap Permit2 incl. SignatureTransfer + witness variants, DAI-style permits) and Seaport
   orders that give assets away — zero consideration, proceeds routed to a third party, or hidden in a
