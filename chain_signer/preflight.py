@@ -70,6 +70,20 @@ _MULTICALL_VARIANTS = {
     "0x1f0464d1": ["bytes32", "bytes[]"],            # multicall(bytes32 prevBlockhash, bytes[]) — Uniswap
     "0x525f7b5e": ["uint256", "bytes32", "bytes[]"], # multicall(uint256, bytes32, bytes[])
 }
+# Multicall3 (0xcA11bde05977b3631167028862bE2a173976CA11 — SAME address on every EVM chain, the most-
+# deployed batch helper there is) does NOT carry a flat bytes[]. Each inner call is a TUPLE — Call
+# (address,bytes) / Call3 (address,bool,bytes) / Call3Value (address,bool,uint256,bytes) — and the
+# calldata is ONE field of it. A drain (approve(attacker,MAX)) hidden in an aggregate3 tuple slips
+# past the flat-bytes[] decoder entirely. Map each variant to (abi types, index of the calldata field
+# inside the tuple); the tuple ARRAY is always the last decoded component (decoded[-1]).
+_MULTICALL3_VARIANTS = {
+    "0x82ad56cb": (["(address,bool,bytes)[]"], 2),          # aggregate3(Call3[])
+    "0x174dea71": (["(address,bool,uint256,bytes)[]"], 3),  # aggregate3Value(Call3Value[])
+    "0x252dba42": (["(address,bytes)[]"], 1),               # aggregate(Call[])
+    "0xc3077fa9": (["(address,bytes)[]"], 1),               # blockAndAggregate(Call[])
+    "0xbce38bd7": (["bool", "(address,bytes)[]"], 1),       # tryAggregate(bool, Call[])
+    "0x399542e9": (["bool", "(address,bytes)[]"], 1),       # tryBlockAndAggregate(bool, Call[])
+}
 _MAX_MULTICALL_DEPTH = 5              # guard against a malicious deeply-nested multicall bomb
 
 # ERC-4337 / smart-account execute wrappers. An agent's smart wallet (ERC-4337 account, Gnosis Safe)
@@ -104,8 +118,8 @@ _SAFE_EXEC = {
                    "uint256", "uint256", "address", "address", "bytes"],
 }
 # Every selector that wraps inner calldata we must unwrap before judging.
-_WRAPPER_SELECTORS = (set(_MULTICALL_VARIANTS) | set(_EXEC_SINGLE) | set(_EXEC_BATCH)
-                      | set(_SAFE_EXEC) | set(_DSPROXY) | {_MULTISEND})
+_WRAPPER_SELECTORS = (set(_MULTICALL_VARIANTS) | set(_MULTICALL3_VARIANTS) | set(_EXEC_SINGLE)
+                      | set(_EXEC_BATCH) | set(_SAFE_EXEC) | set(_DSPROXY) | {_MULTISEND})
 
 # DEX Aggregator swap entrypoints — decoded on the swap's OWN parameters (NOT a wrapper/recursion pattern).
 # A malicious swap calldata can steal output by:
@@ -473,6 +487,23 @@ def _multicall_inner(data):
         return None
 
 
+def _multicall3_inner(data):
+    """Inner calldata of a Multicall3 aggregate/aggregate3 variant, or None if not decodable. The
+    tuple array is the last decoded component; the calldata is one field within each tuple."""
+    s = _norm_hex(data) or ""
+    spec = _MULTICALL3_VARIANTS.get("0x" + s[:8].lower())
+    if not spec:
+        return None
+    types, cd_index = spec
+    try:
+        from eth_abi import decode as _abidecode
+        decoded = _abidecode(types, bytes.fromhex(s[8:]))
+        calls = decoded[-1]              # the Call/Call3/Call3Value[] array is always last
+        return ["0x" + tup[cd_index].hex() for tup in calls]
+    except Exception:
+        return None
+
+
 def _exec_inner(data):
     """Inner calldata of an ERC-4337 execute/executeBatch wrapper, or None if not one / undecodable.
     execute(to,value,data) -> one inner call; executeBatch(...) -> many (the bytes[] is last)."""
@@ -523,6 +554,8 @@ def _wrapper_inner(data, selector):
     """Inner calls for any wrapper selector, dispatched by family. Returns (inner_or_None, label)."""
     if selector in _MULTICALL_VARIANTS:
         return _multicall_inner(data), "(inside multicall) "
+    if selector in _MULTICALL3_VARIANTS:
+        return _multicall3_inner(data), "(inside Multicall3 aggregate) "
     if selector in _EXEC_SINGLE or selector in _EXEC_BATCH:
         return _exec_inner(data), "(inside execute) "
     if selector in _SAFE_EXEC:

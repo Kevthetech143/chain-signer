@@ -10,7 +10,8 @@ Three guards, each callable on its own (and as MCP tools), pairing with any wall
 
 - `preflight(tx)` — decode an unsigned transaction and flag drains before signing (unlimited/large
   approval, approve-all, token & NFT transferFrom, proxy upgrade, on-chain permit, on-chain Permit2
-  approve/permit/transferFrom, approvals hidden in multicall incl. Uniswap router batches, approvals
+  approve/permit/transferFrom, approvals hidden in multicall incl. Uniswap router batches and
+  Multicall3 aggregate/aggregate3/aggregate3Value (the batch helper on every EVM chain), approvals
   wrapped in ERC-4337/smart-account execute/executeBatch, Gnosis Safe multiSend/execTransaction and DSProxy
   execute, drains routed through the Uniswap Universal Router (Permit2 permit/transferFrom commands
   incl. sub-plans), 1inch AggregationRouter v5 swap() with redirected output or zero slippage,
@@ -84,7 +85,8 @@ ERC-20 `transferFrom` + ERC-721/1155 `safeTransferFrom` (token & NFT drains), ER
 on-chain Permit2 `approve`/`permit`/`transferFrom` (single **and** batch — the dominant approval router:
 unlimited uint160 allowance + drain pull) plus Permit2 SignatureTransfer `permit(Witness)TransferFrom`
 (the one-shot signed-permit pull intent/filler protocols use), proxy `upgradeTo`/`upgradeToAndCall`, approvals hidden inside `multicall` (all router
-variants, nested), approvals wrapped in ERC-4337/smart-account `execute`/`executeBatch`, Gnosis Safe
+variants, nested) **and Multicall3 `aggregate`/`aggregate3`/`aggregate3Value`** (the canonical batch
+helper deployed at one address on every EVM chain), approvals wrapped in ERC-4337/smart-account `execute`/`executeBatch`, Gnosis Safe
 `multiSend`/`execTransaction`, or DSProxy `execute(target,data)`/`execute(code,data)` (decoded and recursed),
 drains routed through the Uniswap **Universal Router**
 (`execute(commands,inputs)` — Permit2 `permit`/`transferFrom` commands, batch and `EXECUTE_SUB_PLAN`),
