@@ -37,18 +37,7 @@ export ETHERSCAN_API_KEY=...   # for live balance reads + broadcast (Etherscan v
 ```
 Bitcoin/Solana support is optional: `pip install "chain-signer[all]"`.
 
-## Quickstart (5 lines)
-```python
-from chain_signer import burner, send_ether
-from chain_signer.balance import get_balance
-
-w = burner()                          # fresh throwaway wallet; the agent owns w.private_key
-print(w.address, get_balance(w))      # live on-chain balance
-send_ether(w, "0x...recipient", 0.001)  # auto nonce+gas, signed locally, broadcast
-```
-That's it — your agent just held a wallet and moved funds, no human in the loop.
-
-### Try it in 10 seconds (offline — no key, no funds, no network)
+## Quickstart (10 seconds — offline, no key, no funds, no network)
 ```
 pip install chain-signer
 ```
@@ -57,6 +46,17 @@ from chain_signer import preflight
 spender = "0x" + "22" * 20
 tx = {"to": "0x" + "33" * 20, "data": "0x095ea7b3" + spender[2:].rjust(64, "0") + "f" * 64, "value": 0}
 print(preflight(tx))   # ok=False — flags unlimited_approval before you'd ever sign
+```
+That's the wedge: the drain gets flagged before you'd ever sign it — no key, no funds, no network.
+
+### Bundled wallet (optional — the guards pair with any wallet)
+```python
+from chain_signer import burner, send_ether
+from chain_signer.balance import get_balance
+
+w = burner()                          # fresh throwaway wallet; the agent owns w.private_key
+print(w.address, get_balance(w))      # live on-chain balance
+send_ether(w, "0x...recipient", 0.001)  # auto nonce+gas, signed locally, broadcast
 ```
 Full runnable demos are in the repo: `examples/agent_safety_demo.py` (all three guards stop three
 real attacks) and `examples/quickstart.py` (wallet) — clone to run them, or just import as above.
@@ -214,5 +214,6 @@ Wire it into any MCP client (Claude Desktop, Cursor, etc.) by adding it to the c
   }
 }
 ```
-That's all — the agent can now make a wallet, read balances, send, and swap as native tools.
+That's all — the agent can now screen every tx, signature, and action through the guards before it
+acts, and (optionally) hold its own wallet to read balances, send, and swap as native tools.
 (`ETHERSCAN_API_KEY` is optional; needed only for live balance reads and broadcasting.)
