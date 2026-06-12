@@ -202,3 +202,6 @@ published versions are never overwritten. Dates are UTC.
 
 ## 0.5.30 (2026-06-12)
 - fix(metadata): server.json now declares the MCP launch command (runtimeHint uvx + runtimeArguments --from chain-signer chain-signer-mcp). Evaluators and MCP clients previously ran the default `chain-signer` CLI and concluded the server "cannot be installed" — the root cause behind the missing Glama quality score and the closed awesome-mcp-servers PR #7298. No code changes.
+
+## 0.5.31 (2026-06-12)
+- fix(metadata): runtimeArguments encoded as schema Argument objects (named/positional) — 0.5.30's plain strings failed the registry publisher's unmarshal; registry job's continue-on-error masked it.

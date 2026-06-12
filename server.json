@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Kevthetech143/chain-signer",
   "description": "Security suite for AI agents: flag drains, permit-phishing & risky actions before signing.",
-  "version": "0.5.29",
+  "version": "0.5.31",
   "repository": {
     "url": "https://github.com/Kevthetech143/chain-signer",
     "source": "github"
@@ -11,12 +11,19 @@
     {
       "registryType": "pypi",
       "identifier": "chain-signer",
-      "version": "0.5.29",
+      "version": "0.5.31",
       "runtimeHint": "uvx",
       "runtimeArguments": [
-        "--from",
-        "chain-signer",
-        "chain-signer-mcp"
+        {
+          "type": "named",
+          "name": "--from",
+          "value": "chain-signer"
+        },
+        {
+          "type": "positional",
+          "value": "chain-signer-mcp",
+          "valueHint": "chain-signer-mcp"
+        }
       ],
       "transport": {
         "type": "stdio"
