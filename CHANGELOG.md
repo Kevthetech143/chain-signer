@@ -199,3 +199,6 @@ published versions are never overwritten. Dates are UTC.
 - Initial releases: non-custodial multi-chain wallet for AI agents (burner, balance, send, swap,
   bridge) with the first version of the `preflight` transaction-safety check. Keys generated and
   signed locally; no account, no custody, no signing backend.
+
+## 0.5.30 (2026-06-12)
+- fix(metadata): server.json now declares the MCP launch command (runtimeHint uvx + runtimeArguments --from chain-signer chain-signer-mcp). Evaluators and MCP clients previously ran the default `chain-signer` CLI and concluded the server "cannot be installed" — the root cause behind the missing Glama quality score and the closed awesome-mcp-servers PR #7298. No code changes.
